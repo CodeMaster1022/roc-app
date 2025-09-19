@@ -270,20 +270,23 @@ const HomeDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-2 text-muted-foreground">Cargando solicitudes...</span>
+      <div className="flex flex-col justify-center items-center py-16 px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+        <span className="text-base text-muted-foreground text-center">Cargando solicitudes...</span>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-semibold mb-2">Error al cargar solicitudes</h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <RocButton onClick={() => window.location.reload()}>
+      <div className="text-center py-16 px-4">
+        <div className="text-6xl mb-6">⚠️</div>
+        <h3 className="text-xl font-semibold mb-3">Error al cargar solicitudes</h3>
+        <p className="text-muted-foreground mb-6 leading-relaxed max-w-md mx-auto">{error}</p>
+        <RocButton 
+          onClick={() => window.location.reload()}
+          className="h-12 px-6 text-base font-medium"
+        >
           Intentar de nuevo
         </RocButton>
       </div>
@@ -292,13 +295,16 @@ const HomeDashboard = () => {
 
   if (applications.length === 0) {
     return (
-      <div className="text-center py-12 animate-fade-in">
-        <div className="text-6xl mb-4">🏠</div>
-        <h3 className="text-xl font-semibold mb-2">{t('dashboard.welcome')}</h3>
-        <p className="text-muted-foreground mb-4">
+      <div className="text-center py-16 px-4 animate-fade-in">
+        <div className="text-6xl mb-6">🏠</div>
+        <h3 className="text-xl font-semibold mb-3">{t('dashboard.welcome')}</h3>
+        <p className="text-muted-foreground mb-6 leading-relaxed max-w-md mx-auto">
           {t('dashboard.subtitle')}
         </p>
-        <RocButton onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <RocButton 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="h-12 px-6 text-base font-medium"
+        >
           {t('nav.inicio')}
         </RocButton>
       </div>
@@ -314,44 +320,47 @@ const HomeDashboard = () => {
         </p>
       </div>
 
-      <div className="grid gap-4 px-4 md:px-0 md:gap-6">
+      <div className="grid gap-6 px-4 md:px-0 md:gap-6">
         {applications.map((application, index) => (
           <Card 
             key={index} 
-            className="card-hover animate-fade-in"
+            className="card-hover animate-fade-in shadow-sm"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             {/* Mobile layout */}
             <div className="block md:hidden">
-              <CardHeader className="pb-3">
-                <div className="flex gap-3">
+              <CardHeader className="pb-4">
+                <div className="flex gap-4">
                   {/* Property image on the left */}
                   <div 
-                    className="w-20 h-20 rounded-lg overflow-hidden cursor-pointer flex-shrink-0"
+                    className="w-24 h-24 rounded-lg overflow-hidden cursor-pointer flex-shrink-0 shadow-sm"
                     onClick={() => console.log("Navigate to property details:", application.propertyId)}
                   >
                     <img
                       src={application.property?.images?.[0] || application.property?.photos?.[0] || '/placeholder.svg'}
                       alt={application.property?.title || application.property?.name || 'Property'}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                     />
                   </div>
                   
                   {/* Content on the right */}
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base mb-1 line-clamp-2">
+                    <CardTitle className="text-lg font-semibold mb-2 line-clamp-2 leading-tight">
                       {application.property?.title || application.property?.name || 'Property'}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      ${application.property?.pricing?.totalPrice?.toLocaleString()} • {application.contractDuration} meses
+                    <p className="text-base font-medium text-primary mb-3">
+                      ${application.property?.pricing?.totalPrice?.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {application.contractDuration} meses • {new Date(application.appliedAt).toLocaleDateString()}
                     </p>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge className={`text-xs ${getStatusColor(application.status)}`}>
+                      <Badge className={`text-xs px-2 py-1 ${getStatusColor(application.status)}`}>
                         {getStatusIcon(application.status)}
                         <span className="ml-1">{getStatusText(application.status)}</span>
                       </Badge>
                       {application.status === 'approved' && (
-                        <Badge className={`text-xs ${getPaymentStatusInfo(application).color}`}>
+                        <Badge className={`text-xs px-2 py-1 ${getPaymentStatusInfo(application).color}`}>
                           <CreditCard className="h-3 w-3 mr-1" />
                           {getPaymentStatusInfo(application).text}
                         </Badge>
@@ -360,14 +369,12 @@ const HomeDashboard = () => {
                   </div>
                   
                   {/* Actions */}
-                  <div className="flex flex-col justify-between">
-                    <p className="text-xs text-muted-foreground text-right">
-                      {new Date(application.appliedAt).toLocaleDateString()}
-                    </p>
+                  <div className="flex flex-col justify-start items-end">
                     {application.status === "pending" && (
                       <button
                         onClick={() => handleRemoveApplication(application.id)}
-                        className="text-muted-foreground hover:text-destructive p-1"
+                        className="text-muted-foreground hover:text-destructive p-2 rounded-full hover:bg-muted transition-colors"
+                        aria-label="Retirar solicitud"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -376,38 +383,38 @@ const HomeDashboard = () => {
                 </div>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="pt-0">
                 {application.status === "approved" && (
                   <div className="gradient-section rounded-lg p-4 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold">{t('dashboard.congratulations')}</h4>
+                      <h4 className="font-semibold text-lg">{t('dashboard.congratulations')}</h4>
                     </div>
                     
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {t('dashboard.contractDeadline')}
                     </p>
                     
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <RocButton 
-                        className="flex-1"
+                    <div className="space-y-3">
+                      {/* <RocButton 
+                        className="w-full h-12 text-base font-medium"
                         onClick={() => handleSignContract(application.id)}
                       >
-                        <FileText className="h-4 w-4 mr-2" />
+                        <FileText className="h-5 w-5 mr-2" />
                         {t('dashboard.signContract')}
-                      </RocButton>
+                      </RocButton> */}
                       
                       {getPaymentStatusInfo(application).showButton ? (
                         <RocButton 
                           variant="outline"
-                          className="flex-1"
+                          className="w-full h-12 text-base font-medium"
                           onClick={() => handlePayment(application)}
                           disabled={shouldDisablePaymentButton(application)}
                         >
-                          <CreditCard className="h-4 w-4 mr-2" />
+                          <CreditCard className="h-5 w-5 mr-2" />
                           {t('dashboard.makePayment')}
                         </RocButton>
                       ) : (
-                        <div className="flex-1 px-4 py-2 text-center text-sm text-muted-foreground bg-muted rounded-md">
+                        <div className="w-full px-4 py-3 text-center text-sm text-muted-foreground bg-muted rounded-md border">
                           <CreditCard className="h-4 w-4 mr-2 inline" />
                           {getPaymentStatusInfo(application).text}
                         </div>
@@ -417,8 +424,11 @@ const HomeDashboard = () => {
                 )}
 
                 {application.status === "pending" && (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-muted-foreground">
+                  <div className="text-center py-6">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-100 mb-3">
+                      <Clock className="h-6 w-6 text-yellow-600" />
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {t('dashboard.pendingMessage')}
                     </p>
                   </div>
@@ -427,7 +437,7 @@ const HomeDashboard = () => {
                 {application.status === "rejected" && application.reviewNotes && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <h4 className="font-semibold text-red-800 mb-2">Motivo del rechazo:</h4>
-                    <p className="text-sm text-red-700">{application.reviewNotes}</p>
+                    <p className="text-sm text-red-700 leading-relaxed">{application.reviewNotes}</p>
                   </div>
                 )}
               </CardContent>
@@ -497,12 +507,12 @@ const HomeDashboard = () => {
                         </p>
                         
                         <div className="flex gap-3">
-                          <RocButton 
+                          {/* <RocButton 
                             onClick={() => handleSignContract(application.id)}
                           >
                             <FileText className="h-4 w-4 mr-2" />
                             {t('dashboard.signContract')}
-                          </RocButton>
+                          </RocButton> */}
                           
                           {getPaymentStatusInfo(application).showButton ? (
                             <RocButton 
