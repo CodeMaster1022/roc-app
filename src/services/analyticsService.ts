@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://https://roc-backend.vercel.app/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://roc-backend.vercel.app/api';
 
 // Create axios instance with auth token
 const createAuthenticatedAxios = () => {
