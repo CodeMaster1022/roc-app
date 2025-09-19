@@ -13,11 +13,12 @@ import SortModal from "@/components/modals/SortModal"
 import { RocButton } from "@/components/ui/roc-button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
-import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, Building } from "lucide-react"
+import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building } from "lucide-react"
 import { zones, type Property } from "@/data/mockProperties"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileNavigation from "@/components/layout/MobileNavigation"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { favoriteService } from "@/services/favoriteService"
 import { useToast } from "@/hooks/use-toast"
 import { PropertyMapView } from "@/components/map/PropertyMapView"
@@ -32,6 +33,7 @@ const Index = () => {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { t, language, setLanguage } = useLanguage()
+  const { logout, isAuthenticated, user } = useAuth()
   const { toast } = useToast()
   
   // Use the new property filters hook
@@ -135,6 +137,16 @@ const Index = () => {
 
   const handleSectionChange = (section: string) => {
     setCurrentSection(section)
+  }
+
+  const handleLogout = () => {
+    logout()
+    toast({
+      title: "Sesión cerrada",
+      description: "Has cerrado sesión exitosamente.",
+    })
+    // Navigate to home section
+    setCurrentSection("inicio")
   }
 
   const FilterContent = () => (
@@ -467,18 +479,16 @@ const Index = () => {
                         {t('profile.view_profile')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      {/* <DropdownMenuItem 
-                        onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}
-                      >
-                        <Building className="mr-2 h-4 w-4" />
-                        {t('profile.register_property')}
-                      </DropdownMenuItem> */}
-                      <DropdownMenuSeparator />
                       <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
                       <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
                         <DropdownMenuRadioItem value="es">{t('language.spanish')}</DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="en">{t('language.english')}</DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        {t('profile.logout') || 'Cerrar sesión'}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </nav>

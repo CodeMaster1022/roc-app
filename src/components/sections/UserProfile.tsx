@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Mail, Phone, Briefcase, GraduationCap, Building2, Edit, Save, X, LogIn, Building, Languages, Camera } from "lucide-react"
+import { User, Mail, Phone, Briefcase, GraduationCap, Building2, Edit, Save, X, LogIn, LogOut, Building, Languages, Camera } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
@@ -22,7 +22,7 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const { language, setLanguage, t } = useLanguage()
-  const { user, updateProfile } = useAuth()
+  const { user, updateProfile, logout } = useAuth()
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
@@ -119,6 +119,14 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
       })
     }
     setIsEditing(false)
+  }
+
+  const handleLogout = () => {
+    logout()
+    toast({
+      title: "Sesión cerrada",
+      description: "Has cerrado sesión exitosamente.",
+    })
   }
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -703,6 +711,28 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
                 </div>
                 <div className="text-xs text-muted-foreground">completado</div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Logout Section */}
+        <Card className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold mb-1">Cerrar sesión</h3>
+                <p className="text-sm text-muted-foreground">
+                  Cierra tu sesión de forma segura
+                </p>
+              </div>
+              <RocButton 
+                variant="outline" 
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              >
+                <LogOut className="h-4 w-4" />
+                Cerrar sesión
+              </RocButton>
             </div>
           </CardContent>
         </Card>
