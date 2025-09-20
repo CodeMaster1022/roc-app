@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -62,7 +64,7 @@ export const Header = () => {
                 🇺🇸 {t('header.english')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>{t('header.logout')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => logout()}>{t('header.logout')}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
