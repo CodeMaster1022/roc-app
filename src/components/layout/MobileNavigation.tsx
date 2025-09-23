@@ -25,11 +25,14 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
       .join('')
   }
   
-  const navItems = [
+  // Different navigation items based on authentication status
+  const navItems = isAuthenticated ? [
     { id: "inicio", label: t('nav.inicio'), icon: Home },
     { id: "favoritos", label: t('nav.favoritos'), icon: Heart },
-    // { id: "contratos", label: "Contratos", icon: FileSignature },
     { id: "hogar", label: t('nav.hogar'), icon: FileText },
+  ] : [
+    // Simplified navigation for unauthenticated users
+    { id: "inicio", label: t('nav.inicio'), icon: Home },
   ]
 
   const handleProfileClick = () => {
@@ -83,42 +86,63 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
           )
         })}
         
-        {/* Profile Button with Menu */}
-        <button
-          onClick={handleProfileClick}
-          className={cn(
-            "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
-            "relative"
-          )}
-        >
-          {isAuthenticated && user ? (
+        {/* Profile/Auth Button - Different for authenticated vs unauthenticated */}
+        {isAuthenticated ? (
+          // Authenticated user profile button
+          <button
+            onClick={handleProfileClick}
+            className={cn(
+              "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
+              "relative"
+            )}
+          >
             <Avatar className="h-6 w-6 mb-1">
-              <AvatarImage src={user.profile?.avatar} alt={user.name} />
+              <AvatarImage src={user?.profile?.avatar} alt={user?.name} />
               <AvatarFallback className="text-xs">
-                {getUserInitials(user.name)}
+                {user?.name ? getUserInitials(user.name) : 'U'}
               </AvatarFallback>
             </Avatar>
-          ) : (
-            <User 
-              className={cn(
-                "h-6 w-6 mb-1 transition-colors", 
-                currentSection === "perfil"
-                  ? "text-primary fill-current" 
-                  : "text-muted-foreground"
-              )} 
+            <span className={cn(
+              "text-xs font-medium transition-colors",
+              currentSection === "perfil" ? "text-primary" : "text-muted-foreground"
+            )}>
+              {user?.name ? user.name.split(' ')[0] : 'Profile'}
+            </span>
+            {/* Active indicator */}
+            {currentSection === "perfil" && (
+              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-foreground rounded-full" />
+            )}
+          </button>
+        ) : (
+          // Unauthenticated user - Sign In button
+          <button
+            onClick={() => onSectionChange('perfil')} // This will trigger the auth redirect
+            className={cn(
+              "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
+              "relative"
+            )}
+          >
+            <LogIn 
+              className="h-6 w-6 mb-1 text-muted-foreground"
             />
-          )}
-          <span className={cn(
-            "text-xs font-medium transition-colors",
-            currentSection === "perfil" ? "text-primary" : "text-muted-foreground"
-          )}>
-            {isAuthenticated && user ? user.name.split(' ')[0] : t('nav.perfil')}
-          </span>
-          {/* Active indicator */}
-          {currentSection === "perfil" && (
-            <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-foreground rounded-full" />
-          )}
-        </button>
+            <span className="text-xs font-medium text-muted-foreground">
+              Sign In
+            </span>
+          </button>
+        )}
+
+        {/* Language selector for unauthenticated users */}
+        {!isAuthenticated && (
+          <button
+            onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+            className="flex flex-col items-center justify-center py-1 px-3 transition-all duration-200"
+          >
+            <Languages className="h-6 w-6 mb-1 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">
+              {language === 'es' ? 'ES' : 'EN'}
+            </span>
+          </button>
+        )}
       </div>
     </div>
   )

@@ -16,7 +16,7 @@ import { RocButton } from "@/components/ui/roc-button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building, Bed } from "lucide-react"
+import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building, Bed, Languages } from "lucide-react"
 import { zones, type Property } from "@/data/mockProperties"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileNavigation from "@/components/layout/MobileNavigation"
@@ -31,6 +31,7 @@ import { usePropertyFilters } from "@/hooks/usePropertyFilters"
 
 // Import logo
 import rocLogo from "@/assets/roc-logo.png"
+import AuthPromptModal from "@/components/modals/AuthPromptModal"
 
 const Index = () => {
   const navigate = useNavigate()
@@ -78,6 +79,7 @@ const Index = () => {
   const [zoneModalOpen, setZoneModalOpen] = useState(false)
   const [priceFilterOpen, setPriceFilterOpen] = useState(false)
   const [sortModalOpen, setSortModalOpen] = useState(false)
+  const [showFavoriteAuthPrompt, setShowFavoriteAuthPrompt] = useState(false)
 
   // Helper function to get user initials for fallback
   const getUserInitials = (name: string) => {
@@ -88,25 +90,37 @@ const Index = () => {
       .join('')
   }
 
-  // Load favorites on mount
+  // Load favorites on mount (only if authenticated)
   useEffect(() => {
     const loadFavorites = async () => {
+      if (!isAuthenticated) {
+        setFavorites([])
+        return
+      }
+
       try {
         const favoriteIds = await favoriteService.getFavorites()
         setFavorites(favoriteIds)
       } catch (err) {
         console.error('Failed to load favorites:', err)
+        setFavorites([])
       }
     }
 
     loadFavorites()
-  }, [])
+  }, [isAuthenticated])
 
 
 
 
 
   const handleFavoriteToggle = async (propertyId: string) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setShowFavoriteAuthPrompt(true)
+      return
+    }
+
     const wasAdding = !favorites.includes(propertyId)
     
     try {
@@ -127,12 +141,6 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error)
-      // Still update local state as fallback
-      setFavorites(prev => 
-        prev.includes(propertyId) 
-          ? prev.filter(id => id !== propertyId)
-          : [...prev, propertyId]
-      )
       
       // Show error toast
       toast({
@@ -143,11 +151,34 @@ const Index = () => {
     }
   }
 
+  const handleFavoriteAuthLogin = () => {
+    setShowFavoriteAuthPrompt(false)
+    navigate('/auth')
+  }
+
+  const handleFavoriteAuthClose = () => {
+    setShowFavoriteAuthPrompt(false)
+  }
+
   const handleViewDetails = (propertyId: string) => {
     navigate(`/property/${propertyId}`)
   }
 
   const handleSectionChange = (section: string) => {
+    // If trying to access profile or favorites and not authenticated, redirect to auth
+    if ((section === "perfil" || section === "favoritos") && !isAuthenticated) {
+      const message = section === "perfil" 
+        ? "Please sign in to access your profile."
+        : "Please sign in to view your favorites."
+      
+      toast({
+        title: "Authentication Required",
+        description: message,
+      })
+      navigate('/auth')
+      return
+    }
+    
     setCurrentSection(section)
   }
 
@@ -589,90 +620,119 @@ const Index = () => {
                 </button>
                 
                 <nav className="flex space-x-6">
-                  {[
-                    { id: "hogar", label: t('nav.hogar') },
-                    { id: "inicio", label: t('nav.inicio') },
-                    // { id: "contratos", label: "Contratos" },
-                    { id: "favoritos", label: t('nav.favoritos') }
-                    
-                  ].map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleSectionChange(item.id)}
-                      className={`transition-colors ${
-                        currentSection === item.id 
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                  
-                  {/* Profile Dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className={`flex items-center gap-2 transition-colors ${
-                        currentSection === "perfil" 
-                          ? "text-primary font-semibold" 
-                          : "text-foreground hover:text-primary"
-                      }`}>
-                        {isAuthenticated && user ? (
-                          <>
-                            <Avatar className="h-5 w-5">
-                              <AvatarImage src={user.profile?.avatar} alt={user.name} />
-                              <AvatarFallback className="text-xs">
-                                {getUserInitials(user.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="hidden sm:inline">{user.name}</span>
-                          </>
-                        ) : (
-                          <>
-                            <User className="h-4 w-4" />
-                            <span>{t('nav.perfil')}</span>
-                          </>
-                        )}
-                        <ChevronDown className="h-3 w-3" />
+                  {isAuthenticated ? (
+                    // Authenticated user navigation
+                    [
+                      { id: "hogar", label: t('nav.hogar') },
+                      { id: "inicio", label: t('nav.inicio') },
+                      { id: "favoritos", label: t('nav.favoritos') }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleSectionChange(item.id)}
+                        className={`transition-colors ${
+                          currentSection === item.id 
+                            ? "text-primary font-semibold" 
+                            : "text-foreground hover:text-primary"
+                        }`}
+                      >
+                        {item.label}
                       </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      {isAuthenticated ? (
-                        <>
-                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
-                            <User className="mr-2 h-4 w-4" />
-                            {t('profile.view_profile')}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
-                            <Building className="mr-2 h-4 w-4" />
-                            {t('profile.dashboard')}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            {t('profile.logout')}
-                          </DropdownMenuItem>
-                        </>
-                      ) : (
-                        <>
-                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
-                            <LogIn className="mr-2 h-4 w-4" />
-                            {t('profile.login')}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
-                            <Building className="mr-2 h-4 w-4" />
-                            {t('profile.register_property')}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
-                      <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
-                        <DropdownMenuRadioItem value="es">{t('language.spanish')}</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="en">{t('language.english')}</DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    ))
+                  ) : (
+                    // Unauthenticated user navigation - simpler
+                    <>
+                      <button
+                        onClick={() => handleSectionChange("inicio")}
+                        className={`transition-colors ${
+                          currentSection === "inicio" 
+                            ? "text-primary font-semibold" 
+                            : "text-foreground hover:text-primary"
+                        }`}
+                      >
+                        {t('nav.inicio')}
+                      </button>
+                      <button
+                        onClick={() => navigate('/auth')}
+                        className="text-foreground hover:text-primary transition-colors"
+                      >
+                        Sign In
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Profile/Language Dropdown - Different for authenticated vs unauthenticated */}
+                  {isAuthenticated ? (
+                    // Authenticated user dropdown
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className={`flex items-center gap-2 transition-colors ${
+                          currentSection === "perfil" 
+                            ? "text-primary font-semibold" 
+                            : "text-foreground hover:text-primary"
+                        }`}>
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={user?.profile?.avatar} alt={user?.name} />
+                            <AvatarFallback className="text-xs">
+                              {user?.name ? getUserInitials(user.name) : 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="hidden sm:inline">{user?.name}</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
+                          <User className="mr-2 h-4 w-4" />
+                          {t('profile.view_profile')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
+                          <Building className="mr-2 h-4 w-4" />
+                          {t('profile.dashboard')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          {t('profile.logout')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
+                        <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
+                          <DropdownMenuRadioItem value="es">{t('language.spanish')}</DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="en">{t('language.english')}</DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    // Unauthenticated user - just language dropdown
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+                          <Languages className="h-4 w-4" />
+                          <span className="hidden sm:inline">
+                            {language === 'es' ? 'Español' : 'English'}
+                          </span>
+                          <ChevronDown className="h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
+                        <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
+                          <DropdownMenuRadioItem value="es">🇪🇸 {t('language.spanish')}</DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="en">🇺🇸 {t('language.english')}</DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => navigate('/auth')}>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          Sign In
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
+                          <Building className="mr-2 h-4 w-4" />
+                          List Your Property
+                        </DropdownMenuItem> */}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </nav>
               </div>
           </div>
@@ -682,8 +742,44 @@ const Index = () => {
       {/* Mobile Header */}
       {isMobile && currentSection === "inicio" && (
         <header className="bg-background sticky top-0 z-40 px-4 py-3 md:hidden">
+          {/* Logo and User Info */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => {
+                handleSectionChange("inicio")
+                window.scrollTo({ top: 0, behavior: "smooth" })
+              }}
+              className="focus:outline-none"
+            >
+              <img src={rocLogo} alt="ROC" className="h-8 w-auto" />
+            </button>
+            
+            {/* User info or language selector */}
+            {isAuthenticated && user ? (
+              <div className="flex items-center gap-2">
+                <Avatar className="h-7 w-7">
+                  <AvatarImage src={user.profile?.avatar} alt={user.name} />
+                  <AvatarFallback className="text-xs">
+                    {getUserInitials(user.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium text-foreground">
+                  {user.name.split(' ')[0]}
+                </span>
+              </div>
+            ) : (
+              <button
+                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Languages className="h-4 w-4" />
+                {language === 'es' ? 'Español' : 'English'}
+              </button>
+            )}
+          </div>
+
           {/* Search bar with map icon */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <input
@@ -702,8 +798,6 @@ const Index = () => {
               <Map className="h-5 w-5" />
             </button>
           </div>
-          
-
         </header>
       )}
       
@@ -717,6 +811,16 @@ const Index = () => {
       {isMobile && (
         <MobileNavigation currentSection={currentSection} onSectionChange={handleSectionChange} />
       )}
+
+      {/* Favorite Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={showFavoriteAuthPrompt}
+        onClose={handleFavoriteAuthClose}
+        onLogin={handleFavoriteAuthLogin}
+        title="Save to Favorites?"
+        description="Sign in to save properties to your favorites and access them from any device."
+        actionText="Sign In to Save"
+      />
     </div>
   )
 }

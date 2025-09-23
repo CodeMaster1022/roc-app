@@ -14,7 +14,9 @@ import { favoriteService } from "@/services/favoriteService"
 import { transformBackendPropertyToFrontend } from "@/utils/propertyTransform"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
 import MobilePropertyDetails from "@/components/properties/MobilePropertyDetails"
+import AuthPromptModal from "@/components/modals/AuthPromptModal"
 
 const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -22,12 +24,14 @@ const PropertyDetails = () => {
   const isMobile = useIsMobile()
   const { toast } = useToast()
   const { t } = useLanguage()
+  const { isAuthenticated } = useAuth()
   const [property, setProperty] = useState<Property | null>(null)
   const [isFavorite, setIsFavorite] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
   const [isApplicationFlowOpen, setIsApplicationFlowOpen] = useState(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  const [showFavoriteAuthPrompt, setShowFavoriteAuthPrompt] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -218,6 +222,12 @@ const PropertyDetails = () => {
   const handleFavoriteToggle = async () => {
     if (!id) return
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setShowFavoriteAuthPrompt(true)
+      return
+    }
+
     const wasAdding = !isFavorite
 
     try {
@@ -233,8 +243,6 @@ const PropertyDetails = () => {
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error)
-      // Still update local state as fallback
-      setIsFavorite(!isFavorite)
       
       // Show error toast
       toast({
@@ -243,6 +251,15 @@ const PropertyDetails = () => {
         variant: "destructive"
       })
     }
+  }
+
+  const handleFavoriteAuthLogin = () => {
+    setShowFavoriteAuthPrompt(false)
+    navigate('/auth')
+  }
+
+  const handleFavoriteAuthClose = () => {
+    setShowFavoriteAuthPrompt(false)
   }
 
   const handleShare = async () => {
@@ -820,6 +837,16 @@ const PropertyDetails = () => {
           property={property}
         />
       )}
+
+      {/* Favorite Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={showFavoriteAuthPrompt}
+        onClose={handleFavoriteAuthClose}
+        onLogin={handleFavoriteAuthLogin}
+        title="Save to Favorites?"
+        description="Sign in to save this property to your favorites and access them from any device."
+        actionText="Sign In to Save"
+      />
     </div>
   )
 }

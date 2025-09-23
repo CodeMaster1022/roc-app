@@ -33,18 +33,8 @@ const queryClient = new QueryClient();
 const RoleBasedRoutes = () => {
   const { role, isAuthenticated } = useAuth();
 
-  if (!isAuthenticated) {
-    return (
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={<Navigate to="/auth" replace />} />
-        <Route path="/property/:id" element={<Navigate to="/auth" replace />} />
-        <Route path="*" element={<Navigate to="/auth" replace />} />
-      </Routes>
-    );
-  }
-
-  if (role === 'hoster') {
+  // Authenticated hoster routes
+  if (isAuthenticated && role === 'hoster') {
     return (
       <Routes>
         <Route path="/" element={<AppLayout />}>
@@ -61,12 +51,12 @@ const RoleBasedRoutes = () => {
     );
   }
 
-  // Tenant routes
+  // Public routes (accessible to everyone, including unauthenticated users)
   return (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/property/:id" element={<PropertyDetails />} />
-      <Route path="/auth" element={<Navigate to="/" replace />} />
+      <Route path="/auth" element={<AuthPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

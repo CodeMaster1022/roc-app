@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { RocButton } from "@/components/ui/roc-button"
@@ -14,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { applicationService, type ApplicationData as BackendApplicationData } from "@/services/applicationService"
+import AuthPromptModal from "@/components/modals/AuthPromptModal"
 
 export interface ApplicationData {
   // Basic info
@@ -68,16 +70,35 @@ interface RentalApplicationFlowProps {
 
 export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalApplicationFlowProps) => {
   const { t } = useLanguage()
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false)
   const [applicationData, setApplicationData] = useState<ApplicationData>({
     contractDuration: null,
     occupancyDate: null,
     occupationType: null,
     phone: (user?.profile?.phone && user.profile.phone !== 'N/A') ? user.profile.phone : ''
   })
+
+  // Show auth prompt if not authenticated when trying to apply
+  useEffect(() => {
+    if (isOpen && !isAuthenticated) {
+      onClose()
+      setShowAuthPrompt(true)
+    }
+  }, [isOpen, isAuthenticated, onClose])
+
+  const handleAuthPromptLogin = () => {
+    setShowAuthPrompt(false)
+    navigate('/auth')
+  }
+
+  const handleAuthPromptClose = () => {
+    setShowAuthPrompt(false)
+  }
 
   const updateApplicationData = (data: Partial<ApplicationData>) => {
     setApplicationData(prev => ({ ...prev, ...data }))
@@ -387,41 +408,53 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t('apply_to_rent')}</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-6">
-          {/* Progress indicator */}
-          <div className="flex items-center space-x-2">
-            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-              <div
-                key={step}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step <= currentStep
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {step}
-              </div>
-            ))}
-          </div>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('apply_to_rent')}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Progress indicator */}
+            <div className="flex items-center space-x-2">
+              {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+                <div
+                  key={step}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    step <= currentStep
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
 
-          {/* Property info */}
-          <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold">{property.title}</h3>
-            <p className="text-sm text-muted-foreground">
-              ${property.price.toLocaleString()}{t('units.month')} • {property.zone}
-            </p>
-          </div>
+            {/* Property info */}
+            <div className="bg-muted p-4 rounded-lg">
+              <h3 className="font-semibold">{property.title}</h3>
+              <p className="text-sm text-muted-foreground">
+                ${property.price.toLocaleString()}{t('units.month')} • {property.zone}
+              </p>
+            </div>
 
-          {/* Current step content */}
-          {renderStep()}
-        </div>
-      </DialogContent>
-    </Dialog>
+            {/* Current step content */}
+            {renderStep()}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={showAuthPrompt}
+        onClose={handleAuthPromptClose}
+        onLogin={handleAuthPromptLogin}
+        title="Ready to Apply?"
+        description={`You're about to apply for ${property.title}. Please sign in to continue with your rental application.`}
+        actionText="Sign In to Apply"
+      />
+    </>
   )
 }

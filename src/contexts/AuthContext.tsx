@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import { authService, User } from '@/services/authService'
+import { favoriteService } from '@/services/favoriteService'
 
 export type UserRole = 'hoster' | 'tenant'
 
@@ -42,7 +43,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           authService.logout()
         }
       } catch (error) {
-        // Token is invalid, clear everything
+        // Token is invalid, clear auth data but keep favorites cache
+        // so they can be restored when user logs back in
+        console.warn('Token invalid, clearing auth data but preserving favorites cache')
         authService.logout()
         setUser(null)
       } finally {
@@ -85,6 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     authService.logout()
+    // Only clear favorites cache on explicit logout, not on token expiration
+    // This allows favorites to persist when user logs back in
+    favoriteService.clearCache()
     setUser(null)
     setRole('tenant')
   }

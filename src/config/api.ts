@@ -8,6 +8,10 @@ export const API_CONFIG = {
 
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('roc_token');
+  console.log('🔑 Auth token exists:', !!token);
+  if (token) {
+    console.log('🔑 Auth token (first 20 chars):', token.substring(0, 20) + '...');
+  }
   return {
     ...API_CONFIG.HEADERS,
     ...(token && { Authorization: `Bearer ${token}` }),
