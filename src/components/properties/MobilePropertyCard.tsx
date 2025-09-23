@@ -94,52 +94,52 @@ const MobilePropertyCard = ({
       </button>
 
       {/* Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
+      <div className="absolute inset-0 flex flex-col justify-end px-6 pt-6 pb-2 text-white">
         {/* Title and Location */}
-        <div className="mb-4">
-          <h3 className="text-2xl font-bold leading-tight mb-1 line-clamp-2">
+        <h3 className="text-2xl font-bold leading-tight line-clamp-2">
             {title}
-          </h3>
-          <p className="text-white/80 text-base font-medium">
-            {location || 'Mexico City'}
-          </p>
-        </div>
-
-        {/* Property Details */}
-        <div className="flex items-center gap-2 mb-4 text-sm flex-wrap">
-          {/* Bedrooms */}
-          {type === "propiedad" && (
-            <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/30">
-              <Bed className="h-4 w-4" />
-              <span className="font-medium">
-                {bedrooms} {bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
-              </span>
+        </h3>
+        <div className="flex flex-row gap-2 justify-between">
+            <div className="mb-1">
+            <p className="text-white/80 text-base font-medium">
+                {location || 'Mexico City'}
+            </p>      {/* Price */}
+            <div className="flex items-baseline gap-1">
+            <span className="text-[20px] font-bold">
+                {formatPrice(price)}
+            </span>
+            <span className="text-[14px] font-medium text-white/80">
+                /monthly
+            </span>
             </div>
-          )}
-
-          {/* Area */}
-          <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/30">
-            <Ruler className="h-4 w-4" />
-            <span className="font-medium">{area}m²</span>
-          </div>
-
-          {/* Pet Friendly */}
-          {allowsPets && (
-            <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/30">
-              <PawPrint className="h-4 w-4" />
-              <span className="font-medium">Pet</span>
             </div>
-          )}
-        </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold">
-            {formatPrice(price)}
-          </span>
-          <span className="text-lg font-medium text-white/80">
-            / monthly
-          </span>
+            {/* Property Details */}
+            <div className="flex items-center gap-1 text-sm flex-wrap">
+            {/* Bedrooms */}
+            {type === "propiedad" && (
+                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 border border-white/30">
+                <Bed className="h-4 w-4" />
+                <span className="font-medium">
+                    {bedrooms} {bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
+                </span>
+                </div>
+            )}
+
+            {/* Area */}
+            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 border border-white/30">
+                <Ruler className="h-4 w-4" />
+                <span className="font-medium">{area}m²</span>
+            </div>
+
+            {/* Pet Friendly */}
+            {allowsPets && (
+                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 border border-white/30">
+                <PawPrint className="h-4 w-4" />
+                <span className="font-medium">Pet</span>
+                </div>
+            )}
+            </div>
         </div>
       </div>
 

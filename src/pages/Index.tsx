@@ -286,7 +286,7 @@ const Index = () => {
             )}
 
             {/* Contenido principal */}
-            <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8">
+            <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8 h-screen">
               {/* Mobile view - Show both properties and rooms sections */}
               {isMobile && currentSection === "inicio" && (
                 <div className="space-y-8 pb-6">
@@ -446,7 +446,7 @@ const Index = () => {
 
               {/* Loading state */}
               {loading && (
-                <div className="flex justify-center items-center py-12">
+                <div className="flex justify-center items-center py-12 h-screen bg-gray-100">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   <span className="ml-2 text-muted-foreground">Loading properties...</span>
                 </div>
