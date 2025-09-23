@@ -136,7 +136,7 @@ const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails }: Favorit
             >
               <div className="flex">
                 {/* Image on the left */}
-                <div className="w-24 h-24 flex-shrink-0 relative">
+                <div className="w-24 h-32 flex-shrink-0 relative">
                   <img
                     src={property.image}
                     alt={property.title}
@@ -168,7 +168,7 @@ const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails }: Favorit
                   
                   <div className="text-sm space-y-1">
                     <div className="highlight-text font-bold">
-                      ${property.price.toLocaleString('es-MX')}/{t('units.month')}
+                      ${property.price.toLocaleString('es-MX')}{t('units.month')}
                     </div>
                     <div className="text-xs text-muted-foreground flex items-center gap-3">
                       <span>{property.area} {t('units.m2')}</span>
