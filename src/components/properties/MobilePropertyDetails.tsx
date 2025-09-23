@@ -170,18 +170,18 @@ const MobilePropertyDetails = ({
         {/* Amenities */}
         <div className="w-full">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
-                     <div className="grid grid-cols-2 gap-2">
-             {amenities.slice(0, 6).map((amenity, index) => (
-               <div key={index} className="flex items-center gap-2  justify-center px-2 py-1 rounded-2xl min-w-0">
-                 <div className="flex items-center gap-2 bg-[#E3E3E7] rounded-2xl px-2 py-1">
-                 <div className="text-[13px] flex-shrink-0">{amenity.icon}</div>
-                 <span className="text-[13px] text-gray-700 font-medium break-words leading-tight">
-                   {amenity.name}
-                 </span>
-                 </div>
-               </div>
-             ))}
-          </div>
+            <div className="grid grid-cols-2 gap-2">
+              {amenities.slice(0, 6).map((amenity, index) => (
+                <div key={index} className="flex items-center gap-2 bg-[#E3E3E7] justify-center px-2 py-1 rounded-2xl min-w-0">
+                  <div className="flex items-center gap-2 rounded-2xl px-2 py-1">
+                  <div className="text-[13px] flex-shrink-0">{amenity.icon}</div>
+                  <span className="text-[13px] text-gray-700 font-medium break-words leading-tight">
+                    {amenity.name}
+                  </span>
+                  </div>
+                </div>
+              ))}
+            </div>
         </div>
 
         {/* Space Rules */}
