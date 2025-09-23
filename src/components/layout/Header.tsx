@@ -5,6 +5,8 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import rocLogo from "@/assets/roc-logo.png"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
 
 interface HeaderProps {
@@ -15,9 +17,20 @@ interface HeaderProps {
 const Header = ({ onSearch, onFilterClick }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("")
   const { t, language, setLanguage } = useLanguage()
+  const { user, isAuthenticated } = useAuth()
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch(searchQuery)
+  }
+
+  // Helper function to get user initials for fallback
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('')
   }
 
   return (
@@ -56,14 +69,39 @@ const Header = ({ onSearch, onFilterClick }: HeaderProps) => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <RocButton variant="outline">
-                    {t('nav.perfil')}
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                  <RocButton variant="outline" className="flex items-center gap-2">
+                    {isAuthenticated && user ? (
+                      <>
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={user.profile?.avatar} alt={user.name} />
+                          <AvatarFallback className="text-xs">
+                            {getUserInitials(user.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden sm:inline">{user.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{t('nav.perfil')}</span>
+                      </>
+                    )}
+                    <ChevronDown className="ml-1 h-4 w-4" />
                   </RocButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-56">
-                  <DropdownMenuItem>{t('profile.login')}</DropdownMenuItem>
-                  <DropdownMenuItem>{t('profile.register_property')}</DropdownMenuItem>
+                  {isAuthenticated ? (
+                    <>
+                      <DropdownMenuItem>{t('profile.dashboard')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('profile.settings')}</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>{t('profile.logout')}</DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem>{t('profile.login')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('profile.register_property')}</DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
                   <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>

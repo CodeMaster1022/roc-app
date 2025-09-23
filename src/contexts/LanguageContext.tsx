@@ -20,6 +20,8 @@ const translations = {
     'profile.view_profile': 'Ver Perfil',
     'profile.login': 'Inicia sesión / Regístrate',
     'profile.register_property': 'Registra propiedad',
+    'profile.dashboard': 'Panel de control',
+    'profile.settings': 'Configuración',
     'profile.language': 'Idioma',
 
     'profile.logout': 'Cerrar sesión',
@@ -552,6 +554,8 @@ const translations = {
     'profile.view_profile': 'View Profile',
     'profile.login': 'Sign in / Register',
     'profile.register_property': 'Register property',
+    'profile.dashboard': 'Dashboard',
+    'profile.settings': 'Settings',
     'profile.language': 'Language',
 
     'profile.logout': 'Sign out',

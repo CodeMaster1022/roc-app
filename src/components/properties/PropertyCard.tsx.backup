@@ -64,24 +64,14 @@ const PropertyCard = ({
     }
   }
 
-  const handleCardClick = () => {
-    if (isAvailable) {
-      console.log('Viewing property:', { id, isAvailable, title });
-      onViewDetails(id);
-    }
-  }
-
   return (
     <Card 
-      className={`card-hover group overflow-hidden flex flex-col cursor-pointer ${className || ''} ${
-        !isAvailable ? 'opacity-60 cursor-not-allowed' : ''
-      }`} 
+      className={`card-hover group overflow-hidden flex flex-col ${className || ''}`} 
       style={height ? { height } : {}}
-      onClick={handleCardClick}
     >
       <div className="relative">
         {/* Imagen principal */}
-        <div className="h-[150px] bg-muted relative overflow-hidden">
+        <div className="h-32 bg-muted relative overflow-hidden">
           <img
             src={image}
             alt={title}
@@ -115,7 +105,7 @@ const PropertyCard = ({
 
         {/* Etiqueta de disponibilidad */}
         {!isAvailable && (
-          <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
+          <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
             {t('property.not_allowed')}
           </div>
         )}
@@ -128,21 +118,21 @@ const PropertyCard = ({
         </div>
       </div>
 
-      <CardContent className="p-4 flex-1 flex flex-col justify-between">
-        <div className="flex-1 space-y-3">
+      <CardContent className="p-3 flex-1 flex flex-col">
+        <div className="flex-1 space-y-2">
           {/* Título y precio */}
           <div className="flex justify-between items-start">
-            <h3 className="font-semibold text-xl leading-tight line-clamp-2 flex-1 mr-2">
+            <h3 className="font-semibold text-base leading-tight line-clamp-1 flex-1 mr-2">
               {title}
             </h3>
             <div className="text-right shrink-0">
-              <p className="highlight-text text-xl font-bold">{formatPrice(price)}</p>
-              <p className="text-sm text-muted-foreground">{t('units.month')}</p>
+              <p className="highlight-text text-lg font-bold">{formatPrice(price)}</p>
+              <p className="text-xs text-muted-foreground">{t('units.month')}</p>
             </div>
           </div>
 
           {/* Información básica con iconos específicos */}
-          <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
+          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
             {/* Tipo de propiedad (departamento/casa) */}
             <div className="flex items-center gap-1.5">
               {propertyType === "departamento" ? (
@@ -191,19 +181,17 @@ const PropertyCard = ({
           </div>
         </div>
 
-        {/* Availability indicator */}
-        {!isAvailable && (
-          <div className="text-center text-sm text-red-500 font-medium">
-            No disponible
-          </div>
-        )}
-        
-        {/* Click hint for available properties */}
-        {isAvailable && (
-          <div className="text-center text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            Click para ver detalles
-          </div>
-        )}
+        {/* Botón de ver detalles - Always at bottom */}
+        <RocButton 
+          className="w-full text-sm py-2 mt-2" 
+          onClick={() => {
+            console.log('Viewing property:', { id, isAvailable, title });
+            onViewDetails(id);
+          }}
+          disabled={!isAvailable}
+        >
+          {isAvailable ? t('property.view_more') : 'No disponible'}
+        </RocButton>
       </CardContent>
     </Card>
   )

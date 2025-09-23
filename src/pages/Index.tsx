@@ -13,6 +13,7 @@ import SortModal from "@/components/modals/SortModal"
 import { RocButton } from "@/components/ui/roc-button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building } from "lucide-react"
 import { zones, type Property } from "@/data/mockProperties"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -75,6 +76,15 @@ const Index = () => {
   const [zoneModalOpen, setZoneModalOpen] = useState(false)
   const [priceFilterOpen, setPriceFilterOpen] = useState(false)
   const [sortModalOpen, setSortModalOpen] = useState(false)
+
+  // Helper function to get user initials for fallback
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('')
+  }
 
   // Load favorites on mount
   useEffect(() => {
@@ -182,18 +192,18 @@ const Index = () => {
           <>
             {/* Hero Section - Solo Desktop */}
             {!isMobile && (
-              <section className="text-center py-12 mb-6 animate-fade-in gradient-hero -mx-4">
+              <section className="text-center py-12 mb-6 animate-fade-in mx-4">
                 <div className="container mx-auto px-4">
-                  <h1 className="text-3xl md:text-4xl font-bold mb-3 text-white">
+                  <h1 className="text-3xl md:text-[48px] font-bold mb-3 text-black">
                     {t('hero.title').split(' ').map((word, index, array) => 
-                      index === array.length - 2 ? (
-                        <span key={index} className="text-white">{word} </span>
+                      index >= array.length - 2 ? (
+                        <span key={index} className="text-[#8B227D]">{word} </span>
                       ) : (
                         <span key={index}>{word} </span>
                       )
                     )}
                   </h1>
-                  <p className="text-lg text-white/90 mb-4 max-w-2xl mx-auto">
+                  <p className="text-lg text-gray-900 mb-4 max-w-2xl mx-auto">
                     {t('hero.subtitle')}
                   </p>
                 </div>
@@ -205,83 +215,39 @@ const Index = () => {
               <div className="space-y-4 animate-slide-up">
                 {/* Buscador de zonas */}
                 <div 
-                  className="relative cursor-pointer"
+                  className="relative cursor-pointer max-w-4xl mx-auto"
                    onClick={() => setZoneModalOpen(true)}
                 >
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <div className="w-full pl-10 pr-4 py-3 rounded-lg bg-muted border-0 text-sm cursor-pointer hover:bg-muted/80 transition-colors">
                     {selectedZone || t('search.placeholder')}
                   </div>
+                </div>           
+                <div className="pt-2 pb-8 max-w-4xl mx-auto">
+                    <FilterContent />
                 </div>
-
-                {/* Tipo de renta */}
-                <FilterContent />
-
                 {/* Botones de acciones y filtros */}
-                <div className="flex items-center gap-3">
-                  <RocButton
-                    variant="outline"
-                    onClick={() => setPriceFilterOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Filtros {(filters.furnishing !== "all" || filters.amenities.length > 0) && <span className="ml-1 text-xs">({(filters.furnishing !== "all" ? 1 : 0) + filters.amenities.length})</span>}
-                  </RocButton>
-                  
-                  <RocButton
-                    variant="outline"
-                    onClick={() => setSortModalOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                    Ordenar por
-                  </RocButton>
-                </div>
-              </div>
-            )}
-
-            {/* Contenido principal */}
-            <main className="flex-1 animate-slide-up">
-              {/* Header de resultados - Mobile */}
-              {isMobile && currentSection === "inicio" && (
-                <div className="flex items-center justify-between mb-4 px-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-primary text-white">
-                      <HomeIcon className="h-5 w-5" />
+                <div className="flex items-center gap-3 bg-gray-100 pt-8 pb-4 max-w-8xl mx-auto px-2 sm:px-4 md:px-8">
+                  <div className="flex justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <RocButton
+                        variant="outline"
+                        onClick={() => setPriceFilterOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <SlidersHorizontal className="h-4 w-4" />
+                        Filtros {(filters.furnishing !== "all" || filters.amenities.length > 0) && <span className="ml-1 text-xs">({(filters.furnishing !== "all" ? 1 : 0) + filters.amenities.length})</span>}
+                      </RocButton>
+                      <RocButton
+                        variant="outline"
+                        onClick={() => setSortModalOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <ArrowUpDown className="h-4 w-4" />
+                        Ordenar por
+                      </RocButton>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-foreground">
-                        {filteredProperties.length} {currentFilter === "propiedad" ? t('results.properties_available') : t('results.rooms_available')}
-                      </h2>
-                    </div>
-                  </div>
-                  <button className="flex items-center gap-2 text-muted-foreground">
-                    <Filter className="h-4 w-4" />
-                    <span className="text-sm font-medium">{t('filter.sort_by')}</span>
-                  </button>
-                </div>
-              )}
-              
-              {/* Header de resultados - Desktop */}
-              {!isMobile && (
-                <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-semibold">
-                    {filteredProperties.length} {t('results.properties_available')}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    {currentFilter === "ambas" ? t('results.showing_all')
-                     : currentFilter === "propiedad" ? t('results.complete_properties')
-                     : t('results.individual_rooms')}
-                  </p>
-                </div>
-                </div>
-              )}
-
-              {!isMobile && (
-                <div className="flex items-center justify-end mb-6">
-                  {/* Cambio de vista - Desktop only */}
-                  <div className="flex border rounded-lg">
+                    <div className="flex items-center gap-3">
                     <RocButton
                       variant={viewMode === "grid" ? "selected" : "ghost"}
                       size="icon"
@@ -306,7 +272,79 @@ const Index = () => {
                     >
                       <Map className="h-4 w-4" />
                     </RocButton>
+                    </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Contenido principal */}
+            <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8">
+              {/* Header de resultados - Mobile */}
+              {isMobile && currentSection === "inicio" && (
+                <div className="flex items-center justify-between mb-4 px-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-primary text-white">
+                      <HomeIcon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-foreground">
+                        {filteredProperties.length} {currentFilter === "propiedad" ? t('results.properties_available') : t('results.rooms_available')}
+                      </h2>
+                    </div>
+                  </div>
+                  <button className="flex items-center gap-2 text-muted-foreground">
+                    <Filter className="h-4 w-4" />
+                    <span className="text-sm font-medium">{t('filter.sort_by')}</span>
+                  </button>  
+                </div>
+              )}
+              
+              {/* Header de resultados - Desktop */}
+              {/* {!isMobile && (
+                <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-semibold">
+                    {filteredProperties.length} {t('results.properties_available')}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {currentFilter === "ambas" ? t('results.showing_all')
+                     : currentFilter === "propiedad" ? t('results.complete_properties')
+                     : t('results.individual_rooms')}
+                  </p>
+                </div>
+                </div>
+              )} */}
+
+              {!isMobile && (
+                <div className="flex items-center justify-end mb-6">
+                  {/* Cambio de vista - Desktop only */}
+                  {/* <div className="flex border rounded-lg">
+                    <RocButton
+                      variant={viewMode === "grid" ? "selected" : "ghost"}
+                      size="icon"
+                      onClick={() => setViewMode("grid")}
+                      title={t('map.list_view')}
+                    >
+                      <Grid className="h-4 w-4" />
+                    </RocButton>
+                    <RocButton
+                      variant={viewMode === "list" ? "selected" : "ghost"}
+                      size="icon"
+                      onClick={() => setViewMode("list")}
+                      title={t('map.list_view')}
+                    >
+                      <List className="h-4 w-4" />
+                    </RocButton>
+                    <RocButton
+                      variant={viewMode === "map" ? "selected" : "ghost"}
+                      size="icon"
+                      onClick={() => setViewMode("map")}
+                      title={t('map.view_on_map')}
+                    >
+                      <Map className="h-4 w-4" />
+                    </RocButton>
+                  </div> */}
                 </div>
               )}
 
@@ -359,6 +397,7 @@ const Index = () => {
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <PropertyCard
+                      height="300px"
                       id={property.id}
                       title={property.title}
                       image={property.image}
@@ -426,7 +465,7 @@ const Index = () => {
       {/* Desktop Navigation */}
       {!isMobile && (
         <header className="bg-background border-b border-border sticky top-0 z-40 hidden md:block">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-2">
             <div className="flex items-center justify-between">
                 <button
                   onClick={() => {
@@ -436,14 +475,14 @@ const Index = () => {
                   aria-label="Ir al inicio"
                   className="focus:outline-none"
                 >
-                  <img src={rocLogo} alt="ROC: Ir al inicio" className="h-24 w-auto cursor-pointer hover:opacity-80 transition-opacity" loading="lazy" />
+                  <img src={rocLogo} alt="ROC: Ir al inicio" className="h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity" loading="lazy" />
                 </button>
                 
                 <nav className="flex space-x-6">
                   {[
                     { id: "hogar", label: t('nav.hogar') },
                     { id: "inicio", label: t('nav.inicio') },
-                    { id: "contratos", label: "Contratos" },
+                    // { id: "contratos", label: "Contratos" },
                     { id: "favoritos", label: t('nav.favoritos') }
                     
                   ].map((item) => (
@@ -463,32 +502,65 @@ const Index = () => {
                   {/* Profile Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`flex items-center gap-1 transition-colors ${
+                      <button className={`flex items-center gap-2 transition-colors ${
                         currentSection === "perfil" 
                           ? "text-primary font-semibold" 
                           : "text-foreground hover:text-primary"
                       }`}>
-                        <User className="h-4 w-4" />
-                        {t('nav.perfil')}
+                        {isAuthenticated && user ? (
+                          <>
+                            <Avatar className="h-5 w-5">
+                              <AvatarImage src={user.profile?.avatar} alt={user.name} />
+                              <AvatarFallback className="text-xs">
+                                {getUserInitials(user.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="hidden sm:inline">{user.name}</span>
+                          </>
+                        ) : (
+                          <>
+                            <User className="h-4 w-4" />
+                            <span>{t('nav.perfil')}</span>
+                          </>
+                        )}
                         <ChevronDown className="h-3 w-3" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
-                        <User className="mr-2 h-4 w-4" />
-                        {t('profile.view_profile')}
-                      </DropdownMenuItem>
+                      {isAuthenticated ? (
+                        <>
+                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
+                            <User className="mr-2 h-4 w-4" />
+                            {t('profile.view_profile')}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
+                            <Building className="mr-2 h-4 w-4" />
+                            {t('profile.dashboard')}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            {t('profile.logout')}
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        <>
+                          <DropdownMenuItem onClick={() => handleSectionChange("perfil")}>
+                            <LogIn className="mr-2 h-4 w-4" />
+                            {t('profile.login')}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
+                            <Building className="mr-2 h-4 w-4" />
+                            {t('profile.register_property')}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
                       <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
                         <DropdownMenuRadioItem value="es">{t('language.spanish')}</DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="en">{t('language.english')}</DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        {t('profile.logout') || 'Cerrar sesión'}
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </nav>

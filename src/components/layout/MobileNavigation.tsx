@@ -2,6 +2,8 @@ import { Home, Heart, FileText, User, Building, ChevronUp, LogIn, Languages, Fil
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 
 interface MobileNavigationProps {
@@ -12,11 +14,21 @@ interface MobileNavigationProps {
 const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationProps) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const { language, setLanguage, t } = useLanguage()
+  const { user, isAuthenticated } = useAuth()
+  
+  // Helper function to get user initials for fallback
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('')
+  }
   
   const navItems = [
     { id: "inicio", label: t('nav.inicio'), icon: Home },
     { id: "favoritos", label: t('nav.favoritos'), icon: Heart },
-    { id: "contratos", label: "Contratos", icon: FileSignature },
+    // { id: "contratos", label: "Contratos", icon: FileSignature },
     { id: "hogar", label: t('nav.hogar'), icon: FileText },
   ]
 
@@ -79,19 +91,28 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
             "relative"
           )}
         >
-          <User 
-            className={cn(
-              "h-6 w-6 mb-1 transition-colors", 
-              currentSection === "perfil"
-                ? "text-primary fill-current" 
-                : "text-muted-foreground"
-            )} 
-          />
+          {isAuthenticated && user ? (
+            <Avatar className="h-6 w-6 mb-1">
+              <AvatarImage src={user.profile?.avatar} alt={user.name} />
+              <AvatarFallback className="text-xs">
+                {getUserInitials(user.name)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <User 
+              className={cn(
+                "h-6 w-6 mb-1 transition-colors", 
+                currentSection === "perfil"
+                  ? "text-primary fill-current" 
+                  : "text-muted-foreground"
+              )} 
+            />
+          )}
           <span className={cn(
             "text-xs font-medium transition-colors",
             currentSection === "perfil" ? "text-primary" : "text-muted-foreground"
           )}>
-            {t('nav.perfil')}
+            {isAuthenticated && user ? user.name.split(' ')[0] : t('nav.perfil')}
           </span>
           {/* Active indicator */}
           {currentSection === "perfil" && (
