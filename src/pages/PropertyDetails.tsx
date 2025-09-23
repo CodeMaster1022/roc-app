@@ -14,6 +14,7 @@ import { favoriteService } from "@/services/favoriteService"
 import { transformBackendPropertyToFrontend } from "@/utils/propertyTransform"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/LanguageContext"
+import MobilePropertyDetails from "@/components/properties/MobilePropertyDetails"
 
 const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -345,6 +346,32 @@ const PropertyDetails = () => {
     })
   }
 
+  // Mobile version
+  if (isMobile) {
+    return (
+      <>
+        <MobilePropertyDetails
+          property={property}
+          isFavorite={isFavorite}
+          onBack={() => navigate("/")}
+          onFavoriteToggle={handleFavoriteToggle}
+          onShare={handleShare}
+          onApply={() => setIsApplicationFlowOpen(true)}
+        />
+        
+        {/* Rental Application Flow */}
+        {property && (
+          <RentalApplicationFlow
+            isOpen={isApplicationFlowOpen}
+            onClose={() => setIsApplicationFlowOpen(false)}
+            property={property}
+          />
+        )}
+      </>
+    )
+  }
+
+  // Desktop version
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

@@ -123,6 +123,7 @@ const PropertyCard = ({
         {/* Badge de tipo de propiedad */}
         <div className="absolute bottom-3 left-3">
           <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-foreground">
+          
             {type === "propiedad" ? t('results.complete_properties') : t('filter.room')}
           </Badge>
         </div>

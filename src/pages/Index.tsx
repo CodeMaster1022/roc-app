@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import PropertyCard from "@/components/properties/PropertyCard"
+import MobilePropertyCard from "@/components/properties/MobilePropertyCard"
+import MobileRoomCard from "@/components/properties/MobileRoomCard"
 import FilterSection from "@/components/filters/FilterSection"
 import FavoritesList from "@/components/sections/FavoritesList"
 import HomeDashboard from "@/components/sections/HomeDashboard"
@@ -14,7 +16,7 @@ import { RocButton } from "@/components/ui/roc-button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building } from "lucide-react"
+import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building, Bed } from "lucide-react"
 import { zones, type Property } from "@/data/mockProperties"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileNavigation from "@/components/layout/MobileNavigation"
@@ -60,7 +62,7 @@ const Index = () => {
       clearFilters
     }
   ] = usePropertyFilters({
-    initialFilter: isMobile ? "propiedad" : "ambas",
+    initialFilter: "ambas", // Always load both types for mobile separation
     initialFilters: {
       priceRange: [1000, 50000],
       furnishing: "all",
@@ -166,7 +168,12 @@ const Index = () => {
       isMobile={isMobile}
     />
   )
-
+  console.log(filteredProperties, '===========>')
+  
+  // Separate properties and rooms for mobile view
+  const propertiesOnly = filteredProperties.filter(item => item.type === 'propiedad')
+  const roomsOnly = filteredProperties.filter(item => item.type === 'habitacion')
+  
   const renderContent = () => {
     switch (currentSection) {
       case "favoritos":
@@ -280,23 +287,112 @@ const Index = () => {
 
             {/* Contenido principal */}
             <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8">
-              {/* Header de resultados - Mobile */}
+              {/* Mobile view - Show both properties and rooms sections */}
               {isMobile && currentSection === "inicio" && (
-                <div className="flex items-center justify-between mb-4 px-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-primary text-white">
-                      <HomeIcon className="h-5 w-5" />
-                    </div>
+                <div className="space-y-8 pb-6">
+                  {/* Properties Section */}
+                  {propertiesOnly.length > 0 && (
                     <div>
-                      <h2 className="text-lg font-semibold text-foreground">
-                        {filteredProperties.length} {currentFilter === "propiedad" ? t('results.properties_available') : t('results.rooms_available')}
-                      </h2>
+                      <div className="flex items-center justify-between mb-6 px-4 pt-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-primary text-white">
+                            <HomeIcon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h2 className="text-lg font-bold text-foreground leading-tight">
+                              {propertiesOnly.length} {propertiesOnly.length === 1 ? 'Property Available' : 'Properties Available'}
+                            </h2>
+                            <p className="text-sm text-muted-foreground">Complete properties</p>
+                          </div>
+                        </div>
+                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                          <Filter className="h-4 w-4" />
+                          <span className="text-sm font-medium">{t('tenants.view_all')}</span>
+                        </button>  
+                      </div>
+                      
+                      {/* Properties Grid */}
+                      <div className="space-y-4 px-4">
+                        {propertiesOnly.map((property, index) => (
+                          <div 
+                            key={property.id} 
+                            className="animate-fade-in"
+                            style={{ animationDelay: `${index * 0.1}s` }}
+                          >
+                            <MobilePropertyCard
+                              id={property.id}
+                              title={property.title}
+                              image={property.image}
+                              price={property.price}
+                              type={property.type}
+                              propertyType={property.propertyType}
+                              area={property.area}
+                              bedrooms={property.bedrooms}
+                              allowsPets={property.allowsPets}
+                              location={property.zone}
+                              isFavorite={favorites.includes(property.id)}
+                              isAvailable={property.isAvailable}
+                              onFavoriteToggle={handleFavoriteToggle}
+                              onViewDetails={handleViewDetails}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <button className="flex items-center gap-2 text-muted-foreground">
-                    <Filter className="h-4 w-4" />
-                    <span className="text-sm font-medium">{t('filter.sort_by')}</span>
-                  </button>  
+                  )}
+                  
+                  {/* Rooms Section */}
+                  {roomsOnly.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-6 px-4 pt-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-primary text-white">
+                            <Bed className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h2 className="text-lg font-bold text-foreground leading-tight">
+                              {roomsOnly.length} {roomsOnly.length === 1 ? 'Room Available' : 'Rooms Available'}
+                            </h2>
+                            <p className="text-sm text-muted-foreground">Individual rooms</p>
+                          </div>
+                        </div>
+                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                          <Filter className="h-4 w-4" />
+                          <span className="text-sm font-medium">{t('tenants.view_all')}</span>
+                        </button>  
+                      </div>
+                      
+                      {/* Rooms Grid */}
+                      <div className="space-y-3 px-4">
+                        {roomsOnly.map((room, index) => (
+                          <div 
+                            key={room.id} 
+                            className="animate-fade-in"
+                            style={{ animationDelay: `${index * 0.1}s` }}
+                          >
+                            <MobileRoomCard
+                              id={room.id}
+                              title={room.title}
+                              image={room.image}
+                              price={room.price}
+                              type={room.type}
+                              propertyType={room.propertyType}
+                              area={room.area}
+                              bedrooms={room.bedrooms}
+                              allowsPets={room.allowsPets}
+                              bathType={room.bathType}
+                              scheme={room.scheme}
+                              location={room.zone}
+                              isFavorite={favorites.includes(room.id)}
+                              isAvailable={room.isAvailable}
+                              onFavoriteToggle={handleFavoriteToggle}
+                              onViewDetails={handleViewDetails}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -382,10 +478,9 @@ const Index = () => {
                 </div>
               )}
 
-              {/* Grid/List de propiedades */}
-              {!loading && !error && viewMode !== "map" && (
+              {/* Grid/List de propiedades - Desktop only */}
+              {!loading && !error && viewMode !== "map" && !isMobile && (
                 <div className={`grid gap-4 ${
-                  isMobile ? "grid-cols-1 px-4" : 
                   viewMode === "grid" 
                     ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
                     : "grid-cols-1"
@@ -420,8 +515,23 @@ const Index = () => {
               )}
 
               {/* Empty state */}
-              {!loading && !error && filteredProperties.length === 0 && (
+              {!loading && !error && filteredProperties.length === 0 && !isMobile && (
                 <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🏠</div>
+                  <h3 className="text-xl font-semibold mb-2">{t('results.no_properties')}</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {t('results.no_properties_subtitle')}
+                  </p>
+                  <RocButton onClick={clearFilters}>
+                    {t('filter.clear_filters')}
+                  </RocButton>
+                </div>
+              )}
+
+              {/* Empty state for mobile */}
+              {!loading && !error && isMobile && currentSection === "inicio" && 
+               propertiesOnly.length === 0 && roomsOnly.length === 0 && (
+                <div className="text-center py-12 px-4">
                   <div className="text-6xl mb-4">🏠</div>
                   <h3 className="text-xl font-semibold mb-2">{t('results.no_properties')}</h3>
                   <p className="text-muted-foreground mb-4">
@@ -593,29 +703,7 @@ const Index = () => {
             </button>
           </div>
           
-          {/* Property type toggle buttons */}
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setCurrentFilter("propiedad")}
-              className={`flex-1 py-3 px-6 rounded-full text-sm font-medium transition-all ${
-                currentFilter === "propiedad"
-                  ? "bg-primary text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              Propiedades
-            </button>
-            <button
-              onClick={() => setCurrentFilter("habitacion")}
-              className={`flex-1 py-3 px-6 rounded-full text-sm font-medium transition-all ${
-                currentFilter === "habitacion"
-                  ? "bg-primary text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              Habitaciones
-            </button>
-          </div>
+
         </header>
       )}
       
