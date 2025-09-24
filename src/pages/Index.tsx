@@ -317,7 +317,7 @@ const Index = () => {
             )}
 
             {/* Contenido principal */}
-            <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8 h-screen">
+            <main className="flex-1 animate-slide-up max-w-8xl mx-auto bg-gray-100 px-2 sm:px-84 md:px-8 min-h-[80vh] pb-12">
               {/* Mobile view - Show both properties and rooms sections */}
               {isMobile && currentSection === "inicio" && (
                 <div className="space-y-8 pb-6">
