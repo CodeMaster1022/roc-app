@@ -23,42 +23,57 @@ const rentalTypeMapping = {
 };
 
 export function transformFrontendToBackend(frontendProperty: BackendPropertyType): CreatePropertyRequest {
-  return {
-    title: frontendProperty.details.name,
-    description: frontendProperty.details.description,
+  // Add debugging to see what we're receiving
+  console.log('🔍 Transform Frontend to Backend - Input:', {
+    pricing: frontendProperty.pricing,
+    details: frontendProperty.details,
+    location: frontendProperty.location,
     type: frontendProperty.type,
-    propertyType: frontendProperty.propertyType,
-    location: {
-      address: frontendProperty.location.address,
-      lat: frontendProperty.location.lat || 0,
-      lng: frontendProperty.location.lng || 0,
-      zone: 'Centro' // Default zone, should be extracted from location
-    },
-    area: frontendProperty.additionalInfo.area,
-    bedrooms: frontendProperty.rooms.length,
-    bathrooms: frontendProperty.additionalInfo.bathrooms,
-    parking: frontendProperty.additionalInfo.parking,
-    furniture: frontendProperty.furniture,
-    amenities: frontendProperty.details.amenities,
-    pricing: {
-      totalPrice: frontendProperty.pricing.totalPrice || 0,
-      rentalType: frontendProperty.pricing.rentalType || 'completa'
-    },
-    rules: {
-      pets: frontendProperty.details.advancedConfig.rules.pets,
-      smoking: frontendProperty.details.advancedConfig.rules.smoking,
-      parties: false,
-      meetings: frontendProperty.details.advancedConfig.rules.meetings
-    },
-    images: frontendProperty.details.photos,
-    status: frontendProperty.status,
-    rooms: frontendProperty.rooms.map(room => ({
+    propertyPhotos: frontendProperty.details?.photos?.length || 0,
+    rooms: frontendProperty.rooms?.map(room => ({
       id: room.id,
       name: room.name,
-      characteristics: room.characteristics,
-      furniture: room.furniture,
+      photos: room.photos?.length || 0
+    }))
+  });
+
+  return {
+    title: frontendProperty.details?.name || '',
+    description: frontendProperty.details?.description || '',
+    type: frontendProperty.type || 'property',
+    propertyType: frontendProperty.propertyType || 'departamento',
+    location: {
+      address: frontendProperty.location?.address || '',
+      lat: frontendProperty.location?.lat || 0,
+      lng: frontendProperty.location?.lng || 0,
+      zone: 'Centro' // Default zone, should be extracted from location
+    },
+    area: frontendProperty.additionalInfo?.area || 0,
+    bedrooms: frontendProperty.rooms?.length || 0,
+    bathrooms: frontendProperty.additionalInfo?.bathrooms || 1,
+    parking: frontendProperty.additionalInfo?.parking || 0,
+    furniture: frontendProperty.furniture || 'sin-amueblar',
+    amenities: frontendProperty.details?.amenities || [],
+    pricing: {
+      totalPrice: frontendProperty.pricing?.totalPrice || 0,
+      rentalType: frontendProperty.pricing?.rentalType || 'completa'
+    },
+    rules: {
+      pets: frontendProperty.details?.advancedConfig?.rules?.pets || false,
+      smoking: frontendProperty.details?.advancedConfig?.rules?.smoking || false,
+      parties: false,
+      meetings: frontendProperty.details?.advancedConfig?.rules?.meetings || { allowed: false }
+    },
+    images: frontendProperty.details?.photos || [],
+    status: frontendProperty.status || 'draft',
+    rooms: (frontendProperty.rooms || []).map(room => ({
+      id: room.id || `room-${Date.now()}`,
+      name: room.name || 'Habitación',
+      characteristics: room.characteristics || 'closet_bathroom',
+      furniture: room.furniture || 'sin-amueblar',
       price: room.price || 0,
-      availableFrom: room.availableFrom || new Date()
+      availableFrom: room.availableFrom || new Date(),
+      photos: room.photos || [] // ✅ Added room photos
     }))
   };
 }

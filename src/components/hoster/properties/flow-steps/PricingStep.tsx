@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { RocButton } from "@/components/ui/roc-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,26 +108,35 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {isPropertyFlow && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-primary" />
-                Configuración de la propiedad
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Precio mensual esperado</Label>
-                  <Input
-                    type="number"
-                    placeholder="$0"
-                    value={totalPrice || ''}
-                    onChange={(e) => updateTotalPrice(parseInt(e.target.value) || 0)}
-                  />
-                </div>
+        {/* Total Price Configuration - Show for both property and rooms types */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-primary" />
+              {isPropertyFlow ? 'Configuración de la propiedad' : 'Configuración general de precios'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>
+                  {isPropertyFlow ? 'Precio mensual esperado' : 'Precio total mensual esperado'}
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="$0"
+                  value={totalPrice || ''}
+                  onChange={(e) => updateTotalPrice(parseInt(e.target.value) || 0)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {isPropertyFlow 
+                    ? 'Este será el precio base para calcular los precios individuales de las habitaciones'
+                    : 'Suma total de todas las habitaciones - ayuda a calcular precios individuales'
+                  }
+                </p>
+              </div>
 
+              {isPropertyFlow && (
                 <div className="space-y-2">
                   <Label>Tipo de renta</Label>
                   <Select value={rentalType} onValueChange={updateRentalType}>
@@ -143,37 +153,46 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                     Es el tipo de aplicaciones de inquilinos que recibirás, al final puedes recibir propuestas pero aceptarás la que mejor te funcione
                   </p>
                 </div>
-              </div>
-
-              {(rentalType === 'ambos' || rentalType === 'habitaciones') && totalPrice > 0 && (
-                <div className="p-4 bg-section-contrast rounded-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Calculator className="w-5 h-5 text-primary" />
-                    <h4 className="font-medium">Precio recomendado por habitaciones</h4>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {property.rooms?.map(room => {
-                      const recommendedPrice = roomPrices[room.id] || 0;
-                      const characteristics = ROOM_CHARACTERISTICS.find(c => c.id === room.characteristics);
-                      
-                      return (
-                        <div key={room.id} className="flex items-center justify-between p-3 bg-background rounded">
-                          <div>
-                            <p className="font-medium">{room.name}</p>
-                            <p className="text-sm text-muted-foreground">{characteristics?.points} puntos</p>
-                          </div>
-                          <Badge variant="secondary">
-                            ${recommendedPrice.toLocaleString()}
-                          </Badge>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
               )}
-            </CardContent>
-          </Card>
-        )}
+            </div>
+
+            {/* Show price calculator for both types when total price is set */}
+            {totalPrice > 0 && (
+              <div className="p-4 bg-section-contrast rounded-lg">
+                <div className="flex items-center gap-2 mb-4">
+                  <Calculator className="w-5 h-5 text-primary" />
+                  <h4 className="font-medium">
+                    {isPropertyFlow ? 'Precio recomendado por habitaciones' : 'Distribución de precios sugerida'}
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {property.rooms?.map(room => {
+                    const recommendedPrice = roomPrices[room.id] || 0;
+                    const characteristics = ROOM_CHARACTERISTICS.find(c => c.id === room.characteristics);
+                    
+                    return (
+                      <div key={room.id} className="flex items-center justify-between p-3 bg-background rounded">
+                        <div>
+                          <p className="font-medium">{room.name}</p>
+                          <p className="text-sm text-muted-foreground">{characteristics?.points} puntos</p>
+                        </div>
+                        <Badge variant="secondary">
+                          ${recommendedPrice.toLocaleString()}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  {isPropertyFlow 
+                    ? 'Puedes usar estos precios como referencia o establecer tus propios precios abajo'
+                    : 'Estos son precios sugeridos basados en las características de cada habitación'
+                  }
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {(!isPropertyFlow || rentalType !== 'completa') && (
           <div className="space-y-4">
@@ -261,13 +280,13 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
         <Button variant="outline" onClick={onPrev}>
           Anterior
         </Button>
-        <Button 
-          variant="gradient" 
+        <RocButton 
+          variant="default" 
           onClick={onNext}
           disabled={!isValid}
         >
           Continuar
-        </Button>
+        </RocButton>
       </div>
     </div>
   );

@@ -136,7 +136,7 @@ const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails }: Favorit
             >
               <div className="flex">
                 {/* Image on the left */}
-                <div className="w-24 h-32 flex-shrink-0 relative">
+                <div className="w-32 h-36 flex-shrink-0 relative">
                   <img
                     src={property.image}
                     alt={property.title}

@@ -50,7 +50,9 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
   const [property, setProperty] = useState<Partial<Property>>({
     type: unitType || 'rooms',
     rooms: [],
+    location: { address: '', lat: 0, lng: 0 },
     additionalInfo: { area: 0, parking: 0, bathrooms: 0 },
+    pricing: { totalPrice: 0, rentalType: 'ambos' },
     contracts: { standardOptions: [], requiresDeposit: false },
     details: { 
       name: '', 
@@ -164,7 +166,9 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
     setProperty({
       type: unitType || 'rooms',
       rooms: [],
+      location: { address: '', lat: 0, lng: 0 },
       additionalInfo: { area: 0, parking: 0, bathrooms: 0 },
+      pricing: { totalPrice: 0, rentalType: 'ambos' },
       contracts: { standardOptions: [], requiresDeposit: false },
       details: { 
         name: '', 

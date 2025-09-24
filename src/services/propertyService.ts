@@ -31,6 +31,7 @@ export interface PropertyRoom {
   furniture: string;
   price: number;
   availableFrom: Date;
+  photos?: string[]; // ✅ Added photos field
 }
 
 export interface BackendProperty {
@@ -102,10 +103,21 @@ class PropertyService {
     const formData = new FormData();
     
     // Add all property data as JSON string
-    const { images, ...propertyDataWithoutImages } = propertyData;
-    formData.append('propertyData', JSON.stringify(propertyDataWithoutImages));
+    const { images, rooms, ...propertyDataWithoutImages } = propertyData;
     
-    // Add image files if they exist (convert blob URLs to actual files if needed)
+    // Process rooms to separate images from room data
+    const roomsWithoutImages = rooms?.map(room => {
+      const { photos, ...roomWithoutPhotos } = room;
+      return roomWithoutPhotos;
+    }) || [];
+    
+    // Add property data without images
+    formData.append('propertyData', JSON.stringify({
+      ...propertyDataWithoutImages,
+      rooms: roomsWithoutImages
+    }));
+    
+    // Add property-level image files if they exist
     if (images && images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const imageUrl = images[i];
@@ -115,13 +127,43 @@ class PropertyService {
           try {
             const response = await fetch(imageUrl);
             const blob = await response.blob();
-            const file = new File([blob], `image-${i}.jpg`, { type: blob.type });
+            const file = new File([blob], `property-image-${i}.jpg`, { type: blob.type });
             formData.append('images', file);
           } catch (error) {
-            console.warn('Failed to convert blob URL to file:', error);
+            console.warn('Failed to convert property blob URL to file:', error);
           }
         }
       }
+    }
+
+    // Add room-specific images
+    if (rooms && rooms.length > 0) {
+      for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
+        const room = rooms[roomIndex];
+        if (room.photos && room.photos.length > 0) {
+          for (let photoIndex = 0; photoIndex < room.photos.length; photoIndex++) {
+            const imageUrl = room.photos[photoIndex];
+            
+            // If it's a blob URL, convert to file
+            if (imageUrl.startsWith('blob:')) {
+              try {
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `room-${room.id}-image-${photoIndex}.jpg`, { type: blob.type });
+                // Use a specific field name pattern for room images
+                formData.append(`roomImages_${room.id}`, file);
+              } catch (error) {
+                console.warn(`Failed to convert room ${room.id} blob URL to file:`, error);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log('🖼️ FormData contents:');
+    for (let pair of formData.entries()) {
+      console.log('📎', pair[0], typeof pair[1] === 'string' ? pair[1].substring(0, 100) : 'File');
     }
 
     const response = await fetch(`${API_BASE_URL}/properties`, {
