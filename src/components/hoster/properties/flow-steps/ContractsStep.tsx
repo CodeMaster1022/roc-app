@@ -200,22 +200,7 @@ export const ContractsStep = ({ property, updateProperty, onNext, onPrev }: Cont
               </TabsList>
               
               <TabsContent value="template" className="space-y-4">
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium mb-2">
-                        {t('contracts.template_benefits') || 'Beneficios de la plantilla estándar'}
-                      </h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• {t('contracts.benefit_1') || 'Contrato legalmente válido en México'}</li>
-                        <li>• {t('contracts.benefit_2') || 'Incluye todas las cláusulas necesarias'}</li>
-                        <li>• {t('contracts.benefit_3') || 'Protección para ambas partes'}</li>
-                        <li>• {t('contracts.benefit_4') || 'Actualizado con la legislación vigente'}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+
 
                 {/* Contract Duration Options */}
                 <div className="space-y-4">

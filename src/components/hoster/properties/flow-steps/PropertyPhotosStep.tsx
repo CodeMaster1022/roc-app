@@ -191,25 +191,6 @@ export const PropertyPhotosStep = ({ property, updateProperty, onNext, onPrev }:
             ))}
           </div>
         )}
-
-        {/* Tips */}
-        <Card className="bg-muted/50">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <Camera className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-              <div className="space-y-2">
-                <h4 className="font-medium">{t('propertyFlow.photo_tips') || 'Consejos para mejores fotos'}</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• {t('propertyFlow.tip_1') || 'Incluye fotos de la sala, cocina, y áreas comunes'}</li>
-                  <li>• {t('propertyFlow.tip_2') || 'Toma fotos con buena iluminación natural'}</li>
-                  <li>• {t('propertyFlow.tip_3') || 'Muestra el exterior y la entrada de la propiedad'}</li>
-                  <li>• {t('propertyFlow.tip_4') || 'Evita fotos borrosas o muy oscuras'}</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Navigation */}
         <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
           <Button variant="outline" onClick={onPrev} className="order-2 sm:order-1">

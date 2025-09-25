@@ -272,20 +272,6 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
                 />
               </div>
             )}
-
-            {/* Rules Summary */}
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">{t('propertyFlow.rules_summary') || 'Resumen de reglas'}</h4>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>• {houseRules.pets ? '✅' : '❌'} {t('propertyFlow.pets') || 'Mascotas'}</p>
-                <p>• {houseRules.smoking ? '✅' : '❌'} {t('propertyFlow.smoking') || 'Fumar'}</p>
-                <p>• {houseRules.parties ? '✅' : '❌'} {t('propertyFlow.parties') || 'Fiestas'}</p>
-                <p>• {houseRules.meetings.allowed ? '✅' : '❌'} {t('propertyFlow.work_meetings') || 'Reuniones de trabajo'}</p>
-                {houseRules.meetings.allowed && houseRules.meetings.schedule && (
-                  <p className="ml-4 text-xs">📅 {houseRules.meetings.schedule}</p>
-                )}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
