@@ -5,6 +5,7 @@ import { ProgressBar } from './ProgressBar'
 import { PropertyTypeStep } from './flow-steps/PropertyTypeStep'
 import { FurnitureStep } from './flow-steps/FurnitureStep'
 import { LocationStep } from './flow-steps/LocationStep'
+import { PropertyPhotosStep } from './flow-steps/PropertyPhotosStep'
 import { RoomsQuantityStep } from './flow-steps/RoomsQuantityStep'
 import { RoomCharacteristicsStep } from './flow-steps/RoomCharacteristicsStep'
 import { AdditionalInfoStep } from './flow-steps/AdditionalInfoStep'
@@ -24,21 +25,33 @@ interface PropertyFlowModalProps {
 
 export type FlowStep = 
   | 'property-type'
-  | 'furniture'
   | 'location'
-  | 'rooms-quantity'
-  | 'room-characteristics'
+  | 'property-photos'    // New step for rooms type
+  | 'rooms-quantity'     // Only for rooms type
+  | 'room-characteristics' // Only for rooms type
+  | 'furniture'          // Only for property type
   | 'additional-info'
   | 'pricing'
   | 'contracts'
   | 'property-details';
 
-const FLOW_STEPS: FlowStep[] = [
+// Define flow paths based on property type
+const ROOMS_FLOW_STEPS: FlowStep[] = [
   'property-type',
-  'furniture',
   'location',
+  'property-photos',
   'rooms-quantity',
   'room-characteristics',
+  'additional-info',
+  'pricing',
+  'contracts',
+  'property-details'
+];
+
+const PROPERTY_FLOW_STEPS: FlowStep[] = [
+  'property-type',
+  'location',
+  'furniture',
   'additional-info',
   'pricing',
   'contracts',
@@ -71,25 +84,44 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
   const [submissionStep, setSubmissionStep] = useState('');
   const { toast } = useToast();
 
-  const currentStepIndex = FLOW_STEPS.indexOf(currentStep);
-  const progress = ((currentStepIndex + 1) / FLOW_STEPS.length) * 100;
+  // Get current flow steps based on property type
+  const getFlowSteps = (): FlowStep[] => {
+    return property.type === 'rooms' ? ROOMS_FLOW_STEPS : PROPERTY_FLOW_STEPS;
+  };
+
+  const currentStepIndex = getFlowSteps().indexOf(currentStep);
+  const progress = ((currentStepIndex + 1) / getFlowSteps().length) * 100;
 
   const nextStep = () => {
+    const flowSteps = getFlowSteps();
     const nextIndex = currentStepIndex + 1;
-    if (nextIndex < FLOW_STEPS.length) {
-      setCurrentStep(FLOW_STEPS[nextIndex]);
+    if (nextIndex < flowSteps.length) {
+      setCurrentStep(flowSteps[nextIndex]);
     }
   };
 
   const prevStep = () => {
+    const flowSteps = getFlowSteps();
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
-      setCurrentStep(FLOW_STEPS[prevIndex]);
+      setCurrentStep(flowSteps[prevIndex]);
     }
   };
 
   const updateProperty = (updates: Partial<Property>) => {
-    setProperty(prev => ({ ...prev, ...updates }));
+    setProperty(prev => {
+      const updated = { ...prev, ...updates };
+      
+      // If property type changed, reset to first step after property-type
+      if (updates.type && updates.type !== prev.type) {
+        const newFlowSteps = updates.type === 'rooms' ? ROOMS_FLOW_STEPS : PROPERTY_FLOW_STEPS;
+        if (currentStep !== 'property-type') {
+          setCurrentStep(newFlowSteps[1]); // Second step in the flow
+        }
+      }
+      
+      return updated;
+    });
   };
 
   const handleComplete = async () => {
@@ -136,7 +168,7 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
       
       toast({
         title: "Success",
-        description: "Property created successfully!",
+        description: "Property created successfully and submitted for review!",
       });
 
       // Call the callback if provided
@@ -204,15 +236,17 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
       isSubmitting
     };
 
-    console.log('Rendering step:', currentStep, 'onComplete function:', handleComplete.name);
+    console.log('Rendering step:', currentStep, 'Property type:', property.type);
 
     switch (currentStep) {
       case 'property-type':
         return <PropertyTypeStep {...stepProps} />;
-      case 'furniture':
-        return <FurnitureStep {...stepProps} />;
       case 'location':
         return <LocationStep {...stepProps} />;
+      case 'property-photos':
+        return <PropertyPhotosStep {...stepProps} />;
+      case 'furniture':
+        return <FurnitureStep {...stepProps} />;
       case 'rooms-quantity':
         return <RoomsQuantityStep {...stepProps} />;
       case 'room-characteristics':
@@ -231,11 +265,14 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
     }
   };
 
+  const flowSteps = getFlowSteps();
+  const stepTitle = property.type === 'rooms' ? 'Create Room Rental' : 'Create Property Rental';
+
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Property</DialogTitle>
+          <DialogTitle>{stepTitle}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 relative">

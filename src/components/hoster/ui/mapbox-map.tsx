@@ -11,6 +11,7 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
 interface MapboxMapProps {
   address: string;
+  coordinates?: { lat: number; lng: number };
   onLocationChange: (address: string, lat: number, lng: number) => void;
   onConfirm?: () => void;
   className?: string;
@@ -18,6 +19,7 @@ interface MapboxMapProps {
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({
   address,
+  coordinates,
   onLocationChange,
   onConfirm,
   className = ""
@@ -30,7 +32,20 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
   const [currentAddress, setCurrentAddress] = useState(address);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [currentCoords, setCurrentCoords] = useState<[number, number]>([-99.1332, 19.4326]); // Default to Mexico City
+  const [currentCoords, setCurrentCoords] = useState<[number, number]>(
+    coordinates ? [coordinates.lng, coordinates.lat] : [-99.1332, 19.4326]
+  );
+
+  // Update map center when coordinates prop changes
+  useEffect(() => {
+    if (coordinates && map.current && marker.current) {
+      const newCoords: [number, number] = [coordinates.lng, coordinates.lat];
+      map.current.flyTo({ center: newCoords, zoom: 15 });
+      marker.current.setLngLat(newCoords);
+      setCurrentCoords(newCoords);
+      reverseGeocode(newCoords[0], newCoords[1]);
+    }
+  }, [coordinates]);
 
   // Initialize map
   useEffect(() => {
