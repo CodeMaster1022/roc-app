@@ -93,7 +93,7 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
 
   const handleAuthPromptLogin = () => {
     setShowAuthPrompt(false)
-    navigate('/auth')
+    navigate('/signin')
   }
 
   const handleAuthPromptClose = () => {

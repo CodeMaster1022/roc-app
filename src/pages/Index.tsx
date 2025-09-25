@@ -153,7 +153,7 @@ const Index = () => {
 
   const handleFavoriteAuthLogin = () => {
     setShowFavoriteAuthPrompt(false)
-    navigate('/auth')
+    navigate('/signin')
   }
 
   const handleFavoriteAuthClose = () => {
@@ -175,7 +175,7 @@ const Index = () => {
         title: "Authentication Required",
         description: message,
       })
-      navigate('/auth')
+      navigate('/signin')
       return
     }
     
@@ -653,7 +653,7 @@ const Index = () => {
                         {t('nav.inicio')}
                       </button>
                       <button
-                        onClick={() => navigate('/auth')}
+                        onClick={() => navigate('/signin')}
                         className="text-foreground hover:text-primary transition-colors"
                       >
                         Sign In
@@ -722,7 +722,7 @@ const Index = () => {
                           <DropdownMenuRadioItem value="en">🇺🇸 {t('language.english')}</DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/auth')}>
+                        <DropdownMenuItem onClick={() => navigate('/signin')}>
                           <LogIn className="mr-2 h-4 w-4" />
                           Sign In
                         </DropdownMenuItem>

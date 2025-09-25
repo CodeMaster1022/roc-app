@@ -279,6 +279,21 @@ class PropertyService {
 
     return data;
   }
+
+  getZones(): { id: string; name: string; coordinates: { lat: number; lng: number } }[] {
+    return [
+      { id: 'roma-norte', name: 'Roma Norte', coordinates: { lat: 19.4125, lng: -99.1625 } },
+      { id: 'roma-sur', name: 'Roma Sur', coordinates: { lat: 19.4050, lng: -99.1600 } },
+      { id: 'condesa', name: 'Condesa', coordinates: { lat: 19.4100, lng: -99.1700 } },
+      { id: 'polanco', name: 'Polanco', coordinates: { lat: 19.4350, lng: -99.1950 } },
+      { id: 'santa-fe', name: 'Santa Fe', coordinates: { lat: 19.3600, lng: -99.2700 } },
+      { id: 'coyoacan', name: 'Coyoacán', coordinates: { lat: 19.3500, lng: -99.1600 } },
+      { id: 'del-valle', name: 'Del Valle', coordinates: { lat: 19.3800, lng: -99.1650 } },
+      { id: 'doctores', name: 'Doctores', coordinates: { lat: 19.4200, lng: -99.1450 } },
+      { id: 'narvarte', name: 'Narvarte', coordinates: { lat: 19.3950, lng: -99.1550 } },
+      { id: 'juarez', name: 'Juárez', coordinates: { lat: 19.4250, lng: -99.1550 } }
+    ];
+  }
 }
 
 export const propertyService = new PropertyService();

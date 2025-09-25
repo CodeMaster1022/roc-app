@@ -38,6 +38,7 @@ export interface Property {
     address: string;
     lat?: number;
     lng?: number;
+    zone?: string;
   };
   rooms: Room[];
   additionalInfo: {
@@ -50,6 +51,8 @@ export interface Property {
     rentalType?: RentalType;
   };
   contracts: {
+    contractType?: 'template' | 'custom';
+    customContract?: string;
     standardOptions: string[];
     requiresDeposit: boolean;
     depositAmount?: number;

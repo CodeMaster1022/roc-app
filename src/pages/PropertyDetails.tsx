@@ -255,7 +255,7 @@ const PropertyDetails = () => {
 
   const handleFavoriteAuthLogin = () => {
     setShowFavoriteAuthPrompt(false)
-    navigate('/auth')
+            navigate('/signin')
   }
 
   const handleFavoriteAuthClose = () => {
