@@ -11,6 +11,9 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  phone?: string;
+  gender?: string;
+  birthday?: string;
   role: 'hoster' | 'tenant';
 }
 
@@ -18,6 +21,9 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
+  gender?: string;
+  birthday?: string;
   role: 'hoster' | 'tenant';
   profile?: {
     phone?: string;
