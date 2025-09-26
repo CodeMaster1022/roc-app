@@ -192,6 +192,10 @@ const Index = () => {
     setCurrentSection("inicio")
   }
 
+  const handleViewAllClick = (filterType: "propiedad" | "habitacion") => {
+    navigate('/properties', { state: { filterType } });
+  };
+
   const FilterContent = () => (
     <FilterSection
       currentFilter={currentFilter}
@@ -336,7 +340,10 @@ const Index = () => {
                             <p className="text-sm text-muted-foreground">Complete properties</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                        <button 
+                          onClick={() => handleViewAllClick('propiedad')}
+                          className="flex items-center gap-2 text-muted-foreground px-2"
+                        >
                           <Filter className="h-4 w-4" />
                           <span className="text-sm font-medium">{t('tenants.view_all')}</span>
                         </button>  
@@ -387,7 +394,10 @@ const Index = () => {
                             <p className="text-sm text-muted-foreground">Individual rooms</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                        <button 
+                          onClick={() => handleViewAllClick('habitacion')}
+                          className="flex items-center gap-2 text-muted-foreground px-2"
+                        >
                           <Filter className="h-4 w-4" />
                           <span className="text-sm font-medium">{t('tenants.view_all')}</span>
                         </button>  
