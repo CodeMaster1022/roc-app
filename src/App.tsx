@@ -13,12 +13,13 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 // Tenant pages
 import Index from "./pages/Index";
 import PropertyDetails from "./pages/PropertyDetails";
+import PropertiesPage from "./pages/PropertiesPage";
 import NotFound from "./pages/NotFound";
 
 // Hoster pages
 import { AppLayout } from "./components/hoster/layout/AppLayout";
 import DashboardPage from "./pages/hoster/DashboardPage";
-import PropertiesPage from "./pages/hoster/PropertiesPage";
+import HosterPropertiesPage from "./pages/hoster/PropertiesPage"; // Aliased import
 import TenantsPage from "./pages/hoster/TenantsPage";
 import TenantDetailPage from "./pages/hoster/TenantDetailPage";
 import ProfilePage from "./pages/hoster/ProfilePage";
@@ -41,11 +42,11 @@ const RoleBasedRoutes = () => {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="propiedades" element={<PropertiesPage />} />
-          <Route path="inquilinos" element={<TenantsPage />} />
-          <Route path="inquilinos/:id" element={<TenantDetailPage />} />
-          <Route path="perfil" element={<ProfilePage />} />
-          <Route path="perfil-movil" element={<MobileProfilePage />} />
+          <Route path="properties" element={<HosterPropertiesPage />} />
+          <Route path="tenants" element={<TenantsPage />} />
+          <Route path="tenants/:id" element={<TenantDetailPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="profile-mobile" element={<MobileProfilePage />} />
         </Route>
         <Route path="/auth" element={<Navigate to="/" replace />} />
         <Route path="/signin" element={<Navigate to="/" replace />} />
@@ -60,6 +61,7 @@ const RoleBasedRoutes = () => {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/property/:id" element={<PropertyDetails />} />
+      <Route path="/properties" element={<PropertiesPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />

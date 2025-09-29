@@ -16,7 +16,7 @@ import { RocButton } from "@/components/ui/roc-button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building, Bed, Languages } from "lucide-react"
+import { Filter, Grid, List, Search, Map, Home as HomeIcon, SlidersHorizontal, ArrowUpDown, User, ChevronDown, LogIn, LogOut, Building, Bed, Languages, Facebook, Instagram, Linkedin, ExternalLink } from "lucide-react"
 import { zones, type Property } from "@/data/mockProperties"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileNavigation from "@/components/layout/MobileNavigation"
@@ -29,9 +29,20 @@ import { MobileMapView } from "@/components/map/MobileMapView"
 import { DirectMapboxMap } from "@/components/map/DirectMapboxMap"
 import { usePropertyFilters } from "@/hooks/usePropertyFilters"
 
-// Import logo
+// Import logo and images
 import rocLogo from "@/assets/roc-logo.png"
+import buildingHero from "@/assets/Video-wrappper.png"
 import AuthPromptModal from "@/components/modals/AuthPromptModal"
+const TikTokIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-5 h-5"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+);
 
 const Index = () => {
   const navigate = useNavigate()
@@ -192,6 +203,10 @@ const Index = () => {
     setCurrentSection("inicio")
   }
 
+  const handleViewAllClick = (filterType: "propiedad" | "habitacion") => {
+    navigate('/properties', { state: { filterType } });
+  };
+
   const FilterContent = () => (
     <FilterSection
       currentFilter={currentFilter}
@@ -199,8 +214,7 @@ const Index = () => {
       isMobile={isMobile}
     />
   )
-  console.log(filteredProperties, '===========>')
-  
+
   // Separate properties and rooms for mobile view
   const propertiesOnly = filteredProperties.filter(item => item.type === 'propiedad')
   const roomsOnly = filteredProperties.filter(item => item.type === 'habitacion')
@@ -336,7 +350,10 @@ const Index = () => {
                             <p className="text-sm text-muted-foreground">Complete properties</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                        <button 
+                          onClick={() => handleViewAllClick('propiedad')}
+                          className="flex items-center gap-2 text-muted-foreground px-2"
+                        >
                           <Filter className="h-4 w-4" />
                           <span className="text-sm font-medium">{t('tenants.view_all')}</span>
                         </button>  
@@ -387,7 +404,10 @@ const Index = () => {
                             <p className="text-sm text-muted-foreground">Individual rooms</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 text-muted-foreground px-2">
+                        <button 
+                          onClick={() => handleViewAllClick('habitacion')}
+                          className="flex items-center gap-2 text-muted-foreground px-2"
+                        >
                           <Filter className="h-4 w-4" />
                           <span className="text-sm font-medium">{t('tenants.view_all')}</span>
                         </button>  
@@ -573,7 +593,68 @@ const Index = () => {
                   </RocButton>
                 </div>
               )}
+
+              {/* Additional sections for desktop only */}
             </main>
+            {!isMobile && (
+                <>
+                  {/* Image + Text Block Section */}
+                  <section className="py-16 bg-white">
+                    <div className="container mx-auto px-4">
+                      <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+                        {/* Left: Text Content */}
+                        <div className="space-y-6">
+                          <div className="w-12 h-1 bg-primary rounded-full"></div>
+                          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+                            A space that inspires, choose how you want to live.
+                          </h2>
+                          <div className="space-y-4 text-gray-600">
+                            <p className="text-lg font-medium text-primary">
+                              Your environment matters. When a space inspires you, it transforms the way you live, grow, and dream.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Right: Image */}
+                        <div className="relative">
+                          <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                            <img 
+                              src={buildingHero} 
+                              alt="Beautiful residential building with lush greenery"
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                            />
+                          </div>
+                          {/* Decorative element */}
+                          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* CTA Section */}
+                  <section className="py-8 bg-gray-50">
+                    <div className="container mx-auto px-4 md:px-8 text-center rounded-sm">
+                      <div className="flex space-y-8">
+                        <div className="space-y-4">
+                          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 ">
+                            The change you've been waiting for <br/>starts today
+                          </h2>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row pb-6 justify-center mx-auto ">
+                          <button 
+                            className="px-8 py-1 text-lg font-semibold bg-primary text-white rounded-sm"
+                            onClick={() => navigate('/properties')}
+                          >
+                            View All
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </>
+              )}
+
 
             {/* Modales */}
             <ZoneSearchModal
@@ -821,6 +902,93 @@ const Index = () => {
         description="Sign in to save properties to your favorites and access them from any device."
         actionText="Sign In to Save"
       />
+
+      {/* Footer */}
+      {!isMobile && (
+      <footer className="bg-footer py-12">
+        <div className="container mx-auto px-6">
+          {/* Main footer content */}
+          <div className="flex justify-between items-start mb-4">
+            {/* Links section */}
+                         <div>
+               <h3 className="font-medium text-foreground mb-4">Links</h3>
+               <div className="space-y-3">
+                 <a 
+                   href="/documents/terminos-y-condiciones-roc-avance.docx" 
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="block text-footer-link hover:text-foreground transition-colors duration-200"
+                   download
+                 >
+                   Terms and conditions
+                 </a>
+                 <a 
+                   href="/documents/aviso-de-privacidad-roc.docx" 
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="block text-footer-link hover:text-foreground transition-colors duration-200"
+                   download
+                 >
+                   Privacy notice
+                 </a>
+               </div>
+             </div>
+          </div>
+          <div className="flex space-x-4 justify-end mb-4">
+             <a 
+               href="https://www.facebook.com/ROC" 
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
+               aria-label="Facebook - ROC"
+             >
+               <Facebook className="w-5 h-5" />
+             </a>
+             <a 
+               href="https://www.instagram.com/roc.space" 
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
+               aria-label="Instagram - ROC (@roc.space)"
+             >
+               <Instagram className="w-5 h-5" />
+             </a>
+             <a 
+               href="https://www.tiktok.com/@roc" 
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
+               aria-label="TikTok - ROC on TikTok"
+             >
+               <TikTokIcon />
+             </a>
+             <a 
+               href="https://www.linkedin.com/company/roc-space/"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
+               aria-label="LinkedIn - ROC"
+             >
+               <Linkedin className="w-5 h-5" />
+             </a>
+           </div>
+
+          {/* Copyright */}
+          <div className="border-t border-border py-4">
+            <p className="text-footer-copyright text-sm">
+              Copyright © 2025 ROC - All rights reserved.
+            </p>
+          </div>
+
+          {/* Mission statement */}
+          <div className="">
+            <p className="text-footer-text leading-relaxed">
+              Our mission is clear: <span className="text-primary font-medium">"Make the world your home."</span> Step by step, we are building a path toward that goal. Today we offer you rooms and properties in the best locations, but this is only the beginning. We are building something bigger, for you.
+            </p>
+          </div>
+        </div>
+      </footer>
+      )}
     </div>
   )
 }

@@ -1,192 +1,203 @@
 import { useState } from 'react'
-import { useAuth, UserRole } from '@/contexts/AuthContext'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Building, User, Mail, Lock } from 'lucide-react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import rocLogo from '@/assets/roc-logo.png'
 
 const SignUpPage = () => {
-  const { register } = useAuth()
-  const { t } = useLanguage()
-  const navigate = useNavigate()
-  
-  // Register state
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [selectedRole, setSelectedRole] = useState<UserRole>('tenant')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    birthday: "",
+    gender: "",
+    password: "",
+    confirmPassword: "",
+    role: "tenant",
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
-    setSuccess('')
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
-    // Validation
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      setIsLoading(false)
-      return
+  const handleSelectChange = (id: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!formData.password || !formData.confirmPassword) {
+      setError("Please fill in all password fields.");
+      return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long')
-      setIsLoading(false)
-      return
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
-
+    setIsLoading(true);
     try {
-      await register(email, password, name, selectedRole)
-      setSuccess('Registration successful! You are now logged in.')
-      setTimeout(() => {
-        navigate('/')
-      }, 1500)
-    } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.')
+      const { confirmPassword, role, ...registerData } = formData;
+      await register(registerData);
+      navigate("/");
+    } catch (error: any) {
+      setError(error.message || "Failed to sign up");
+      console.error("Failed to sign up", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+  const nextStep = () => {
+    setError("");
+    if (step === 1) {
+      if (!formData.name || !formData.email || !formData.phone) {
+        setError("Please fill in all fields.");
+        return;
+      }
+    } else if (step === 2) {
+      if (!formData.birthday || !formData.gender) {
+        setError("Please fill in all fields.");
+        return;
+      }
+    }
+    setStep((prev) => prev + 1);
+  };
+
+  const prevStep = () => {
+    setError("");
+    setStep((prev) => prev - 1);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Join ROC Platform</CardTitle>
-          <CardDescription>
-            Create your account and start your journey
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password (min 6 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>I am a:</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant={selectedRole === 'tenant' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRole('tenant')}
-                  className="flex items-center gap-2"
-                >
-                  <User className="h-4 w-4" />
-                  Tenant
-                </Button>
-                <Button
-                  type="button"
-                  variant={selectedRole === 'hoster' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRole('hoster')}
-                  className="flex items-center gap-2"
-                >
-                  <Building className="h-4 w-4" />
-                  Host
-                </Button>
-              </div>
-            </div>
-            
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                {error}
-              </div>
-            )}
-            
-            {success && (
-              <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
-                {success}
-              </div>
-            )}
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create Account'}
-            </Button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link 
-                to="/signin" 
-                className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
-              >
-                Sign in
-              </Link>
+    <div className="w-full lg:grid lg:min-h-screen md:grid-cols-[35%_65%]">
+      <div className="hidden bg-violet-800 lg:flex lg:flex-col p-12 text-white">
+        <div className="w-full">
+          <img src={rocLogo} alt="ROC Logo" className="h-10 mb-12 invert brightness-0" />
+          <p className="text-violet-300 mb-4">The New Standard for Housing</p>
+          <h1 className="text-4xl font-bold">Verified tenants</h1>
+          <h1 className="text-4xl font-bold mb-6">Complete management</h1>
+          <p className="text-violet-200">
+            All-in-one solution for safe, simple property management
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-sm space-y-8">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold">Sign Up</h1>
+            <p className="text-balance text-muted-foreground">
+              Enter your information to create an account
             </p>
           </div>
-        </CardContent>
-      </Card>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {error && <p className="text-red-500 text-sm text-center bg-red-100 p-2 rounded-md">{error}</p>}
+            {step === 1 && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" type="text" placeholder="John Doe" required value={formData.name} onChange={handleChange} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="m@example.com" required value={formData.email} onChange={handleChange} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" type="tel" placeholder="+1234567890" required value={formData.phone} onChange={handleChange} />
+                </div>
+                <Button type="button" onClick={nextStep} className="w-full bg-violet-600 hover:bg-violet-700">
+                  Next
+                </Button>
+              </>
+            )}
+            {step === 2 && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="birthday">Birthday</Label>
+                  <Input id="birthday" type="date" required value={formData.birthday} onChange={handleChange} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select onValueChange={(value) => handleSelectChange("gender", value)} value={formData.gender}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <Button type="button" onClick={prevStep} variant="outline" className="w-full">
+                    Previous
+                  </Button>
+                  <Button type="button" onClick={nextStep} className="w-full bg-violet-600 hover:bg-violet-700">
+                    Next
+                  </Button>
+                </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" required value={formData.password} onChange={handleChange} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input id="confirmPassword" type="password" required value={formData.confirmPassword} onChange={handleChange} />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select onValueChange={(value) => handleSelectChange("role", value)} value={formData.role}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tenant">Tenant</SelectItem>
+                      <SelectItem value="hoster">Hoster</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <Button type="button" onClick={prevStep} variant="outline" className="w-full">
+                    Previous
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="w-full bg-violet-600 hover:bg-violet-700"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </div>
+              </>
+            )}
+          </form>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default SignUpPage 
+export default SignUpPage; 

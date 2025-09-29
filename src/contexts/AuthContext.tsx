@@ -9,7 +9,7 @@ interface AuthContextType {
   role: UserRole
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, name: string, role: UserRole) => Promise<void>
+  register: (userData: Omit<User, 'id' | 'role' | 'profile' | 'favorites' | 'isVerified'> & { password?: string }) => Promise<void>
   logout: () => void
   updateProfile: (profile: Partial<User['profile']>) => Promise<void>
   loading: boolean
@@ -71,16 +71,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const register = async (email: string, password: string, name: string, userRole: UserRole) => {
+  const register = async (userData: Omit<User, 'id' | 'role' | 'profile' | 'favorites' | 'isVerified'> & { password?: string }) => {
     try {
-      const response = await authService.register({ email, password, name, role: userRole })
-      const userData = response.data.user
+      const response = await authService.register({ ...userData, role: 'tenant', password: userData.password || '' })
+      const newUser = response.data.user
       
-      setUser(userData)
-      setRole(userData.role)
+      setUser(newUser)
+      setRole(newUser.role)
       
       // Save to localStorage
-      localStorage.setItem('roc_user', JSON.stringify(userData))
+      localStorage.setItem('roc_user', JSON.stringify(newUser))
     } catch (error) {
       throw error
     }
