@@ -49,7 +49,7 @@ export const NotificationPanel = () => {
     if (notification.type === 'tenant_application' && notification.data?.applicationId) {
       // navigate(`/inquilinos/${notification.data.applicationId}`);
     } else if (notification.type === 'property_status_change' && notification.data?.propertyId) {
-      // navigate(`/propiedades`);
+      // navigate(`/properties`);
     }
   };
 

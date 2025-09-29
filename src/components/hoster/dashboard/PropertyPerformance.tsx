@@ -63,7 +63,7 @@ export const PropertyPerformance: React.FC<PropertyPerformanceProps> = ({
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Building className="w-5 h-5" />
-          {t('dashboard.topProperties') || 'Propiedades Destacadas'}
+          {t('dashboard.topProperties') || 'properties Destacadas'}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -132,7 +132,7 @@ export const PropertyPerformance: React.FC<PropertyPerformanceProps> = ({
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <Building className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>{t('dashboard.noProperties') || 'No hay propiedades registradas'}</p>
+              <p>{t('dashboard.noProperties') || 'No hay properties registradas'}</p>
               <p className="text-sm mt-1">
                 {t('dashboard.addPropertyPrompt') || 'Agrega tu primera propiedad para ver analytics'}
               </p>
@@ -147,7 +147,7 @@ export const PropertyPerformance: React.FC<PropertyPerformanceProps> = ({
               <div>
                 <p className="text-lg font-bold">{properties.length}</p>
                 <p className="text-xs text-muted-foreground">
-                  {t('dashboard.totalProps') || 'Propiedades'}
+                  {t('dashboard.totalProps') || 'properties'}
                 </p>
               </div>
               <div>

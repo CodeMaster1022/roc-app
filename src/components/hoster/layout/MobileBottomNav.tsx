@@ -12,7 +12,7 @@ export const MobileBottomNav = () => {
       label: t('sidebar.dashboard')
     },
     {
-      path: "/propiedades",
+      path: "/properties",
       icon: Building2,
       label: t('sidebar.properties')
     },
