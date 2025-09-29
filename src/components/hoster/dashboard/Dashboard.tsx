@@ -69,7 +69,7 @@ export const Dashboard = () => {
       {/* Main KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <KPICard 
-          title={t('dashboard.totalProperties') || 'Total Propiedades'}
+          title={t('dashboard.totalProperties') || 'Total properties'}
           value={analytics.totalProperties}
           subtitle={`${analytics.activeProperties} ${t('dashboard.active') || 'activas'}`}
           highlight

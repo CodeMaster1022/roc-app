@@ -160,7 +160,7 @@ const PropertyCard = ({
               <span>{area} {t('units.m2')}</span>
             </div>
 
-            {/* Para propiedades completas: número de habitaciones */}
+            {/* Para properties completas: número de habitaciones */}
             {type === "propiedad" && (
               <div className="flex items-center gap-1.5">
                 <Bed className="h-4 w-4 text-primary" />

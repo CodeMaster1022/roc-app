@@ -31,7 +31,7 @@ export const Sidebar = () => {
   ];
 
   const offerItems = [
-    { title: t('sidebar.properties') || 'Propiedades', url: "/propiedades", icon: Building2 },
+    { title: t('sidebar.properties') || 'properties', url: "/properties", icon: Building2 },
   ];
 
   return (

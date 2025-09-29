@@ -52,7 +52,7 @@ const translations = {
     
     // Hero Section
     'hero.title': 'Encuentra tu hogar ideal',
-    'hero.subtitle': 'Descubre propiedades completas o habitaciones en las mejores zonas de la ciudad',
+    'hero.subtitle': 'Descubre properties completas o habitaciones en las mejores zonas de la ciudad',
     
     // Filter Section
     'filter.property_type': 'Tipo de renta',
@@ -69,12 +69,12 @@ const translations = {
     'sort.price_desc': 'Precio: mayor a menor',
     
     // Property Results
-    'results.properties_available': 'propiedades disponibles',
+    'results.properties_available': 'properties disponibles',
     'results.rooms_available': 'habitaciones disponibles',
     'results.showing_all': 'Mostrando todas las opciones',
-    'results.complete_properties': 'Propiedades completas',
+    'results.complete_properties': 'properties completas',
     'results.individual_rooms': 'Habitaciones individuales',
-    'results.no_properties': 'No se encontraron propiedades',
+    'results.no_properties': 'No se encontraron properties',
     'results.no_properties_subtitle': 'Intenta ajustar tus filtros para ver más opciones',
     
     // Property Card
@@ -133,7 +133,7 @@ const translations = {
     
     // Hoster Sidebar
     'sidebar.dashboard': 'Dashboard',
-    'sidebar.properties': 'Propiedades',
+    'sidebar.properties': 'properties',
     'sidebar.tenants': 'Inquilinos',
     'sidebar.operation': 'OPERACIÓN',
     'sidebar.offer': 'OFERTA',
@@ -145,7 +145,7 @@ const translations = {
     'dashboard.week': 'Semana',
     'dashboard.day': 'Día',
     'dashboard.custom': 'Personalizado',
-    'dashboard.totalProperties': 'Propiedades Totales',
+    'dashboard.totalProperties': 'properties Totales',
     'dashboard.totalIncome': 'Ingresos Totales',
     'dashboard.occupancyRate': 'Tasa de Ocupación',
     'dashboard.avgRent': 'Renta Promedio',
@@ -182,13 +182,13 @@ const translations = {
     'dashboard.toDate': 'A la fecha',
     'dashboard.paymentStatus': 'Estado de Pagos',
     'dashboard.overdue': 'Vencidos',
-    'dashboard.topProperties': 'Propiedades Destacadas',
+    'dashboard.topProperties': 'properties Destacadas',
     'dashboard.bestPerforming': 'Mejor Rendimiento',
     'dashboard.applications': 'solicitudes',
     'dashboard.apps': 'sol',
-    'dashboard.noProperties': 'No hay propiedades registradas',
+    'dashboard.noProperties': 'No hay properties registradas',
     'dashboard.addPropertyPrompt': 'Agrega tu primera propiedad para ver analytics',
-    'dashboard.totalProps': 'Propiedades',
+    'dashboard.totalProps': 'properties',
     'dashboard.totalApps': 'Solicitudes',
     'dashboard.avgOccupancy': 'Ocupación Prom.',
     'dashboard.recentActivity': 'Actividad Reciente',
@@ -197,10 +197,10 @@ const translations = {
     'dashboard.activityWillAppear': 'La actividad aparecerá aquí cuando recibas solicitudes',
     
     // Hoster Properties
-    'properties.title': 'Gestión de Propiedades',
-    'properties.subtitle': 'Administra tus propiedades de manera eficiente',
+    'properties.title': 'Gestión de properties',
+    'properties.subtitle': 'Administra tus properties de manera eficiente',
     'properties.addProperty': 'Agregar Propiedad',
-    'properties.noProperties': 'No hay propiedades registradas',
+    'properties.noProperties': 'No hay properties registradas',
     'properties.addFirst': 'Agrega tu primera propiedad para comenzar',
     
     // Hoster Tenants
@@ -378,13 +378,13 @@ const translations = {
     
     // Favorites
     'favorites.title': 'Mis Favoritos',
-    'favorites.empty': 'No tienes propiedades favoritas',
-    'favorites.empty_subtitle': 'Explora propiedades y guarda las que más te gusten',
+    'favorites.empty': 'No tienes properties favoritas',
+    'favorites.empty_subtitle': 'Explora properties y guarda las que más te gusten',
     'favorites.remove': 'Remover de favoritos',
     
     // Dashboard
     'dashboard.welcome': 'Bienvenido a tu hogar',
-    'dashboard.subtitle': 'Gestiona tus propiedades y solicitudes',
+    'dashboard.subtitle': 'Gestiona tus properties y solicitudes',
     'dashboard.home.title': 'Mi hogar',
     'dashboard.description': 'Aquí puedes ver el estatus de tus aplicaciones y gestionar tus contratos',
     'dashboard.status.en-revision': 'En revisión',
@@ -403,8 +403,8 @@ const translations = {
     'dashboard.makePayment': 'Realizar pago',
     'dashboard.paymentCompleted': 'Pago realizado',
     'dashboard.underReview': 'Tu aplicación está siendo revisada por el propietario. Te notificaremos cuando tengamos una respuesta.',
-    'dashboard.applicationRejected': 'Tu aplicación no fue aceptada en esta ocasión. Puedes aplicar a otras propiedades disponibles.',
-    'dashboard.viewMoreProperties': 'Ver más propiedades',
+    'dashboard.applicationRejected': 'Tu aplicación no fue aceptada en esta ocasión. Puedes aplicar a otras properties disponibles.',
+    'dashboard.viewMoreProperties': 'Ver más properties',
     
     // Profile
     'profile.title': 'Mi Perfil',
@@ -472,8 +472,8 @@ const translations = {
     'common.loading': 'Cargando...',
     
     // Map
-    'map.search_placeholder': 'Buscar propiedades en el mapa...',
-    'map.properties_found': 'propiedades encontradas',
+    'map.search_placeholder': 'Buscar properties en el mapa...',
+    'map.properties_found': 'properties encontradas',
     'map.view_on_map': 'Ver en mapa',
     'map.list_view': 'Vista de lista',
     'map.fullscreen': 'Pantalla completa',
@@ -499,7 +499,7 @@ const translations = {
     'contracts.total_income': 'Ingresos Totales',
     'contracts.average_label': 'Promedio',
     'contracts.occupancy_rate': 'Tasa de Ocupación',
-    'contracts.occupied_properties': 'propiedades ocupadas',
+    'contracts.occupied_properties': 'properties ocupadas',
     'contracts.alerts': 'Alertas',
     'contracts.expiring': 'expirando',
     'contracts.overdue_payments': 'pagos vencidos',

@@ -529,7 +529,7 @@ const Index = () => {
                 </div>
               )}
 
-              {/* Grid/List de propiedades - Desktop only */}
+              {/* Grid/List de properties - Desktop only */}
               {!loading && !error && viewMode !== "map" && !isMobile && (
                 <div className={`grid gap-4 ${
                   viewMode === "grid" 
