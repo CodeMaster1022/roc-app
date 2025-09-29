@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Link, useNavigate } from 'react-router-dom'
 import rocLogo from '@/assets/roc-logo.png'
-
+import groupLogo from '@/assets/group-logo.png'
 const SignInPage = () => {
   const { login } = useAuth()
   const { t } = useLanguage()
@@ -34,9 +34,9 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-violet-800 lg:flex lg:flex-col items-center justify-center p-12 text-white">
-        <div className="max-w-sm">
+    <div className="w-full lg:grid lg:min-h-screen md:grid-cols-[35%_65%]">
+      <div className="hidden bg-violet-800 lg:flex lg:flex-col p-12 text-white">
+        <div className="w-full">
           <img src={rocLogo} alt="ROC Logo" className="h-10 mb-12 invert brightness-0" />
           <p className="text-violet-300 mb-4">The New Standard for Housing</p>
           <h1 className="text-4xl font-bold">Verified tenants</h1>
