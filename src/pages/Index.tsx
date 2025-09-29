@@ -176,15 +176,11 @@ const Index = () => {
   }
 
   const handleSectionChange = (section: string) => {
-    // If trying to access profile or favorites and not authenticated, redirect to auth
-    if ((section === "perfil" || section === "favoritos") && !isAuthenticated) {
-      const message = section === "perfil" 
-        ? "Please sign in to access your profile."
-        : "Please sign in to view your favorites."
-      
+    // Only profile section requires authentication now - favorites and household are accessible for all users
+    if (section === "perfil" && !isAuthenticated) {
       toast({
         title: "Authentication Required",
-        description: message,
+        description: "Please sign in to access your profile.",
       })
       navigate('/signin')
       return
@@ -227,6 +223,7 @@ const Index = () => {
             favoriteIds={favorites}
             onRemoveFavorite={handleFavoriteToggle}
             onViewDetails={handleViewDetails}
+            onShowAuthPrompt={() => setShowFavoriteAuthPrompt(true)}
           />
         )
       
@@ -701,46 +698,25 @@ const Index = () => {
                 </button>
                 
                 <nav className="flex space-x-6">
-                  {isAuthenticated ? (
-                    // Authenticated user navigation
-                    [
-                      { id: "hogar", label: t('nav.hogar') },
-                      { id: "inicio", label: t('nav.inicio') },
-                      { id: "favoritos", label: t('nav.favoritos') }
-                    ].map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleSectionChange(item.id)}
-                        className={`transition-colors ${
-                          currentSection === item.id 
-                            ? "text-primary font-semibold" 
-                            : "text-foreground hover:text-primary"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))
-                  ) : (
-                    // Unauthenticated user navigation - simpler
-                    <>
-                      <button
-                        onClick={() => handleSectionChange("inicio")}
-                        className={`transition-colors ${
-                          currentSection === "inicio" 
-                            ? "text-primary font-semibold" 
-                            : "text-foreground hover:text-primary"
-                        }`}
-                      >
-                        {t('nav.inicio')}
-                      </button>
-                      <button
-                        onClick={() => navigate('/signin')}
-                        className="text-foreground hover:text-primary transition-colors"
-                      >
-                        Sign In
-                      </button>
-                    </>
-                  )}
+                  {/* Navigation - same for all users to maintain product feel */}
+                  {[
+                    { id: "hogar", label: t('nav.hogar') },
+                    { id: "inicio", label: t('nav.inicio') },
+                    { id: "favoritos", label: t('nav.favoritos') }
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleSectionChange(item.id)}
+                      className={`transition-colors ${
+                        currentSection === item.id 
+                          ? "text-primary font-semibold" 
+                          : "text-foreground hover:text-primary"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+
                   
                   {/* Profile/Language Dropdown - Different for authenticated vs unauthenticated */}
                   {isAuthenticated ? (
@@ -785,32 +761,32 @@ const Index = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    // Unauthenticated user - just language dropdown
+                    // Unauthenticated user - profile split button with three options
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-                          <Languages className="h-4 w-4" />
+                          <User className="h-4 w-4" />
                           <span className="hidden sm:inline">
-                            {language === 'es' ? 'Español' : 'English'}
+                            Profile
                           </span>
                           <ChevronDown className="h-3 w-3" />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem onClick={() => navigate('/signin')}>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          Sign In / Sign Up
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
+                          <Building className="mr-2 h-4 w-4" />
+                          Register Property
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuLabel>{t('profile.language')}</DropdownMenuLabel>
                         <DropdownMenuRadioGroup value={language} onValueChange={(val) => setLanguage(val as 'es' | 'en')}>
                           <DropdownMenuRadioItem value="es">🇪🇸 {t('language.spanish')}</DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="en">🇺🇸 {t('language.english')}</DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/signin')}>
-                          <LogIn className="mr-2 h-4 w-4" />
-                          Sign In
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
-                          <Building className="mr-2 h-4 w-4" />
-                          List Your Property
-                        </DropdownMenuItem> */}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
