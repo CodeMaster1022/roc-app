@@ -4,6 +4,7 @@ import { RocButton } from "@/components/ui/roc-button"
 import { type Property } from "@/data/mockProperties"
 import { Trash2, Heart } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { favoriteService } from "@/services/favoriteService"
 import { propertyService } from "@/services/propertyService"
 import { transformBackendPropertyToFrontend } from "@/utils/propertyTransform"
@@ -12,10 +13,12 @@ interface FavoritesListProps {
   favoriteIds: string[]
   onRemoveFavorite: (id: string) => void
   onViewDetails: (id: string) => void
+  onShowAuthPrompt?: () => void
 }
 
-const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails }: FavoritesListProps) => {
+const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails, onShowAuthPrompt }: FavoritesListProps) => {
   const { t } = useLanguage()
+  const { isAuthenticated } = useAuth()
   const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -83,8 +86,25 @@ const FavoritesList = ({ favoriteIds, onRemoveFavorite, onViewDetails }: Favorit
     )
   }
 
-  // Empty state
+  // Empty state - different for authenticated vs non-authenticated users
   if (favoriteProperties.length === 0) {
+    if (!isAuthenticated) {
+      // Non-authenticated empty state with heart icon and auth prompt
+      return (
+        <div className="text-center py-12 animate-fade-in">
+          <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Your Favorites</h3>
+          <p className="text-muted-foreground mb-4">
+            Save properties you love by creating an account
+          </p>
+          <RocButton onClick={() => onShowAuthPrompt?.()}>
+            Create Account
+          </RocButton>
+        </div>
+      )
+    }
+    
+    // Authenticated but no favorites
     return (
       <div className="text-center py-12 animate-fade-in">
         <div className="text-6xl mb-4">💜</div>

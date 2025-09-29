@@ -2,8 +2,9 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { RocButton } from "@/components/ui/roc-button"
-import { FileText, CreditCard, Clock, CheckCircle, XCircle, Trash2 } from "lucide-react"
+import { FileText, CreditCard, Clock, CheckCircle, XCircle, Trash2, Home } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { applicationService, type Application } from "@/services/applicationService"
 import { useToast } from "@/hooks/use-toast"
 import { PaymentModal } from "@/components/payments/PaymentModal"
@@ -23,6 +24,7 @@ const HomeDashboard = () => {
   const [showContractSigningModal, setShowContractSigningModal] = useState(false)
   const { t } = useLanguage()
   const { toast } = useToast()
+  const { isAuthenticated } = useAuth()
 
   // Helper function to get payment for an application
   const getPaymentForApplication = (applicationId: string, paymentType: Payment['paymentType'] = 'first_month'): Payment | undefined => {
@@ -288,6 +290,25 @@ const HomeDashboard = () => {
           className="h-12 px-6 text-base font-medium"
         >
           Intentar de nuevo
+        </RocButton>
+      </div>
+    )
+  }
+
+  // Show different empty states based on authentication status
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-16 px-4 animate-fade-in">
+        <Home className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+        <h3 className="text-xl font-semibold mb-3">Household</h3>
+        <p className="text-muted-foreground mb-6 leading-relaxed max-w-md mx-auto">
+          This section is for users already renting with ROC. Create your account to start living the experience.
+        </p>
+        <RocButton 
+          onClick={() => window.location.href = '/signin'}
+          className="h-12 px-6 text-base font-medium"
+        >
+          Create Account
         </RocButton>
       </div>
     )

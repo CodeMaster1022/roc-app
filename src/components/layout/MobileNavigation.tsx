@@ -1,10 +1,12 @@
 import { Home, Heart, FileText, User, Building, ChevronUp, LogIn, Languages, FileSignature } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 interface MobileNavigationProps {
   currentSection: string
@@ -15,6 +17,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const { language, setLanguage, t } = useLanguage()
   const { user, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   
   // Helper function to get user initials for fallback
   const getUserInitials = (name: string) => {
@@ -25,14 +28,11 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
       .join('')
   }
   
-  // Different navigation items based on authentication status
-  const navItems = isAuthenticated ? [
+  // Navigation items - same for all users to maintain product feel
+  const navItems = [
     { id: "inicio", label: t('nav.inicio'), icon: Home },
     { id: "favoritos", label: t('nav.favoritos'), icon: Heart },
     { id: "hogar", label: t('nav.hogar'), icon: FileText },
-  ] : [
-    // Simplified navigation for unauthenticated users
-    { id: "inicio", label: t('nav.inicio'), icon: Home },
   ]
 
   const handleProfileClick = () => {
@@ -114,34 +114,89 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
             )}
           </button>
         ) : (
-          // Unauthenticated user - Sign In button
-          <button
-            onClick={() => onSectionChange('perfil')} // This will trigger the auth redirect
-            className={cn(
-              "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
-              "relative"
-            )}
-          >
-            <LogIn 
-              className="h-6 w-6 mb-1 text-muted-foreground"
-            />
-            <span className="text-xs font-medium text-muted-foreground">
-              Sign In
-            </span>
-          </button>
-        )}
-
-        {/* Language selector for unauthenticated users */}
-        {!isAuthenticated && (
-          <button
-            onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
-            className="flex flex-col items-center justify-center py-1 px-3 transition-all duration-200"
-          >
-            <Languages className="h-6 w-6 mb-1 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              {language === 'es' ? 'ES' : 'EN'}
-            </span>
-          </button>
+          // Unauthenticated user - Profile split button with sheet
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className={cn(
+                "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
+                "relative"
+              )}>
+                <User 
+                  className="h-6 w-6 mb-1 text-muted-foreground"
+                />
+                <span className="text-xs font-medium text-muted-foreground">
+                  Profile
+                </span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-auto">
+              <SheetHeader>
+                <SheetTitle>Profile Options</SheetTitle>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">
+                <button
+                  onClick={() => {
+                    navigate('/signin')
+                    setShowProfileMenu(false)
+                  }}
+                  className="flex items-center gap-3 p-4 text-left hover:bg-muted rounded-lg transition-colors"
+                >
+                  <LogIn className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium">Sign In / Sign Up</div>
+                    <div className="text-sm text-muted-foreground">Access your account or create one</div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    window.open('https://preview--hoster-haven.lovable.app/', '_blank')
+                    setShowProfileMenu(false)
+                  }}
+                  className="flex items-center gap-3 p-4 text-left hover:bg-muted rounded-lg transition-colors"
+                >
+                  <Building className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium">Register Property</div>
+                    <div className="text-sm text-muted-foreground">List your property for rent</div>
+                  </div>
+                </button>
+                <Separator />
+                <div className="px-4">
+                  <div className="font-medium mb-3">Language</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setLanguage('es')
+                        setShowProfileMenu(false)
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 p-3 rounded-lg transition-colors border",
+                        language === 'es' 
+                          ? "bg-primary text-primary-foreground border-primary" 
+                          : "hover:bg-muted border-border"
+                      )}
+                    >
+                      🇪🇸 Español
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLanguage('en')
+                        setShowProfileMenu(false)
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 p-3 rounded-lg transition-colors border",
+                        language === 'en' 
+                          ? "bg-primary text-primary-foreground border-primary" 
+                          : "hover:bg-muted border-border"
+                      )}
+                    >
+                      🇺🇸 English
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         )}
       </div>
     </div>
