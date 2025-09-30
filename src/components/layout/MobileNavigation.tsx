@@ -118,16 +118,16 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
           <Sheet>
             <SheetTrigger asChild>
               <button className={cn(
-                "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
-                "relative"
+              "flex flex-col items-center justify-center py-1 px-3 transition-all duration-200",
+              "relative"
               )}>
                 <User 
-                  className="h-6 w-6 mb-1 text-muted-foreground"
-                />
-                <span className="text-xs font-medium text-muted-foreground">
+              className="h-6 w-6 mb-1 text-muted-foreground"
+            />
+            <span className="text-xs font-medium text-muted-foreground">
                   Profile
-                </span>
-              </button>
+            </span>
+          </button>
             </SheetTrigger>
             <SheetContent side="bottom" className="h-auto">
               <SheetHeader>
@@ -178,7 +178,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
                     >
                       🇪🇸 Español
                     </button>
-                    <button
+          <button
                       onClick={() => {
                         setLanguage('en')
                         setShowProfileMenu(false)
@@ -191,7 +191,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
                       )}
                     >
                       🇺🇸 English
-                    </button>
+          </button>
                   </div>
                 </div>
               </div>

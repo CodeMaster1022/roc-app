@@ -36,30 +36,29 @@ const SignInPage = () => {
   return (
     <div className="w-full lg:grid lg:min-h-screen md:grid-cols-[35%_65%]">
       <div className="hidden bg-violet-800 lg:flex lg:flex-col p-12 text-white">
-        <div className="w-full">
-          <img src={rocLogo} alt="ROC Logo" className="h-10 mb-12 invert brightness-0" />
-          <p className="text-violet-300 mb-4">The New Standard for Housing</p>
-          <h1 className="text-4xl font-bold">Verified tenants</h1>
-          <h1 className="text-4xl font-bold mb-6">Complete management</h1>
+        <div className="w-full flex flex-col items-center justify-center h-full">
+          <img src={rocLogo} alt="ROC Logo" className="h-24 mb-12 invert brightness-0" />
+          <h1 className="text-[24px] font-bold">Find it-Live it-Own it</h1>
           <p className="text-violet-200">
-            All-in-one solution for safe, simple property management
+          Properties & Rooms
           </p>
         </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-sm space-y-8">
-          <div className="space-y-2 text-center">
+          <div className="space-y-2 py-12">
             <h1 className="text-3xl font-bold">Sign in</h1>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address / Phone number</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="w-full"
               />
             </div>
             
@@ -71,6 +70,7 @@ const SignInPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="w-full"
               />
             </div>
             
@@ -85,7 +85,7 @@ const SignInPage = () => {
             </Button>
           </form>
           
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-sm text-gray-600">
             Don't have an account?{' '}
             <Link 
               to="/signup" 

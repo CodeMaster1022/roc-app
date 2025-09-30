@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Link, useNavigate } from 'react-router-dom'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import rocLogo from '@/assets/roc-logo.png'
-
+import groupLogo from '@/assets/group-logo.png'
 const SignUpPage = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -82,9 +82,9 @@ const SignUpPage = () => {
 
   return (
     <div className="w-full lg:grid lg:min-h-screen md:grid-cols-[35%_65%]">
-      <div className="hidden bg-violet-800 lg:flex lg:flex-col p-12 text-white">
+      <div className="hidden bg-violet-800 lg:flex lg:flex-col py-12 pl-12 text-white justify-between items-center">
         <div className="w-full">
-          <img src={rocLogo} alt="ROC Logo" className="h-10 mb-12 invert brightness-0" />
+          <img src={rocLogo} alt="ROC Logo" className="h-16 mb-12 invert brightness-0" />
           <p className="text-violet-300 mb-4">The New Standard for Housing</p>
           <h1 className="text-4xl font-bold">Verified tenants</h1>
           <h1 className="text-4xl font-bold mb-6">Complete management</h1>
@@ -92,10 +92,13 @@ const SignUpPage = () => {
             All-in-one solution for safe, simple property management
           </p>
         </div>
+        <div className="flex flex-col w-full items-end transform translate-x-[30px] -translate-y-[50px]">
+          <img src={groupLogo} alt="Group Logo" className="h-[300px] w-[330px]" />
+        </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-sm space-y-8">
-          <div className="grid gap-2 text-center">
+          <div className="grid gap-2">
             <h1 className="text-3xl font-bold">Sign Up</h1>
             <p className="text-balance text-muted-foreground">
               Enter your information to create an account
@@ -188,7 +191,7 @@ const SignUpPage = () => {
               </>
             )}
           </form>
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-4 text-sm">
             Already have an account?{" "}
             <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
               Sign in
