@@ -921,7 +921,7 @@ const Index = () => {
                <Facebook className="w-5 h-5" />
              </a>
              <a 
-               href="https://www.instagram.com/roc.space" 
+               href="https://www.instagram.com/roc.space?igsh=MWo1MWVhN3h5ZDJ6eA==" 
                target="_blank"
                rel="noopener noreferrer"
                className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
@@ -930,7 +930,7 @@ const Index = () => {
                <Instagram className="w-5 h-5" />
              </a>
              <a 
-               href="https://www.tiktok.com/@roc" 
+               href="https://www.tiktok.com/@roc.space?_t=ZS-902Ax8sf3TU&_r=1" 
                target="_blank"
                rel="noopener noreferrer"
                className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
@@ -939,7 +939,7 @@ const Index = () => {
                <TikTokIcon />
              </a>
              <a 
-               href="https://www.linkedin.com/company/roc-space/"
+               href="https://www.facebook.com/share/1CQFt3UGNx/?mibextid=wwXIfr"
                target="_blank"
                rel="noopener noreferrer"
                className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
