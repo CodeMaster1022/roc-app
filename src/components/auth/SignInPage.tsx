@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import rocLogo from '@/assets/roc-logo.png'
 import groupLogo from '@/assets/group-logo.png'
+
 const SignInPage = () => {
   const { login } = useAuth()
   const { t } = useLanguage()
@@ -34,8 +36,8 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen md:grid-cols-[35%_65%]">
-      <div className="hidden bg-violet-800 lg:flex lg:flex-col p-12 text-white">
+    <div className="w-full md:grid md:min-h-screen md:grid-cols-[35%_65%]">
+      <div className="hidden bg-violet-800 md:flex md:flex-col p-12 text-white">
         <div className="w-full flex flex-col items-center justify-center h-full">
           <img src={rocLogo} alt="ROC Logo" className="h-24 mb-12 invert brightness-0" />
           <h1 className="text-[24px] font-bold">Find it-Live it-Own it</h1>
@@ -44,14 +46,29 @@ const SignInPage = () => {
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-sm space-y-8">
-          <div className="space-y-2 py-12">
+      <div className="flex flex-col min-h-screen md:items-center md:justify-center py-6 px-4 sm:px-6 md:px-8">
+        {/* Mobile Header */}
+        <div className="md:hidden mb-8">
+          <button 
+            onClick={() => navigate(-1)}
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="mx-auto flex flex-col w-full max-w-sm space-y-8">
+          {/* Mobile Logo */}
+          <div className="md:hidden flex justify-center mb-8">
+            <img src={rocLogo} alt="ROC Logo" className="h-20" />
+          </div>
+
+          <div className="space-y-2">
             <h1 className="text-3xl font-bold">Sign in</h1>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-gray-600">Email Address / Phone number</Label>
               <Input
                 id="email"
                 type="email"
@@ -59,11 +76,12 @@ const SignInPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full"
+                placeholder="Email Address / Phone number"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-600">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -71,6 +89,7 @@ const SignInPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full"
+                placeholder="Password"
               />
             </div>
             
@@ -79,21 +98,21 @@ const SignInPage = () => {
                 {error}
               </div>
             )}
+
+            <div className="text-center text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link 
+                to="/signup" 
+                className="font-medium text-violet-600 hover:text-violet-500"
+              >
+                Create One
+              </Link>
+            </div>
             
-            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700 py-6 text-base" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Continuar'}
             </Button>
           </form>
-          
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link 
-              to="/signup" 
-              className="font-medium text-violet-600 hover:text-violet-500"
-            >
-              Create One
-            </Link>
-          </p>
         </div>
       </div>
     </div>
