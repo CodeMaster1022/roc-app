@@ -84,7 +84,7 @@ const SignUpPage = () => {
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[35%_65%] xl:grid-cols-[40%_60%] 2xl:grid-cols-[45%_55%]">
-      <div className="hidden bg-[#57007B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:py-16 xl:pl-12 text-white justify-between items-center">
+      <div className="hidden bg-[#57007B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:pl-12 text-white justify-between items-center">
         <div className="w-full">
           <img src={rocLogo} alt="ROC Logo" className="h-12 lg:h-16 xl:h-20 mb-8 lg:mb-12 invert brightness-0" />
           <p className="text-violet-300 mb-3 lg:mb-4 text-sm lg:text-base">The New Standard for Housing</p>
