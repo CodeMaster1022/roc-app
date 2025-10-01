@@ -69,6 +69,7 @@ export interface Property {
       rules: {
         pets: boolean;
         smoking: boolean;
+        parties?: boolean; // Add parties field
         meetings: {
           allowed: boolean;
           schedule?: string;
