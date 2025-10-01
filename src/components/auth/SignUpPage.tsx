@@ -83,14 +83,14 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="w-full md:grid md:min-h-screen md:grid-cols-[35%_65%]">
-      <div className="hidden bg-[#57007B] md:flex md:flex-col py-12 pl-12 text-white justify-between items-center">
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[35%_65%] xl:grid-cols-[40%_60%] 2xl:grid-cols-[45%_55%]">
+      <div className="hidden bg-[#57007B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:py-16 xl:pl-12 text-white justify-between items-center">
         <div className="w-full">
-          <img src={rocLogo} alt="ROC Logo" className="h-16 mb-12 invert brightness-0" />
-          <p className="text-violet-300 mb-4">The New Standard for Housing</p>
-          <h1 className="text-4xl font-bold">Verified tenants</h1>
-          <h1 className="text-4xl font-bold mb-6">Complete management</h1>
-          <p className="text-violet-200">
+          <img src={rocLogo} alt="ROC Logo" className="h-12 lg:h-16 xl:h-20 mb-8 lg:mb-12 invert brightness-0" />
+          <p className="text-violet-300 mb-3 lg:mb-4 text-sm lg:text-base">The New Standard for Housing</p>
+          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold">Verified tenants</h1>
+          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-4 lg:mb-6">Complete management</h1>
+          <p className="text-violet-200 text-sm lg:text-base xl:text-lg leading-relaxed">
             All-in-one solution for safe, simple property management
           </p>
         </div>
@@ -98,34 +98,34 @@ const SignUpPage = () => {
           <img 
             src={groupLogo} 
             alt="Group Logo" 
-            className="max-w-full h-auto object-contain lg:h-[300px] lg:w-[330px] xl:h-[350px] xl:w-[380px] 2xl:h-[400px] 2xl:w-[430px] transform lg:translate-x-[30px] lg:-translate-y-[50px] xl:translate-x-[40px] xl:-translate-y-[60px]" 
+            className="max-w-full h-auto object-contain lg:h-[250px] lg:w-[280px] xl:h-[320px] xl:w-[350px] 2xl:h-[380px] 2xl:w-[390px] transform lg:translate-x-[20px] lg:-translate-y-[30px] xl:translate-x-[30px] xl:-translate-y-[40px] 2xl:translate-x-[60px] 2xl:-translate-y-[20px]" 
           />
         </div>
       </div>
-      <div className="flex flex-col min-h-screen md:items-center md:justify-center py-6 px-4 sm:px-6 md:px-8">
+      <div className="flex flex-col min-h-screen lg:items-center lg:justify-center py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:px-8 xl:px-12">
         {/* Mobile Header */}
-        <div className="md:hidden mb-8">
+        <div className="lg:hidden mb-6 sm:mb-8">
           <button 
             onClick={() => step === 1 ? navigate(-1) : prevStep()}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
         </div>
 
-        <div className="mx-auto flex flex-col w-full max-w-sm space-y-8">
+        <div className="mx-auto flex flex-col w-full max-w-sm lg:max-w-md xl:max-w-lg space-y-6 lg:space-y-8">
           {/* Mobile Logo */}
-          <div className="md:hidden flex justify-center mb-8">
-            <img src={rocLogo} alt="ROC Logo" className="h-20" />
+          <div className="lg:hidden flex justify-center mb-6 sm:mb-8">
+            <img src={rocLogo} alt="ROC Logo" className="h-16 sm:h-20" />
           </div>
 
           <div className="grid gap-2">
-            <h1 className="text-3xl font-bold">Sign Up</h1>
-            <p className="text-balance text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Sign Up</h1>
+            <p className="text-balance text-muted-foreground text-sm sm:text-base">
               Enter your information to create an account
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="grid gap-4">
+          <form onSubmit={handleSubmit} className="grid gap-4 lg:gap-6">
             {error && <p className="text-red-500 text-sm text-center bg-red-100 p-2 rounded-md">{error}</p>}
             {step === 1 && (
               <>
@@ -163,10 +163,10 @@ const SignUpPage = () => {
                   />
                 </div>
 
-                <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base">
+                <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg">
                   Continuar
                 </Button>
-                <div className="text-center text-sm text-gray-600">
+                <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
                   <Link to="/signin" className="font-medium text-[#57007B] hover:text-violet-500">
                     Sign in
@@ -200,18 +200,18 @@ const SignUpPage = () => {
                   </Select>
                 </div>
 
-                <div className="text-center text-sm text-gray-600">
+                <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
                   <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
                     Sign in
                   </Link>
                 </div>
 
-                <div className="flex justify-between gap-4">
-                  <Button type="button" onClick={prevStep} variant="outline" className="w-full py-6 hidden md:flex">
+                <div className="flex justify-between gap-3 sm:gap-4">
+                  <Button type="button" onClick={prevStep} variant="outline" className="w-full py-4 sm:py-6 text-sm sm:text-base hidden lg:flex">
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base">
+                  <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg">
                     Continuar
                   </Button>
                 </div>
@@ -254,20 +254,20 @@ const SignUpPage = () => {
                   </Select>
                 </div>
 
-                <div className="text-center text-sm text-gray-600">
+                <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
                   <Link to="/signin" className="font-medium text-[#57007B] hover:text-violet-500">
                     Sign in
                   </Link>
                 </div>
 
-                <div className="flex justify-between gap-4">
-                  <Button type="button" onClick={prevStep} variant="outline" className="w-full py-6 hidden md:flex">
+                <div className="flex justify-between gap-3 sm:gap-4">
+                  <Button type="button" onClick={prevStep} variant="outline" className="w-full py-4 sm:py-6 text-sm sm:text-base hidden lg:flex">
                     Previous
                   </Button>
                   <Button
                     type="submit"
-                    className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base"
+                    className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg"
                     disabled={isLoading}
                   >
                     {isLoading ? "Creating Account..." : "Continuar"}
