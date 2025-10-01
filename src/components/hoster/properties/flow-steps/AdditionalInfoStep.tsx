@@ -26,12 +26,31 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
 
   const [roommates, setRoommates] = useState(0); // For rooms type
   const [houseRules, setHouseRules] = useState({
-    pets: property.details?.advancedConfig?.rules?.pets || false,
-    smoking: property.details?.advancedConfig?.rules?.smoking || false,
-    parties: property.details?.advancedConfig?.rules?.smoking || false, // Assuming parties is similar to smoking
+    pets: {
+      allowed: property.details?.advancedConfig?.rules?.pets || false,
+      policy: 'No pets allowed',
+      details: ''
+    },
+    smoking: {
+      allowed: property.details?.advancedConfig?.rules?.smoking || false,
+      policy: 'No smoking',
+      details: ''
+    },
+    parties: {
+      allowed: false,
+      policy: 'No parties',
+      details: ''
+    },
     meetings: {
       allowed: property.details?.advancedConfig?.rules?.meetings?.allowed || false,
-      schedule: property.details?.advancedConfig?.rules?.meetings?.schedule || ''
+      schedule: property.details?.advancedConfig?.rules?.meetings?.schedule || '',
+      details: ''
+    },
+    parking: {
+      available: info.parking > 0,
+      spaces: info.parking,
+      policy: 'No parking available',
+      details: ''
     }
   });
 
@@ -51,8 +70,16 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
         advancedConfig: {
           ...property.details?.advancedConfig,
           enabled: true,
-          rules: newRules,
-          environment: property.details?.advancedConfig?.environment || { title: '', description: '' }
+          rules: {
+            ...property.details?.advancedConfig?.rules,
+            pets: newRules.pets.allowed,
+            smoking: newRules.smoking.allowed,
+            parties: newRules.parties.allowed,
+            meetings: {
+              allowed: newRules.meetings.allowed,
+              schedule: newRules.meetings.schedule
+            }
+          }
         }
       }
     });
@@ -199,8 +226,8 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="pets"
-                  checked={houseRules.pets}
-                  onCheckedChange={(checked) => updateHouseRules({ pets: checked as boolean })}
+                  checked={houseRules.pets.allowed}
+                  onCheckedChange={(checked) => updateHouseRules({ pets: { ...houseRules.pets, allowed: checked as boolean } })}
                 />
                 <div className="flex items-center gap-2">
                   <PawPrint className="w-4 h-4 text-muted-foreground" />
@@ -213,8 +240,8 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="smoking"
-                  checked={houseRules.smoking}
-                  onCheckedChange={(checked) => updateHouseRules({ smoking: checked as boolean })}
+                  checked={houseRules.smoking.allowed}
+                  onCheckedChange={(checked) => updateHouseRules({ smoking: { ...houseRules.smoking, allowed: checked as boolean } })}
                 />
                 <div className="flex items-center gap-2">
                   <Cigarette className="w-4 h-4 text-muted-foreground" />
@@ -227,8 +254,8 @@ export const AdditionalInfoStep = ({ property, updateProperty, onNext, onPrev }:
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="parties"
-                  checked={houseRules.parties}
-                  onCheckedChange={(checked) => updateHouseRules({ parties: checked as boolean })}
+                  checked={houseRules.parties.allowed}
+                  onCheckedChange={(checked) => updateHouseRules({ parties: { ...houseRules.parties, allowed: checked as boolean } })}
                 />
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-muted-foreground" />

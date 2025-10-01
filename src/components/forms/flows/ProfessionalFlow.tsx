@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { IncomeStep } from "../steps/IncomeStep"
 import { KYCStep } from "../steps/KYCStep"
 import type { ApplicationData } from "../RentalApplicationFlow"
-import type { Property } from "@/data/mockProperties"
+import type { Property } from "@/types/unified-property"
 
 interface ProfessionalFlowProps {
   applicationData: ApplicationData

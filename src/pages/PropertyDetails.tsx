@@ -92,9 +92,10 @@ const PropertyDetails = () => {
         const transformedProperty = transformBackendPropertyToFrontend(backendProperty)
         console.log('Transformed property:', transformedProperty)
         
-        // Create property with multiple images for gallery (using the same image for demo)
+        // Create property with multiple images for gallery and preserve contracts field
         const propertyWithImages = {
           ...transformedProperty,
+          contracts: backendProperty.contracts, // Preserve contracts field for RentalApplicationFlow
           images: backendProperty.images && backendProperty.images.length > 0 
             ? backendProperty.images 
             : [transformedProperty.image] // Fallback to single image

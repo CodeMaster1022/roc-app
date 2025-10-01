@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileText, Clock, Shield, AlertCircle, Upload, Download, Eye } from "lucide-react";
 import { Property, ROOM_CHARACTERISTICS } from "@/types/property";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -24,10 +25,13 @@ export const ContractsStep = ({ property, updateProperty, onNext, onPrev }: Cont
   const { toast } = useToast();
   
   const [contractType, setContractType] = useState<'template' | 'custom'>('template');
-  const [selectedMonths, setSelectedMonths] = useState<string[]>(property.contracts?.standardOptions || []);
+  const [selectedMonths, setSelectedMonths] = useState<string[]>(
+    property.contracts?.standardOptions?.length ? property.contracts.standardOptions : ['12'] // Default to 12 months
+  );
   const [requiresDeposit, setRequiresDeposit] = useState(property.contracts?.requiresDeposit || false);
   const [depositAmount, setDepositAmount] = useState<number>(property.contracts?.depositAmount || 0);
   const [customContract, setCustomContract] = useState<File | null>(null);
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
   const [roomDeposits, setRoomDeposits] = useState<{[key: string]: number}>(
     property.rooms?.reduce((acc, room) => ({
       ...acc,
@@ -169,221 +173,308 @@ export const ContractsStep = ({ property, updateProperty, onNext, onPrev }: Cont
     : customContract !== null;
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">
-          <span className="text-highlight">{t('contracts.flow_title') || 'Configuración de Contratos'}</span>
-        </h2>
-        <p className="text-muted-foreground text-sm md:text-base">
-          {t('contracts.flow_description') || 'Configura las opciones de contrato para tu propiedad'}
-        </p>
-      </div>
+    <>
+      <div className="p-4 space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">
+            <span className="text-highlight">{t('propertyFlow.contracts') || 'Contratos'}</span>
+          </h2>
+          <p className="text-muted-foreground text-sm md:text-base">
+            {t('propertyFlow.contracts_description') || 'Configura los términos de contrato para tu propiedad'}
+          </p>
+        </div>
 
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Contract Type Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
-              {t('contracts.contract_type') || 'Tipo de Contrato'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={contractType} onValueChange={(value) => setContractType(value as 'template' | 'custom')}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="template">
-                  {t('contracts.use_template') || 'Usar Plantilla'}
-                </TabsTrigger>
-                <TabsTrigger value="custom">
-                  {t('contracts.upload_custom') || 'Subir Personalizado'}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="template" className="space-y-4">
-
-
-                {/* Contract Duration Options */}
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">
-                    {t('contracts.duration_options') || 'Opciones de duración de contrato'}
-                  </Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {contractOptions.map((option) => (
-                      <div key={option.value} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`month-${option.value}`}
-                          checked={selectedMonths.includes(option.value)}
-                          onCheckedChange={() => toggleMonth(option.value)}
-                        />
-                        <Label 
-                          htmlFor={`month-${option.value}`}
-                          className="cursor-pointer text-sm"
-                        >
-                          {option.label}
-                        </Label>
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Contract Type Selection */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                {t('contracts.contract_type') || 'Tipo de Contrato'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={contractType} onValueChange={(value) => setContractType(value as 'template' | 'custom')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="template">
+                    {t('contracts.use_template') || 'Usar Plantilla'}
+                  </TabsTrigger>
+                  <TabsTrigger value="custom">
+                    {t('contracts.upload_custom') || 'Subir Personalizado'}
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="template" className="space-y-4">
+                  {/* ROC Contract Preview */}
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <FileText className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-medium mb-2">
+                            {t('contracts.roc_template') || 'Contrato ROC (Recomendado)'}
+                          </h4>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Contrato estándar protegido legalmente, diseñado para proteger tanto al inquilino como al propietario.
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowPDFPreview(true)}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye className="w-4 h-4" />
+                              {t('contracts.preview') || 'Vista previa'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                // Mock download - replace with real PDF URL
+                                const link = document.createElement('a');
+                                link.href = '/contracts/roc-template.pdf';
+                                link.download = 'contrato-roc-template.pdf';
+                                link.click();
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              {t('contracts.download') || 'Descargar'}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                  {selectedMonths.length > 0 && (
-                    <div className="text-sm text-muted-foreground">
-                      {t('contracts.selected_durations') || 'Duraciones seleccionadas'}: {selectedMonths.length}
+
+                  {/* Contract Duration Options */}
+                  <div className="space-y-4">
+                    <Label className="text-base font-medium">
+                      {t('contracts.duration_options') || 'Opciones de duración de contrato'}
+                    </Label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {contractOptions.map((option) => (
+                        <div key={option.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`month-${option.value}`}
+                            checked={selectedMonths.includes(option.value)}
+                            onCheckedChange={() => toggleMonth(option.value)}
+                          />
+                          <Label 
+                            htmlFor={`month-${option.value}`}
+                            className="cursor-pointer text-sm"
+                          >
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedMonths.length > 0 && (
+                      <div className="text-sm text-muted-foreground">
+                        {t('contracts.selected_durations') || 'Duraciones seleccionadas'}: {selectedMonths.length}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="custom" className="space-y-4">
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium mb-2">
+                          {t('contracts.custom_requirements') || 'Requisitos para contratos personalizados'}
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• {t('contracts.requirement_1') || 'Debe ser legalmente válido en México'}</li>
+                          <li>• {t('contracts.requirement_2') || 'Incluir cláusulas de protección al inquilino'}</li>
+                          <li>• {t('contracts.requirement_3') || 'Formatos: PDF, DOC, DOCX (máx. 5MB)'}</li>
+                          <li>• {t('contracts.requirement_4') || 'Será revisado por nuestro equipo legal'}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* File Upload */}
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleCustomContractUpload}
+                      className="hidden"
+                      id="contract-upload"
+                    />
+                    <label htmlFor="contract-upload" className="cursor-pointer">
+                      <div className="space-y-3">
+                        <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto">
+                          <Upload className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            {customContract 
+                              ? customContract.name 
+                              : (t('contracts.upload_contract_file') || 'Subir contrato personalizado')
+                            }
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {t('contracts.upload_instructions') || 'PDF, DOC o DOCX hasta 5MB'}
+                          </p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  {customContract && (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="font-medium">{customContract.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {(customContract.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setCustomContract(null)}
+                      >
+                        {t('contracts.remove') || 'Remover'}
+                      </Button>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Deposit Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                {t('contracts.deposit_config') || 'Configuración de Depósito'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-base">
+                    {t('contracts.require_deposit') || 'Requerir depósito'}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {t('contracts.deposit_description') || 'Los inquilinos deberán pagar un depósito de garantía'}
+                  </p>
+                </div>
+                <Switch
+                  checked={requiresDeposit}
+                  onCheckedChange={handleDepositToggle}
+                />
+              </div>
+
+              {requiresDeposit && (
+                <div className="space-y-4 animate-fade-in">
+                  {!isRoomsType && (
+                    <div className="space-y-2">
+                      <Label>
+                        {t('contracts.deposit_amount') || 'Monto del depósito (MXN)'}
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="0"
+                        value={depositAmount || ''}
+                        onChange={(e) => handleDepositAmountChange(parseFloat(e.target.value) || 0)}
+                        className="max-w-xs"
+                        min="0"
+                      />
+                    </div>
+                  )}
+
+                  {isRoomsType && (
+                    <div className="space-y-3">
+                      <Label>
+                        {t('contracts.room_deposits') || 'Depósito por habitación (MXN)'}
+                      </Label>
+                      {property.rooms?.map((room) => (
+                        <div key={room.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <span className="font-medium">{room.name}</span>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={roomDeposits[room.id] || ''}
+                            onChange={(e) => handleRoomDepositChange(room.id, parseFloat(e.target.value) || 0)}
+                            className="w-32"
+                            min="0"
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="custom" className="space-y-4">
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium mb-2">
-                        {t('contracts.custom_requirements') || 'Requisitos para contratos personalizados'}
-                      </h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• {t('contracts.requirement_1') || 'Debe ser legalmente válido en México'}</li>
-                        <li>• {t('contracts.requirement_2') || 'Incluir cláusulas de protección al inquilino'}</li>
-                        <li>• {t('contracts.requirement_3') || 'Formatos: PDF, DOC, DOCX (máx. 5MB)'}</li>
-                        <li>• {t('contracts.requirement_4') || 'Será revisado por nuestro equipo legal'}</li>
-                      </ul>
-                    </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4 max-w-4xl mx-auto">
+          <Button variant="outline" onClick={onPrev} className="order-2 sm:order-1">
+            {t('propertyFlow.previous') || 'Anterior'}
+          </Button>
+          <Button 
+            onClick={handleNext}
+            disabled={!hasValidConfiguration}
+            className="order-1 sm:order-2"
+          >
+            {t('propertyFlow.continue') || 'Continuar'}
+          </Button>
+        </div>
+      </div>
+
+      {/* PDF Preview Modal */}
+      <Dialog open={showPDFPreview} onOpenChange={setShowPDFPreview}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Vista previa - Contrato ROC</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden">
+            <div className="w-full h-[70vh] border rounded-lg overflow-hidden">
+              {/* Mock PDF Preview - Replace with actual PDF viewer */}
+              <div className="w-full h-full bg-muted/20 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <FileText className="w-16 h-16 text-muted-foreground mx-auto" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Contrato de Arrendamiento ROC</h3>
+                    <p className="text-muted-foreground">
+                      Vista previa del contrato estándar
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      El contrato completo se generará con los datos específicos de tu propiedad
+                    </p>
                   </div>
-                </div>
-
-                {/* File Upload */}
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleCustomContractUpload}
-                    className="hidden"
-                    id="contract-upload"
-                  />
-                  <label htmlFor="contract-upload" className="cursor-pointer">
-                    <div className="space-y-3">
-                      <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto">
-                        <Upload className="w-6 h-6 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          {customContract 
-                            ? customContract.name 
-                            : (t('contracts.upload_contract_file') || 'Subir contrato personalizado')
-                          }
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {t('contracts.upload_instructions') || 'PDF, DOC o DOCX hasta 5MB'}
-                        </p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-
-                {customContract && (
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <div>
-                        <p className="font-medium">{customContract.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {(customContract.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setCustomContract(null)}
+                  <div className="flex gap-2 justify-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        // Mock download
+                        const link = document.createElement('a');
+                        link.href = '/contracts/roc-template.pdf';
+                        link.download = 'contrato-roc-template.pdf';
+                        link.click();
+                      }}
                     >
-                      {t('contracts.remove') || 'Remover'}
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar PDF
                     </Button>
                   </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Deposit Configuration */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              {t('contracts.deposit_config') || 'Configuración de Depósito'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base">
-                  {t('contracts.require_deposit') || 'Requerir depósito'}
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  {t('contracts.deposit_description') || 'Los inquilinos deberán pagar un depósito de garantía'}
-                </p>
+                </div>
               </div>
-              <Switch
-                checked={requiresDeposit}
-                onCheckedChange={handleDepositToggle}
-              />
             </div>
-
-            {requiresDeposit && (
-              <div className="space-y-4 animate-fade-in">
-                {!isRoomsType && (
-                  <div className="space-y-2">
-                    <Label>
-                      {t('contracts.deposit_amount') || 'Monto del depósito (MXN)'}
-                    </Label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={depositAmount || ''}
-                      onChange={(e) => handleDepositAmountChange(parseFloat(e.target.value) || 0)}
-                      className="max-w-xs"
-                      min="0"
-                    />
-                  </div>
-                )}
-
-                {isRoomsType && (
-                  <div className="space-y-3">
-                    <Label>
-                      {t('contracts.room_deposits') || 'Depósito por habitación (MXN)'}
-                    </Label>
-                    {property.rooms?.map((room) => (
-                      <div key={room.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <span className="font-medium">{room.name}</span>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          value={roomDeposits[room.id] || ''}
-                          onChange={(e) => handleRoomDepositChange(room.id, parseFloat(e.target.value) || 0)}
-                          className="w-32"
-                          min="0"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4 max-w-4xl mx-auto">
-        <Button variant="outline" onClick={onPrev} className="order-2 sm:order-1">
-          {t('propertyFlow.previous') || 'Anterior'}
-        </Button>
-        <Button 
-          onClick={handleNext}
-          disabled={!hasValidConfiguration}
-          className="order-1 sm:order-2"
-        >
-          {t('propertyFlow.continue') || 'Continuar'}
-        </Button>
-      </div>
-    </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

@@ -103,7 +103,7 @@ const TenantsPage = () => {
   return (
     <div className="space-y-3 md:space-y-6 p-2 md:p-0">
       {/* Only show NotificationDemo on desktop */}
-      {!isMobile && <NotificationDemo />}
+      {/* {!isMobile && <NotificationDemo />} */}
       
       {/* Header */}
       <div className="animate-fade-in">

@@ -10,12 +10,13 @@ import { ContactInfoStep } from "./steps/ContactInfoStep"
 import { StudentFlow } from "./flows/StudentFlow"
 import { ProfessionalFlow } from "./flows/ProfessionalFlow"
 import { EntrepreneurFlow } from "./flows/EntrepreneurFlow"
-import type { Property } from "@/data/mockProperties"
+import type { Property } from "@/types/unified-property"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { applicationService, type ApplicationData as BackendApplicationData } from "@/services/applicationService"
 import AuthPromptModal from "@/components/modals/AuthPromptModal"
+import React from "react"
 
 export interface ApplicationData {
   // Basic info
@@ -316,7 +317,30 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
     }
   }
 
-  const contractOptions = [3, 6, 12] // months - normally set by host
+  // Get contract options from property configuration, fallback to default if not set
+  const contractOptions = React.useMemo(() => {
+    // Check if property has contracts configuration
+    if (property.contracts?.standardOptions?.length) {
+      const options = property.contracts.standardOptions
+        .map(option => parseInt(option, 10))
+        .filter(option => !isNaN(option) && option > 0)
+        .sort((a, b) => a - b);
+      
+      if (options.length > 0) {
+        return options;
+      }
+    }
+    
+    // Fallback to default options
+    return [3, 6, 12];
+  }, [property.contracts?.standardOptions]);
+
+  // Debug logging
+  console.log('🔍 Contract options debug:', {
+    propertyContracts: property.contracts,
+    standardOptions: property.contracts?.standardOptions,
+    finalOptions: contractOptions
+  });
 
   const renderStep = () => {
     switch (currentStep) {

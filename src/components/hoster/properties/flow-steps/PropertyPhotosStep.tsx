@@ -106,28 +106,43 @@ export const PropertyPhotosStep = ({ property, updateProperty, onNext, onPrev }:
   };
 
   const handleNext = () => {
-    if (photos.length === 0) {
+    const minPhotos = 5;
+    if (photos.length < minPhotos) {
       toast({
-        title: "Fotos requeridas",
-        description: "Por favor sube al menos una foto de la propiedad",
+        title: "Fotos insuficientes",
+        description: `Se requieren mínimo ${minPhotos} fotos de la propiedad. Tienes ${photos.length} foto${photos.length === 1 ? '' : 's'}.`,
         variant: "destructive",
       });
       return;
     }
+
+    updateProperty({
+      details: {
+        ...property.details,
+        photos
+      }
+    });
     onNext();
   };
 
+  const hasMinPhotos = photos.length >= 5;
   const hasPhotos = photos.length > 0;
 
   return (
     <div className="p-4 space-y-6">
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">
-          <span className="text-highlight">{t('propertyFlow.property_photos') || 'Fotos de la Propiedad'}</span>
+          <span className="text-highlight">{t('propertyFlow.photos') || 'Fotos de la propiedad'}</span>
         </h2>
         <p className="text-muted-foreground text-sm md:text-base">
-          {t('propertyFlow.property_photos_desc') || 'Sube fotos generales de la propiedad (espacios comunes, exterior, etc.)'}
+          Sube mínimo 5 fotos de alta calidad de tu propiedad
         </p>
+        <div className="mt-2">
+          <span className={`text-sm font-medium ${hasMinPhotos ? 'text-green-600' : 'text-orange-600'}`}>
+            {photos.length}/5 fotos mínimas {hasMinPhotos && '✓'}
+          </span>
+          <span className="text-xs text-muted-foreground ml-2">(máximo 10)</span>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
@@ -198,7 +213,7 @@ export const PropertyPhotosStep = ({ property, updateProperty, onNext, onPrev }:
           </Button>
           <Button 
             onClick={handleNext}
-            disabled={!hasPhotos}
+            disabled={!hasMinPhotos}
             className="order-1 sm:order-2"
           >
             {t('propertyFlow.continue') || 'Continuar'} ({photos.length}/10)

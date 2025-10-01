@@ -63,6 +63,7 @@ export interface Property {
     photos: string[];
     amenities: string[];
     included?: string[];
+    roommates?: any[]; // Add roommates field
     advancedConfig: {
       enabled: boolean;
       rules: {

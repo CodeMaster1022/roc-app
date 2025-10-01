@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Plus, MapPin, Bed, Bath, Car, DollarSign, Eye, Edit, Trash2, Home } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Property } from '@/types/property'
@@ -50,16 +51,16 @@ export const PropertiesSection = () => {
       console.log('=== LOAD PROPERTIES DEBUG START ===');
       setLoading(true);
       
-      console.log('Calling propertyService.getHosterProperties()...');
-      const response = await propertyService.getHosterProperties();
-      console.log('API Response:', response);
+      console.log('Calling propertyService.getAllHosterProperties()...');
+      const allProperties = await propertyService.getAllHosterProperties();
+      console.log('API Response - All Properties:', allProperties);
       
       console.log('Transforming properties...');
-      const transformedProperties = response.data.properties.map(transformBackendToFrontend);
+      const transformedProperties = allProperties.map(transformBackendToFrontend);
       console.log('Transformed properties:', transformedProperties);
       
       setProperties(transformedProperties);
-      console.log('Properties state updated');
+      console.log('Properties state updated - Total properties:', transformedProperties.length);
       console.log('=== LOAD PROPERTIES DEBUG END ===');
     } catch (error: any) {
       console.error('=== LOAD PROPERTIES ERROR DEBUG ===');
@@ -177,8 +178,8 @@ export const PropertiesSection = () => {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:gap-6">
-        <NotificationDemo />
+      <div className="space-y-4 md:space-y-6">
+        {/* <NotificationDemo /> */}
         
         {properties.length === 0 ? (
           <Card className="text-center py-8">
@@ -191,7 +192,15 @@ export const PropertiesSection = () => {
             </CardContent>
           </Card>
         ) : (
-          properties.map((property) => (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Showing {properties.length} {properties.length === 1 ? 'property' : 'properties'}
+              </p>
+            </div>
+            <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+              <div className="grid gap-4 md:gap-6">
+                {properties.map((property) => (
             <Card key={property.id} className="animate-slide-up hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3 md:pb-4">
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
@@ -289,8 +298,12 @@ export const PropertiesSection = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          ))
+                  </Card>
+                ))
+              }
+              </div>
+            </ScrollArea>
+          </div>
         )}
       </div>
       

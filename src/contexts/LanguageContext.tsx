@@ -315,6 +315,25 @@ const translations = {
     'propertyFlow.parties': 'Fiestas',
     'propertyFlow.work_meetings': 'Reuniones de trabajo',
     
+    // Property Flow - Additional missing keys
+    'propertyFlow.photos': 'Fotos de la propiedad',
+    'propertyFlow.contracts_description': 'Configura los términos de contrato para tu propiedad',
+    
+    // Roommates Step
+    'propertyFlow.roommates_title': 'Compañeros de casa',
+    'propertyFlow.roommates_description': 'Describe a las personas que actualmente viven en la propiedad',
+    'propertyFlow.add_roommate': 'Agregar compañero de casa',
+    'propertyFlow.roommate_optional': 'Opcional: Ayuda a los inquilinos a conocer el ambiente de la casa',
+    'propertyFlow.roommate_number': 'Compañero',
+    'propertyFlow.gender': 'Género',
+    'propertyFlow.age': 'Edad',
+    'propertyFlow.occupation': 'Ocupación',
+    'propertyFlow.personality': 'Personalidad',
+    'propertyFlow.select_occupation': 'Selecciona ocupación',
+    'propertyFlow.personality_placeholder': 'Describe la personalidad (ej: Tranquilo, Sociable, Estudioso)',
+    'propertyFlow.no_roommates': 'Sin compañeros de casa',
+    'propertyFlow.no_roommates_description': 'Agrega información sobre las personas que viven en la propiedad para ayudar a los inquilinos a conocer el ambiente',
+    
     // Contracts Step
     'contracts.flow_title': 'Configuración de Contratos',
     'contracts.flow_description': 'Configura las opciones de contrato para tu propiedad',
@@ -362,6 +381,11 @@ const translations = {
     'contracts.select_duration_desc': 'Selecciona al menos una opción de duración de contrato',
     'contracts.upload_contract': 'Sube tu contrato',
     'contracts.upload_contract_desc': 'Sube tu contrato personalizado',
+    
+    // Contracts - Additional keys for new features
+    'contracts.roc_template': 'Contrato ROC (Recomendado)',
+    'contracts.preview': 'Vista previa',
+    'contracts.download': 'Descargar',
     
     // General
     'apply_to_rent': 'Aplicar para rentar',
@@ -965,6 +989,25 @@ const translations = {
     'propertyFlow.parties': 'Parties',
     'propertyFlow.work_meetings': 'Work meetings',
     
+    // Property Flow - Additional missing keys
+    'propertyFlow.photos': 'Property photos',
+    'propertyFlow.contracts_description': 'Configure contract terms for your property',
+    
+    // Roommates Step
+    'propertyFlow.roommates_title': 'Roommates',
+    'propertyFlow.roommates_description': 'Describe the people currently living in the property',
+    'propertyFlow.add_roommate': 'Add roommate',
+    'propertyFlow.roommate_optional': 'Optional: Helps tenants understand the property environment',
+    'propertyFlow.roommate_number': 'Roommate',
+    'propertyFlow.gender': 'Gender',
+    'propertyFlow.age': 'Age',
+    'propertyFlow.occupation': 'Occupation',
+    'propertyFlow.personality': 'Personality',
+    'propertyFlow.select_occupation': 'Select occupation',
+    'propertyFlow.personality_placeholder': 'Describe personality (e.g., Calm, Sociable, Studious)',
+    'propertyFlow.no_roommates': 'No roommates',
+    'propertyFlow.no_roommates_description': 'Add information about the people living in the property to help tenants understand the environment',
+    
     // Contracts Step
     'contracts.flow_title': 'Contract Configuration',
     'contracts.flow_description': 'Configure contract options for your property',
@@ -1012,6 +1055,11 @@ const translations = {
     'contracts.select_duration_desc': 'Select at least one contract duration option',
     'contracts.upload_contract': 'Upload your contract',
     'contracts.upload_contract_desc': 'Upload your custom contract',
+    
+    // Contracts - Additional keys for new features
+    'contracts.roc_template': 'ROC Contract (Recommended)',
+    'contracts.preview': 'Preview',
+    'contracts.download': 'Download',
     
     // General
     'apply_to_rent': 'Apply to rent',

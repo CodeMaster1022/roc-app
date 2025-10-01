@@ -2,11 +2,13 @@ import { useState } from "react"
 import { RocButton } from "@/components/ui/roc-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { IncomeStep } from "../steps/IncomeStep"
 import { KYCStep } from "../steps/KYCStep"
 import type { ApplicationData } from "../RentalApplicationFlow"
-import type { Property } from "@/data/mockProperties"
+import type { Property } from "@/types/unified-property"
 
 interface EntrepreneurFlowProps {
   applicationData: ApplicationData

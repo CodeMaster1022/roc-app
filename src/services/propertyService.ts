@@ -42,15 +42,38 @@ export interface BackendProperty {
   description: string;
   type: 'property' | 'rooms';
   propertyType: 'casa' | 'departamento';
-  location: PropertyLocation;
+  location: {
+    address: string;
+    lat: number;
+    lng: number;
+    zone: string;
+  };
   area: number;
   bedrooms: number;
   bathrooms: number;
   parking: number;
   furniture: 'amueblada' | 'semi-amueblada' | 'sin-amueblar';
   amenities: string[];
-  pricing: PropertyPricing;
-  rules: PropertyRules;
+  pricing: {
+    totalPrice: number;
+    rentalType: 'completa' | 'habitaciones' | 'ambos';
+  };
+  rules: {
+    pets: boolean;
+    smoking: boolean;
+    parties: boolean;
+    meetings?: {
+      allowed: boolean;
+      schedule?: string;
+    };
+  };
+  contracts?: {
+    contractType?: 'template' | 'custom';
+    customContract?: string;
+    standardOptions: string[];
+    requiresDeposit: boolean;
+    depositAmount?: number;
+  };
   images: string[];
   status: 'draft' | 'review' | 'approved' | 'rejected' | 'returned';
   rooms?: PropertyRoom[];
@@ -63,18 +86,49 @@ export interface CreatePropertyRequest {
   description: string;
   type: 'property' | 'rooms';
   propertyType: 'casa' | 'departamento';
-  location: PropertyLocation;
+  location: {
+    address: string;
+    lat: number;
+    lng: number;
+    zone: string;
+  };
   area: number;
   bedrooms: number;
   bathrooms: number;
-  parking?: number;
+  parking: number;
   furniture: 'amueblada' | 'semi-amueblada' | 'sin-amueblar';
-  amenities?: string[];
-  pricing: PropertyPricing;
-  rules?: PropertyRules;
-  images?: string[];
-  status?: 'draft' | 'review' | 'approved' | 'rejected' | 'returned';
-  rooms?: PropertyRoom[];
+  amenities: string[];
+  pricing: {
+    totalPrice: number;
+    rentalType: 'completa' | 'habitaciones' | 'ambos';
+  };
+  rules: {
+    pets: boolean;
+    smoking: boolean;
+    parties: boolean;
+    meetings?: {
+      allowed: boolean;
+      schedule?: string;
+    };
+  };
+  contracts?: {
+    contractType?: 'template' | 'custom';
+    customContract?: string;
+    standardOptions: string[];
+    requiresDeposit: boolean;
+    depositAmount?: number;
+  };
+  images: string[];
+  status: 'draft' | 'review' | 'approved' | 'rejected' | 'returned';
+  rooms?: {
+    id: string;
+    name: string;
+    characteristics: string;
+    furniture: string;
+    price: number;
+    availableFrom: Date;
+    photos?: string[];
+  }[];
 }
 
 export interface PropertyResponse {
@@ -181,7 +235,7 @@ class PropertyService {
     return data;
   }
 
-  async getHosterProperties(page: number = 1, limit: number = 10, status?: string): Promise<PropertiesResponse> {
+  async getHosterProperties(page: number = 1, limit: number = 100, status?: string): Promise<PropertiesResponse> {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -200,6 +254,23 @@ class PropertyService {
     }
 
     return data;
+  }
+
+  // Method to get ALL hoster properties (handles pagination automatically)
+  async getAllHosterProperties(status?: string): Promise<BackendProperty[]> {
+    let allProperties: BackendProperty[] = [];
+    let currentPage = 1;
+    let hasMorePages = true;
+
+    while (hasMorePages) {
+      const response = await this.getHosterProperties(currentPage, 100, status);
+      allProperties = [...allProperties, ...response.data.properties];
+      
+      hasMorePages = currentPage < response.data.pagination.pages;
+      currentPage++;
+    }
+
+    return allProperties;
   }
 
   async getProperty(id: string): Promise<PropertyResponse> {

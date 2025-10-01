@@ -4,7 +4,7 @@ import { Shield } from "lucide-react"
 import { DocumentUpload } from "@/components/ui/document-upload"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/LanguageContext"
-import type { Property } from "@/data/mockProperties"
+import type { Property } from "@/types/unified-property"
 
 interface KYCStepProps {
   applicationType: 'student' | 'professional' | 'entrepreneur'

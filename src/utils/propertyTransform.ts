@@ -46,7 +46,7 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
       address: frontendProperty.location?.address || '',
       lat: frontendProperty.location?.lat || 0,
       lng: frontendProperty.location?.lng || 0,
-      zone: 'Centro' // Default zone, should be extracted from location
+      zone: frontendProperty.location?.zone || 'Centro' // Use actual zone from frontend, fallback to Centro
     },
     area: frontendProperty.additionalInfo?.area || 0,
     bedrooms: frontendProperty.rooms?.length || 0,
@@ -64,6 +64,13 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
       parties: false,
       meetings: frontendProperty.details?.advancedConfig?.rules?.meetings || { allowed: false }
     },
+    contracts: frontendProperty.contracts ? {
+      contractType: frontendProperty.contracts.contractType,
+      customContract: frontendProperty.contracts.customContract,
+      standardOptions: frontendProperty.contracts.standardOptions || [],
+      requiresDeposit: frontendProperty.contracts.requiresDeposit || false,
+      depositAmount: frontendProperty.contracts.depositAmount
+    } : undefined,
     images: frontendProperty.details?.photos || [],
     status: frontendProperty.status || 'draft',
     rooms: (frontendProperty.rooms || []).map(room => ({
@@ -107,8 +114,11 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
       rentalType: backendProperty.pricing.rentalType,
     },
     contracts: {
-      standardOptions: [], // Default empty array
-      requiresDeposit: false, // Default value
+      standardOptions: backendProperty.contracts?.standardOptions || [], // Use actual data from backend
+      requiresDeposit: backendProperty.contracts?.requiresDeposit || false, // Use actual data from backend
+      depositAmount: backendProperty.contracts?.depositAmount,
+      contractType: backendProperty.contracts?.contractType,
+      customContract: backendProperty.contracts?.customContract,
     },
     details: {
       name: backendProperty.title,

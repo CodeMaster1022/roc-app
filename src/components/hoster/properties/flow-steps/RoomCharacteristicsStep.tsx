@@ -109,6 +109,7 @@ export const RoomCharacteristicsStep = ({ property, updateProperty, onNext, onPr
   };
 
   const isRoomComplete = (room: Room) => {
+    const minPhotos = 3;
     return !!(
       room.name &&
       room.characteristics &&
@@ -117,8 +118,23 @@ export const RoomCharacteristicsStep = ({ property, updateProperty, onNext, onPr
       room.price > 0 &&
       room.availableFrom &&
       room.photos &&
-      room.photos.length > 0
+      room.photos.length >= minPhotos
     );
+  };
+
+  const getRoomValidationMessage = (room: Room) => {
+    const minPhotos = 3;
+    const issues = [];
+    
+    if (!room.characteristics) issues.push('características');
+    if (!room.furniture) issues.push('mobiliario');
+    if (!room.price || room.price <= 0) issues.push('precio');
+    if (!room.availableFrom) issues.push('fecha disponible');
+    if (!room.photos || room.photos.length < minPhotos) {
+      issues.push(`${minPhotos} fotos mínimas (tienes ${room.photos?.length || 0})`);
+    }
+    
+    return issues.length > 0 ? `Falta: ${issues.join(', ')}` : 'Completo ✓';
   };
 
   const allRoomsConfigured = property.rooms?.every(room => isRoomComplete(room)) || false;
@@ -273,7 +289,15 @@ export const RoomCharacteristicsStep = ({ property, updateProperty, onNext, onPr
 
                   {/* Room Photos */}
                   <div className="space-y-4">
-                    <Label>{t('propertyFlow.room_photos') || 'Fotos de la habitación'}</Label>
+                    <div className="flex items-center justify-between">
+                      <Label>{t('propertyFlow.room_photos') || 'Fotos de la habitación'}</Label>
+                      <span className={`text-sm font-medium ${(room.photos?.length || 0) >= 3 ? 'text-green-600' : 'text-orange-600'}`}>
+                        {room.photos?.length || 0}/3 mínimas {(room.photos?.length || 0) >= 3 && '✓'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Sube mínimo 3 fotos de alta calidad de esta habitación
+                    </p>
                     
                     {/* Upload Area */}
                     <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center hover:border-muted-foreground/50 transition-colors">
@@ -320,24 +344,29 @@ export const RoomCharacteristicsStep = ({ property, updateProperty, onNext, onPr
                       </div>
                     )}
                   </div>
-
-                  {/* Summary */}
-                  {isComplete && (
-                    <div className="bg-muted/50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FurnitureIcon className="w-4 h-4 text-primary" />
-                        <span className="font-medium">Resumen</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>• {ROOM_CHARACTERISTICS.find(c => c.id === room.characteristics)?.name}</p>
-                        <p>• {furnitureOptions.find(f => f.value === room.furniture)?.label}</p>
-                        <p>• ${room.price?.toLocaleString()} MXN/mes</p>
-                        {room.depositAmount && <p>• Depósito: ${room.depositAmount.toLocaleString()} MXN</p>}
-                        <p>• Disponible desde: {room.availableFrom ? new Date(room.availableFrom).toLocaleDateString() : 'No especificado'}</p>
-                        <p>• {room.photos?.length || 0} foto(s)</p>
+                </CardContent>
+              )}
+              {!expandedRoom && (
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${isRoomComplete(room) ? 'bg-green-500' : 'bg-orange-500'}`} />
+                      <div>
+                        <h3 className="font-semibold">{room.name}</h3>
+                        <p className={`text-sm ${isRoomComplete(room) ? 'text-green-600' : 'text-orange-600'}`}>
+                          {getRoomValidationMessage(room)}
+                        </p>
                       </div>
                     </div>
-                  )}
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <p>• {ROOM_CHARACTERISTICS.find(c => c.id === room.characteristics)?.name || 'Sin configurar'}</p>
+                      <p>• {furnitureOptions.find(f => f.value === room.furniture)?.label || 'Sin configurar'}</p>
+                      <p>• ${room.price?.toLocaleString() || '0'} MXN/mes</p>
+                      {room.depositAmount && <p>• Depósito: ${room.depositAmount.toLocaleString()} MXN</p>}
+                      <p>• Disponible desde: {room.availableFrom ? new Date(room.availableFrom).toLocaleDateString() : 'No especificado'}</p>
+                      <p>• {room.photos?.length || 0} foto(s) {(room.photos?.length || 0) >= 3 ? '✓' : '(mín. 3)'}</p>
+                    </div>
+                  </div>
                 </CardContent>
               )}
             </Card>
