@@ -37,7 +37,7 @@ const SignInPage = () => {
 
   return (
     <div className="w-full md:grid md:min-h-screen md:grid-cols-[35%_65%]">
-      <div className="hidden bg-violet-800 md:flex md:flex-col p-12 text-white">
+      <div className="hidden bg-[#57007B] md:flex md:flex-col p-12 text-white">
         <div className="w-full flex flex-col items-center justify-center h-full">
           <img src={rocLogo} alt="ROC Logo" className="h-24 mb-12 invert brightness-0" />
           <h1 className="text-[24px] font-bold">Find it-Live it-Own it</h1>
@@ -98,20 +98,19 @@ const SignInPage = () => {
                 {error}
               </div>
             )}
-
-            <div className="text-center text-sm text-gray-600">
+            
+            <Button type="submit" className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Continuar'}
+            </Button>
+            <div className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link 
                 to="/signup" 
-                className="font-medium text-violet-600 hover:text-violet-500"
+                className="font-medium text-[#57007B] hover:text-violet-500"
               >
                 Create One
               </Link>
             </div>
-            
-            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700 py-6 text-base" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Continuar'}
-            </Button>
           </form>
         </div>
       </div>

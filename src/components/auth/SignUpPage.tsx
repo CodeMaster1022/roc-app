@@ -84,7 +84,7 @@ const SignUpPage = () => {
 
   return (
     <div className="w-full md:grid md:min-h-screen md:grid-cols-[35%_65%]">
-      <div className="hidden bg-violet-800 md:flex md:flex-col py-12 pl-12 text-white justify-between items-center">
+      <div className="hidden bg-[#57007B] md:flex md:flex-col py-12 pl-12 text-white justify-between items-center">
         <div className="w-full">
           <img src={rocLogo} alt="ROC Logo" className="h-16 mb-12 invert brightness-0" />
           <p className="text-violet-300 mb-4">The New Standard for Housing</p>
@@ -159,16 +159,15 @@ const SignUpPage = () => {
                   />
                 </div>
 
+                <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base">
+                  Continuar
+                </Button>
                 <div className="text-center text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
+                  <Link to="/signin" className="font-medium text-[#57007B] hover:text-violet-500">
                     Sign in
                   </Link>
                 </div>
-
-                <Button type="button" onClick={nextStep} className="w-full bg-violet-600 hover:bg-violet-700 py-6 text-base">
-                  Continuar
-                </Button>
               </>
             )}
             {step === 2 && (
@@ -208,7 +207,7 @@ const SignUpPage = () => {
                   <Button type="button" onClick={prevStep} variant="outline" className="w-full py-6 hidden md:flex">
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="w-full bg-violet-600 hover:bg-violet-700 py-6 text-base">
+                  <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base">
                     Continuar
                   </Button>
                 </div>
@@ -253,7 +252,7 @@ const SignUpPage = () => {
 
                 <div className="text-center text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
+                  <Link to="/signin" className="font-medium text-[#57007B] hover:text-violet-500">
                     Sign in
                   </Link>
                 </div>
@@ -264,7 +263,7 @@ const SignUpPage = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="w-full bg-violet-600 hover:bg-violet-700 py-6 text-base"
+                    className="w-full bg-[#57007B] hover:bg-violet-700 py-6 text-base"
                     disabled={isLoading}
                   >
                     {isLoading ? "Creating Account..." : "Continuar"}
