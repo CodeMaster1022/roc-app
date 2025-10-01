@@ -71,7 +71,7 @@ export interface Property {
         smoking: boolean;
         parties?: boolean; // Add parties field
         meetings: {
-          allowed: boolean;
+          allowed: boolean; 
           schedule?: string;
         };
       };

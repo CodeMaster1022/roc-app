@@ -33,6 +33,8 @@ import { usePropertyFilters } from "@/hooks/usePropertyFilters"
 import rocLogo from "@/assets/roc-logo.png"
 import buildingHero from "@/assets/Video-wrappper.png"
 import AuthPromptModal from "@/components/modals/AuthPromptModal"
+import { TermsModal } from "@/components/modals/TermsModal"
+import { PrivacyModal } from "@/components/modals/PrivacyModal"
 const TikTokIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -91,6 +93,8 @@ const Index = () => {
   const [priceFilterOpen, setPriceFilterOpen] = useState(false)
   const [sortModalOpen, setSortModalOpen] = useState(false)
   const [showFavoriteAuthPrompt, setShowFavoriteAuthPrompt] = useState(false)
+  const [termsModalOpen, setTermsModalOpen] = useState(false)
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false)
 
   // Helper function to get user initials for fallback
   const getUserInitials = (name: string) => {
@@ -879,6 +883,17 @@ const Index = () => {
         actionText="Sign In to Save"
       />
 
+      {/* Terms and Privacy Modals */}
+      <TermsModal
+        open={termsModalOpen}
+        onOpenChange={setTermsModalOpen}
+      />
+      
+      <PrivacyModal
+        open={privacyModalOpen}
+        onOpenChange={setPrivacyModalOpen}
+      />
+
       {/* Footer */}
       {!isMobile && (
       <footer className="bg-footer py-12">
@@ -889,24 +904,18 @@ const Index = () => {
                          <div>
                <h3 className="font-medium text-foreground mb-4">Links</h3>
                <div className="space-y-3">
-                 <a 
-                   href="/documents/terminos-y-condiciones-roc-avance.docx" 
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className="block text-footer-link hover:text-foreground transition-colors duration-200"
-                   download
+                 <button 
+                   onClick={() => setTermsModalOpen(true)}
+                   className="block text-footer-link hover:text-foreground transition-colors duration-200 text-left"
                  >
                    Terms and conditions
-                 </a>
-                 <a 
-                   href="/documents/aviso-de-privacidad-roc.docx" 
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className="block text-footer-link hover:text-foreground transition-colors duration-200"
-                   download
+                 </button>
+                 <button 
+                   onClick={() => setPrivacyModalOpen(true)}
+                   className="block text-footer-link hover:text-foreground transition-colors duration-200 text-left"
                  >
                    Privacy notice
-                 </a>
+                 </button>
                </div>
              </div>
           </div>

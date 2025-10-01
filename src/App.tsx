@@ -14,6 +14,8 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import Index from "./pages/Index";
 import PropertyDetails from "./pages/PropertyDetails";
 import PropertiesPage from "./pages/PropertiesPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import NotFound from "./pages/NotFound";
 
 // Hoster pages
@@ -62,6 +64,8 @@ const RoleBasedRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/property/:id" element={<PropertyDetails />} />
       <Route path="/properties" element={<PropertiesPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
