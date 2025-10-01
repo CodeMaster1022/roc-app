@@ -94,8 +94,12 @@ const SignUpPage = () => {
             All-in-one solution for safe, simple property management
           </p>
         </div>
-        <div className="flex flex-col w-full items-end transform translate-x-[30px] -translate-y-[50px]">
-          <img src={groupLogo} alt="Group Logo" className="h-[300px] w-[330px]" />
+        <div className="flex flex-col w-full items-end justify-end relative">
+          <img 
+            src={groupLogo} 
+            alt="Group Logo" 
+            className="max-w-full h-auto object-contain lg:h-[300px] lg:w-[330px] xl:h-[350px] xl:w-[380px] 2xl:h-[400px] 2xl:w-[430px] transform lg:translate-x-[30px] lg:-translate-y-[50px] xl:translate-x-[40px] xl:-translate-y-[60px]" 
+          />
         </div>
       </div>
       <div className="flex flex-col min-h-screen md:items-center md:justify-center py-6 px-4 sm:px-6 md:px-8">
