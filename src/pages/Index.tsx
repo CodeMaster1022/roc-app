@@ -912,7 +912,7 @@ const Index = () => {
           </div>
           <div className="flex space-x-4 justify-end mb-4">
              <a 
-               href="https://www.facebook.com/ROC" 
+               href="https://www.facebook.com/share/1CQFt3UGNx/?mibextid=wwXIfr" 
                target="_blank"
                rel="noopener noreferrer"
                className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
@@ -939,7 +939,7 @@ const Index = () => {
                <TikTokIcon />
              </a>
              <a 
-               href="https://www.facebook.com/share/1CQFt3UGNx/?mibextid=wwXIfr"
+               href="https://www.linkedin.com/company/roc-space/"
                target="_blank"
                rel="noopener noreferrer"
                className="text-footer-text hover:text-foreground transition-colors duration-200 bg-gray-100 p-1 rounded-full shadow-lg"
