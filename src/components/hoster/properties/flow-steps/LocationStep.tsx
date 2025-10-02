@@ -6,14 +6,6 @@ import { MapboxMap } from "@/components/hoster/ui/mapbox-map";
 import { Property } from "@/types/property";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { propertyService } from "@/services/propertyService";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface LocationStepProps {
   property: Partial<Property>;
@@ -22,19 +14,17 @@ interface LocationStepProps {
   onPrev: () => void;
 }
 
-type LocationPhase = 'zone' | 'address' | 'map';
+type LocationPhase = 'address' | 'map';
 
 export const LocationStep = ({ property, updateProperty, onNext, onPrev }: LocationStepProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [currentPhase, setCurrentPhase] = useState<LocationPhase>('zone');
+  const [currentPhase, setCurrentPhase] = useState<LocationPhase>('address');
   const [address, setAddress] = useState(property.location?.address || '');
   const [coordinates, setCoordinates] = useState({
     lat: property.location?.lat || 19.4326,
     lng: property.location?.lng || -99.1332
   });
-  const [selectedZone, setSelectedZone] = useState(property.location?.zone || '');
-  const [zones] = useState(() => propertyService.getZones());
   const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -48,9 +38,6 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
         lat: property.location.lat,
         lng: property.location.lng
       });
-    }
-    if (property.location?.zone && property.location.zone !== selectedZone) {
-      setSelectedZone(property.location.zone);
     }
   }, [property.location]);
 
@@ -88,29 +75,6 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
     console.log('Location changed:', { newAddress, lat, lng });
     setAddress(newAddress);
     setCoordinates({ lat, lng });
-    
-    // Find the closest zone based on coordinates
-    const closestZone = findClosestZone(lat, lng);
-    if (closestZone && !selectedZone) {
-      setSelectedZone(closestZone.id);
-    }
-  };
-
-  const findClosestZone = (lat: number, lng: number) => {
-    // Mock implementation - replace with real zone detection
-    return zones[0];
-  };
-
-  const handleZoneNext = () => {
-    if (selectedZone) {
-      setCurrentPhase('address');
-    } else {
-      toast({
-        title: "Zona requerida",
-        description: "Por favor selecciona una zona para continuar",
-        variant: "destructive",
-      });
-    }
   };
 
   const handleAddressNext = () => {
@@ -131,72 +95,28 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
         address: address.trim(),
         lat: coordinates.lat,
         lng: coordinates.lng,
-        zone: selectedZone
+        zone: undefined // Zone is optional now
       }
     });
     onNext();
   };
 
   const handlePhaseBack = () => {
-    switch (currentPhase) {
-      case 'address':
-        setCurrentPhase('zone');
-        break;
-      case 'map':
-        setCurrentPhase('address');
-        break;
-      default:
-        onPrev();
+    if (currentPhase === 'map') {
+      setCurrentPhase('address');
+    } else {
+      onPrev();
     }
   };
 
   const renderPhase = () => {
     switch (currentPhase) {
-      case 'zone':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-highlight">Paso 1: Selecciona la zona</span>
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base">
-                ¿En qué zona se encuentra tu propiedad?
-              </p>
-            </div>
-
-            <div className="max-w-md mx-auto">
-              <Label htmlFor="zone">Zona</Label>
-              <Select value={selectedZone} onValueChange={setSelectedZone}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona una zona" />
-                </SelectTrigger>
-                <SelectContent>
-                  {zones.map((zone) => (
-                    <SelectItem key={zone.id} value={zone.id}>
-                      {zone.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={onPrev}>
-                Anterior
-              </Button>
-              <Button onClick={handleZoneNext} disabled={!selectedZone}>
-                Continuar
-              </Button>
-            </div>
-          </div>
-        );
-
       case 'address':
         return (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-highlight">Paso 2: Ingresa la dirección</span>
+                <span className="text-highlight">Ingresa la dirección</span>
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
                 Escribe la dirección completa de tu propiedad
@@ -229,7 +149,7 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={handlePhaseBack}>
+              <Button variant="outline" onClick={onPrev}>
                 Anterior
               </Button>
               <Button onClick={handleAddressNext} disabled={!address.trim()}>
@@ -244,7 +164,7 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-highlight">Paso 3: Confirma en el mapa</span>
+                <span className="text-highlight">Confirma en el mapa</span>
               </h2>
               <p className="text-muted-foreground text-sm md:text-base">
                 Arrastra el pin para ajustar la ubicación exacta
@@ -261,9 +181,6 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
               />
               
               <div className="mt-4 p-4 bg-muted rounded-lg">
-                <p className="text-sm">
-                  <strong>Zona:</strong> {zones.find(z => z.id === selectedZone)?.name}
-                </p>
                 <p className="text-sm">
                   <strong>Dirección:</strong> {address}
                 </p>
