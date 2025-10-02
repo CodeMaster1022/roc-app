@@ -43,7 +43,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
     if (action === 'profile') {
       onSectionChange('perfil')
     } else {
-      window.open('https://preview--hoster-haven.lovable.app/', '_blank')
+      navigate('/hoster/signup')
     }
     setShowProfileMenu(false)
   }
@@ -149,7 +149,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
                 </button>
                 <button
                   onClick={() => {
-                    window.open('https://preview--hoster-haven.lovable.app/', '_blank')
+                    navigate('/hoster/signup')
                     setShowProfileMenu(false)
                   }}
                   className="flex items-center gap-3 p-4 text-left hover:bg-muted rounded-lg transition-colors"

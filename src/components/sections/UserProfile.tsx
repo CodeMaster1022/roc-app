@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RocButton } from "@/components/ui/roc-button"
 import { Input } from "@/components/ui/input"
@@ -24,6 +25,7 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
   const { language, setLanguage, t } = useLanguage()
   const { user, updateProfile, logout } = useAuth()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Initialize profile data from auth context
@@ -483,14 +485,14 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
           <CardContent className="p-4">
             <div className="space-y-3">
               <button
-                onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}
+                onClick={() => navigate('/hoster/signin')}
                 className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted rounded-lg transition-colors"
               >
                 <LogIn className="h-5 w-5 text-muted-foreground" />
                 <span className="font-medium">{t('profile.login')}</span>
               </button>
               <button
-                onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}
+                onClick={() => navigate('/hoster/signup')}
                 className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted rounded-lg transition-colors"
               >
                 <Building className="h-5 w-5 text-muted-foreground" />

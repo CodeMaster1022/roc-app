@@ -781,7 +781,7 @@ const Index = () => {
                           <LogIn className="mr-2 h-4 w-4" />
                           Sign In / Sign Up
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open('https://preview--hoster-haven.lovable.app/', '_blank')}>
+                        <DropdownMenuItem onClick={() => navigate('/hoster/signup')}>
                           <Building className="mr-2 h-4 w-4" />
                           Register Property
                         </DropdownMenuItem>

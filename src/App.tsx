@@ -31,6 +31,8 @@ import { MobileProfilePage } from "./pages/hoster/MobileProfilePage";
 import AuthPage from "./components/auth/AuthPage";
 import SignInPage from "./components/auth/SignInPage";
 import SignUpPage from "./components/auth/SignUpPage";
+import HosterSignInPage from "./components/auth/HosterSignInPage";
+import HosterSignUpPage from "./components/auth/HosterSignUpPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const RoleBasedRoutes = () => {
         <Route path="/auth" element={<Navigate to="/" replace />} />
         <Route path="/signin" element={<Navigate to="/" replace />} />
         <Route path="/signup" element={<Navigate to="/" replace />} />
+        <Route path="/hoster/signin" element={<Navigate to="/" replace />} />
+        <Route path="/hoster/signup" element={<Navigate to="/" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -69,6 +73,8 @@ const RoleBasedRoutes = () => {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/hoster/signin" element={<HosterSignInPage />} />
+      <Route path="/hoster/signup" element={<HosterSignUpPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

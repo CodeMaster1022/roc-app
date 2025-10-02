@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Link, useNavigate } from 'react-router-dom'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Building } from 'lucide-react'
 import rocLogo from '@/assets/roc-logo.png'
 import groupLogo from '@/assets/group-logo.png'
 
-const SignUpPage = () => {
+const HosterSignUpPage = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,7 +19,7 @@ const SignUpPage = () => {
     gender: "",
     password: "",
     confirmPassword: "",
-    role: "tenant",
+    role: "hoster",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ const SignUpPage = () => {
     }
     setIsLoading(true);
     try {
-      const { confirmPassword, role, ...registerData } = formData;
+      const { confirmPassword, ...registerData } = formData;
       await register(registerData);
       navigate("/");
     } catch (error: any) {
@@ -88,15 +88,15 @@ const SignUpPage = () => {
   const isStep3Valid = formData.password !== "" && formData.confirmPassword !== "";
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[35%_65%] xl:grid-cols-[40%_60%] 2xl:grid-cols-[45%_55%]">
-      <div className="hidden bg-[#10116B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:pl-12 text-white justify-between items-center">
+    <div className="w-full md:grid md:min-h-screen md:grid-cols-[35%_65%]">
+      <div className="hidden bg-[#57007B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:pl-12 text-white justify-between items-center">
         <div className="w-full">
           <img src={rocLogo} alt="ROC Logo" className="h-12 lg:h-16 xl:h-20 mb-8 lg:mb-12 invert brightness-0" />
-          <p className="text-violet-300 mb-3 lg:mb-4 text-sm lg:text-base">The New Standard for Housing</p>
-          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold">Verified tenants</h1>
-          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-4 lg:mb-6">Complete management</h1>
-          <p className="text-violet-200 text-sm lg:text-base xl:text-lg leading-relaxed">
-            All-in-one solution for safe, simple property management
+          <p className="text-blue-300 mb-3 lg:mb-4 text-sm lg:text-base">The New Standard for Property Management</p>
+          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold">Manage Properties</h1>
+          <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-4 lg:mb-6">Verified Tenants</h1>
+          <p className="text-blue-200 text-sm lg:text-base xl:text-lg leading-relaxed">
+            All-in-one platform for property owners to list, manage, and grow their rental business
           </p>
         </div>
         <div className="flex flex-col w-full items-end justify-end relative">
@@ -125,9 +125,11 @@ const SignUpPage = () => {
           </div>
 
           <div className="grid gap-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Sign Up</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Create account</h1>
+            </div>
             <p className="text-balance text-muted-foreground text-sm sm:text-base">
-              Enter your information to create an account
+              Create your account to start listing and managing properties
             </p>
           </div>
           <form onSubmit={handleSubmit} className="grid gap-4 lg:gap-6">
@@ -171,14 +173,14 @@ const SignUpPage = () => {
                 <Button 
                   type="button" 
                   onClick={nextStep} 
-                  className="w-full bg-[#10116B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#57007B] hover:bg-blue-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!isStep1Valid}
                 >
                   Continuar
                 </Button>
                 <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/signin" className="font-medium text-[#10116B] hover:text-violet-500">
+                  <Link to="/hoster/signin" className="font-medium text-[#57007B] hover:text-blue-500">
                     Sign in
                   </Link>
                 </div>
@@ -212,7 +214,7 @@ const SignUpPage = () => {
 
                 <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/signin" className="font-medium text-violet-600 hover:text-violet-500">
+                  <Link to="/hoster/signin" className="font-medium text-[#57007B] hover:text-blue-500">
                     Sign in
                   </Link>
                 </div>
@@ -224,7 +226,7 @@ const SignUpPage = () => {
                   <Button 
                     type="button" 
                     onClick={nextStep} 
-                    className="w-full bg-[#10116B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#57007B] hover:bg-blue-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!isStep2Valid}
                   >
                     Continuar
@@ -259,7 +261,7 @@ const SignUpPage = () => {
 
                 <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/signin" className="font-medium text-[#10116B] hover:text-violet-500">
+                  <Link to="/hoster/signin" className="font-medium text-[#57007B] hover:text-blue-500">
                     Sign in
                   </Link>
                 </div>
@@ -270,7 +272,7 @@ const SignUpPage = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="w-full bg-[#10116B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#57007B] hover:bg-blue-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading || !isStep3Valid || formData.password !== formData.confirmPassword}
                   >
                     {isLoading ? "Creating Account..." : "Continuar"}
@@ -285,4 +287,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage; 
+export default HosterSignUpPage; 

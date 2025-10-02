@@ -71,9 +71,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const register = async (userData: Omit<User, 'id' | 'role' | 'profile' | 'favorites' | 'isVerified'> & { password?: string }) => {
+  const register = async (userData: Omit<User, 'id' | 'profile' | 'favorites' | 'isVerified'> & { password?: string; role?: 'tenant' | 'hoster' }) => {
     try {
-      const response = await authService.register({ ...userData, role: 'tenant', password: userData.password || '' })
+      const role = userData.role || 'tenant'
+      const response = await authService.register({ ...userData, role, password: userData.password || '' })
       const newUser = response.data.user
       
       setUser(newUser)
