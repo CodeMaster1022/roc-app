@@ -15,6 +15,7 @@ import { propertyService } from "@/services/propertyService";
 import { useToast } from "@/hooks/use-toast";
 import { Property } from "@/types/property";
 import { transformFrontendToBackend, transformBackendToFrontend } from "@/utils/propertyTransform";
+import { API_CONFIG } from "@/config/api";
 import { ArrowLeft, Save, Send, FileText, Upload, AlertCircle, Shield, Users, User, Plus, X, Minus, Home, ImageIcon, Trash2 } from "lucide-react";
 
 const PropertyConfigurationPage = () => {
@@ -136,7 +137,7 @@ const PropertyConfigurationPage = () => {
         description: status === 'review' ? "Property submitted for review!" : "Property saved as draft",
       });
       
-      navigate('/propiedades');
+      navigate('/properties');
     } catch (error: any) {
       console.error('Error saving property:', error);
       toast({
@@ -214,9 +215,11 @@ const PropertyConfigurationPage = () => {
     const newRoom = {
       id: `room-${Date.now()}`,
       name: `Room ${(property.rooms?.length || 0) + 1}`,
+      description: '',
       characteristics: 'closet_bathroom',
       furniture: 'sin-amueblar' as const,
       price: 0,
+      requiresDeposit: false,
       availableFrom: new Date(),
       depositAmount: 0,
       photos: []
@@ -237,12 +240,91 @@ const PropertyConfigurationPage = () => {
     updateProperty({ rooms: updatedRooms as any });
   };
 
-  const handleRoomPhotoUpload = (roomId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadToCloudinary = async (file: File, fieldName: string): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append(fieldName, file);
+
+      const token = localStorage.getItem('roc_token');
+      const response = await fetch(`${API_CONFIG.BASE_URL}/properties/upload-image`, {
+        method: 'POST',
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload image');
+      }
+
+      const data = await response.json();
+      return data.data.url;
+    } catch (error: any) {
+      console.error('Error uploading to Cloudinary:', error);
+      toast({
+        title: "Upload Error",
+        description: error.message || "Failed to upload image. Please try again.",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
+  const handlePropertyPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const existingPhotos = property.details?.photos || [];
+    const uploadPromises = files.map(file => uploadToCloudinary(file, 'images'));
+
+    try {
+      toast({
+        title: "Uploading...",
+        description: `Uploading ${files.length} image(s)...`,
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      
+      updateProperty({
+        details: { ...property.details, photos: [...existingPhotos, ...uploadedUrls] } as any
+      });
+
+      toast({
+        title: "Success",
+        description: `${files.length} image(s) uploaded successfully!`,
+      });
+    } catch (error) {
+      // Error already handled in uploadToCloudinary
+    }
+  };
+
+  const handleRoomPhotoUpload = async (roomId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
     const room = property.rooms?.find(r => r.id === roomId);
     const existingPhotos = room?.photos || [];
-    const photoUrls = files.map(file => URL.createObjectURL(file));
-    updateRoom(roomId, { photos: [...existingPhotos, ...photoUrls] });
+    const uploadPromises = files.map(file => uploadToCloudinary(file, `roomImages_${roomId}`));
+
+    try {
+      toast({
+        title: "Uploading...",
+        description: `Uploading ${files.length} image(s) for ${room?.name}...`,
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      
+      updateRoom(roomId, { photos: [...existingPhotos, ...uploadedUrls] });
+
+      toast({
+        title: "Success",
+        description: `${files.length} image(s) uploaded successfully!`,
+      });
+    } catch (error) {
+      // Error already handled in uploadToCloudinary
+    }
   };
 
   if (loading) {
@@ -303,14 +385,7 @@ const PropertyConfigurationPage = () => {
                 multiple
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  const existingPhotos = property.details?.photos || [];
-                  const photoUrls = files.map(file => URL.createObjectURL(file));
-                  updateProperty({
-                    details: { ...property.details, photos: [...existingPhotos, ...photoUrls] } as any
-                  });
-                }}
+                onChange={handlePropertyPhotoUpload}
               />
               <label
                 htmlFor="photos"
@@ -580,27 +655,69 @@ const PropertyConfigurationPage = () => {
                       </div>
 
                       {/* Room Details */}
-                      <div className="flex-1 space-y-3">
-                        {/* Room Name */}
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-base">{room.name}</h4>
+                      <div className="flex-1 space-y-4">
+                        {/* Room Name and Delete Button */}
+                        <div className="flex items-center justify-between gap-2">
+                          <Input
+                            value={room.name}
+                            onChange={(e) => updateRoom(room.id, { name: e.target.value })}
+                            placeholder="Room name"
+                            className="font-semibold"
+                          />
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeRoom(room.id)}
-                            className="text-destructive hover:text-destructive"
+                            className="text-destructive hover:text-destructive flex-shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
 
-                        {/* Furniture Badge */}
+                        {/* Room Description */}
                         <div>
+                          <Textarea
+                            value={room.description || ''}
+                            onChange={(e) => updateRoom(room.id, { description: e.target.value })}
+                            placeholder="Room description..."
+                            rows={2}
+                            maxLength={500}
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {(room.description?.length || 0)}/500 characters
+                          </p>
+                        </div>
+
+                        {/* Room Characteristics */}
+                        <div>
+                          <Label className="text-sm">Room Characteristics</Label>
+                          <Select
+                            value={room.characteristics}
+                            onValueChange={(value: any) => updateRoom(room.id, { characteristics: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="walking_closet_bathroom_terrace">With walking closet, full bathroom and terrace</SelectItem>
+                              <SelectItem value="walking_closet_bathroom">With walking closet and full bathroom</SelectItem>
+                              <SelectItem value="closet_bathroom_terrace">With closet, full bathroom and terrace</SelectItem>
+                              <SelectItem value="closet_bathroom">With closet and full bathroom</SelectItem>
+                              <SelectItem value="closet_shared_bathroom">With closet and shared bathroom</SelectItem>
+                              <SelectItem value="service_room_bathroom">Service room with full bathroom</SelectItem>
+                              <SelectItem value="service_room_shared_bathroom">Service room with shared bathroom</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Furniture Level */}
+                        <div>
+                          <Label className="text-sm">Furniture Level</Label>
                           <Select
                             value={room.furniture}
                             onValueChange={(value: any) => updateRoom(room.id, { furniture: value })}
                           >
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -611,45 +728,60 @@ const PropertyConfigurationPage = () => {
                           </Select>
                         </div>
 
-                        {/* Price and Deposit */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <Label className="text-xs">Monthly Price</Label>
-                            <div className="flex items-center gap-1">
-                              <span className="text-lg font-bold">$</span>
-                              <Input
-                                type="number"
-                                value={room.price || 0}
-                                onChange={(e) => updateRoom(room.id, { price: Number(e.target.value) })}
-                                className="text-lg font-bold h-8"
-                                min="0"
-                              />
-                              <span className="text-sm text-muted-foreground">/ monthly</span>
-                            </div>
+                        {/* Monthly Price */}
+                        <div>
+                          <Label className="text-sm">Monthly Price</Label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-lg font-bold">$</span>
+                            <Input
+                              type="number"
+                              value={room.price || 0}
+                              onChange={(e) => updateRoom(room.id, { price: Number(e.target.value) })}
+                              className="text-lg font-bold"
+                              min="0"
+                            />
+                            <span className="text-sm text-muted-foreground">/ monthly</span>
                           </div>
+                        </div>
+
+                        {/* Requires Deposit Toggle */}
+                        <div className="flex items-center justify-between">
                           <div>
-                            <Label className="text-xs">Deposit</Label>
+                            <Label className="text-sm">Requires Deposit</Label>
+                            <p className="text-xs text-muted-foreground">Tenant must pay a security deposit</p>
+                          </div>
+                          <Switch
+                            checked={room.requiresDeposit || false}
+                            onCheckedChange={(checked) => updateRoom(room.id, { 
+                              requiresDeposit: checked,
+                              depositAmount: checked ? room.depositAmount : 0
+                            })}
+                          />
+                        </div>
+
+                        {/* Deposit Amount (conditional) */}
+                        {room.requiresDeposit && (
+                          <div>
+                            <Label className="text-sm">Deposit Amount</Label>
                             <div className="flex items-center gap-1">
                               <span className="text-sm">$</span>
                               <Input
                                 type="number"
                                 value={room.depositAmount || 0}
                                 onChange={(e) => updateRoom(room.id, { depositAmount: Number(e.target.value) })}
-                                className="h-8"
                                 min="0"
                               />
                             </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* Available From */}
                         <div>
-                          <Label className="text-xs">Available from</Label>
+                          <Label className="text-sm">Available from</Label>
                           <Input
                             type="date"
                             value={room.availableFrom ? new Date(room.availableFrom).toISOString().split('T')[0] : ''}
                             onChange={(e) => updateRoom(room.id, { availableFrom: new Date(e.target.value) })}
-                            className="h-8"
                           />
                         </div>
                       </div>

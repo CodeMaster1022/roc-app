@@ -1,13 +1,15 @@
 import { useState } from "react"
-import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Car, Calendar, Cigarette, PartyPopper, Clock, Expand } from "lucide-react"
+import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Car, Calendar, Cigarette, PartyPopper, Clock, Expand, DollarSign, CheckCircle, XCircle, Shield, UserCheck } from "lucide-react"
 import { RocButton } from "@/components/ui/roc-button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { type Property } from "@/data/mockProperties"
 import { useLanguage } from "@/contexts/LanguageContext"
 import MobilePropertyMap from "./MobilePropertyMap"
 
 interface MobilePropertyDetailsProps {
   property: Property
+  backendProperty?: any
   isFavorite: boolean
   onBack: () => void
   onFavoriteToggle: () => void
@@ -17,6 +19,7 @@ interface MobilePropertyDetailsProps {
 
 const MobilePropertyDetails = ({
   property,
+  backendProperty,
   isFavorite,
   onBack,
   onFavoriteToggle,
@@ -35,6 +38,32 @@ const MobilePropertyDetails = ({
     }).format(price)
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const getFurnishingText = (furnishing: string) => {
+    switch(furnishing) {
+      case "furnished": return "Amueblado"
+      case "semi-furnished": return "Semi-amueblado"
+      case "unfurnished": return "Sin amueblar"
+      default: return furnishing
+    }
+  }
+
+  const getGenderText = (gender: string) => {
+    switch(gender) {
+      case "male": return "Hombre"
+      case "female": return "Mujer"
+      case "other": return "Otro"
+      default: return gender
+    }
+  }
+
   const nextImage = () => {
     if (property?.images) {
       setCurrentImageIndex((prev) => (prev + 1) % property.images.length)
@@ -46,19 +75,6 @@ const MobilePropertyDetails = ({
       setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length)
     }
   }
-
-  // Sample amenities with icons
-  const amenities = [
-    { icon: "🏊‍♂️", name: "Swimming Pool" },
-    { icon: "🎬", name: "Cinema Room" },
-    { icon: "🏠", name: "Rooftop" },
-    { icon: "🐾", name: "Pet-Friendly" },
-    { icon: "🛡️", name: "24/7 Security" },
-    { icon: "🛗", name: "Elevator" },
-    { icon: "🏋️‍♂️", name: "Fitness Center" },
-    { icon: "🎉", name: "Party Room" },
-    { icon: "🌿", name: "Garden" }
-  ]
 
   return (
     <div className="min-h-screen bg-white max-w-full overflow-x-hidden">
@@ -115,6 +131,13 @@ const MobilePropertyDetails = ({
             </div>
           </>
         )}
+        
+        {/* Availability Badge */}
+        <div className="absolute bottom-4 left-4">
+          <Badge variant={property.isAvailable ? "default" : "secondary"} className="bg-white/90 text-gray-900">
+            {property.isAvailable ? "Disponible" : "No disponible"}
+          </Badge>
+        </div>
       </div>
 
       {/* Content Section - Overlapping the image with rounded top corners */}
@@ -122,138 +145,334 @@ const MobilePropertyDetails = ({
         {/* Property Info */}
         <div className="w-full">
           <h1 className="text-[20px] font-bold text-gray-900 mb-2 break-words">{property.title}</h1>
-          <div className="flex items-center gap-1 text-gray-600 mb-4">
+          <div className="flex items-center gap-1 text-gray-600 mb-2">
             <MapPin className="h-4 w-4" />
-            <span className="text-sm">{property.zone}</span>
+            <span className="text-sm">{backendProperty?.location?.address || property.zone}</span>
           </div>
+          {backendProperty?.location?.zone && (
+            <div className="text-xs text-gray-500 mb-4">
+              Zona: {backendProperty.location.zone}
+            </div>
+          )}
           
-          {/* Key Details */}
-          <div className="flex items-center gap-3 text-sm text-gray-600 mb-4 flex-wrap">
-            <div className="flex items-center gap-1 whitespace-nowrap">
-              <span className="text-gray-900 font-medium">Private</span>
+          {/* Key Details Grid - 4 columns to match desktop */}
+          <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <Bed className="h-5 w-5 mx-auto mb-1 text-primary" />
+              <div className="text-lg font-bold">{backendProperty?.bedrooms || property.bedrooms}</div>
+              <div className="text-[10px] text-gray-500">rooms</div>
             </div>
-            <div className="flex items-center gap-1 whitespace-nowrap">
-              <Home className="h-4 w-4 flex-shrink-0" />
-              <span className="font-medium">{property.area} m²</span>
+            <div className="text-center">
+              <Home className="h-5 w-5 mx-auto mb-1 text-primary" />
+              <div className="text-lg font-bold">{property.area}</div>
+              <div className="text-[10px] text-gray-500">m²</div>
             </div>
-            <div className="flex items-center gap-1 whitespace-nowrap">
-              <PawPrint className="h-4 w-4 flex-shrink-0" />
-              <span className="font-medium">Pets</span>
+            <div className="text-center">
+              <PawPrint className="h-5 w-5 mx-auto mb-1 text-primary" />
+              <div className="text-lg font-bold">{property.rules.pets ? "Yes" : "No"}</div>
+              <div className="text-[10px] text-gray-500">Pets</div>
+            </div>
+            <div className="text-center">
+              <Users className="h-5 w-5 mx-auto mb-1 text-primary" />
+              <div className="text-lg font-bold">{backendProperty?.roommates?.length || 0}</div>
+              <div className="text-[10px] text-gray-500">Roomies</div>
+            </div>
+          </div>
+
+          {/* Security badges */}
+          <div className="flex flex-wrap gap-2 mb-4 text-xs">
+            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
+              <Shield className="h-3 w-3" />
+              <span>Deposit required</span>
+            </div>
+            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
+              <UserCheck className="h-3 w-3" />
+              <span>ID verified</span>
             </div>
           </div>
 
           {/* Price */}
-          <div className="mb-6">
-            <span className="text-[18px] font-bold text-gray-900">
+          <div className="mb-6 p-4 bg-primary/5 rounded-lg">
+            <div className="text-sm text-gray-600 mb-1">Precio mensual</div>
+            <span className="text-2xl font-bold text-primary">
               {formatPrice(property.price)}
             </span>
             <span className="text-gray-600 ml-2">/ mes</span>
           </div>
+        </div>
+
         {/* Description */}
         <div className="w-full">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">Descripción</h2>
-          <p className="text-gray-600 leading-relaxed mb-2 break-words">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Descripción</h2>
+          <p className="text-gray-600 leading-relaxed break-words">
             {property.description}
           </p>
-          {/* <button className="text-blue-600 font-medium text-sm">... Leer más</button> */}
         </div>
-          {/* Unfurnished Badge */}
-          <div className="mb-6">
-            <Badge className="bg-[#10116B] text-white px-4 py-2">
-              📦 Unfurnished
-            </Badge>
+
+        {/* Furnishing */}
+        <div className="w-full">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Amueblado</h2>
+          <Badge className="bg-primary text-white px-4 py-2">
+            {getFurnishingText(property.furnishing)}
+          </Badge>
+        </div>
+
+        {/* Individual Rooms */}
+        {backendProperty?.rooms && backendProperty.rooms.length > 0 && (
+          <div className="w-full">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">Habitaciones Disponibles</h2>
+            <div className="space-y-3">
+              {backendProperty.rooms.map((room: any, index: number) => (
+                <Card key={room.id || index} className="overflow-hidden">
+                  <div className="flex">
+                    {/* Image on the left */}
+                    {room.photos && room.photos.length > 0 && (
+                      <div className="relative w-32 h-32 flex-shrink-0">
+                        <img
+                          src={room.photos[0]}
+                          alt={room.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    {/* Content on the right */}
+                    <CardContent className="p-3 flex-1">
+                      <h3 className="font-semibold mb-2">{room.name}</h3>
+                      {room.description && (
+                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">{room.description}</p>
+                      )}
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Precio:</span>
+                          <span className="font-bold text-primary">{formatPrice(room.price)}/mes</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Amueblado:</span>
+                          <span className="text-xs">{getFurnishingText(room.furniture)}</span>
+                        </div>
+                        {room.requiresDeposit && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Depósito:</span>
+                            <span className="text-xs">{formatPrice(room.depositAmount || 0)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Roommates with Personality Tags */}
+        {backendProperty?.roommates && backendProperty.roommates.length > 0 && (
+          <div className="w-full">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">Personality of roommates</h2>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex -space-x-2">
+                  {backendProperty.roommates.slice(0, 3).map((roommate: any, index: number) => (
+                    <div 
+                      key={roommate.id || index}
+                      className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold border-2 border-white"
+                    >
+                      {roommate.gender === 'male' ? '👨' : roommate.gender === 'female' ? '👩' : '👤'}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs font-medium text-gray-700">
+                  {backendProperty.roommates.length} roommate{backendProperty.roommates.length !== 1 ? 's' : ''} out of {backendProperty?.bedrooms || 5}
+                </div>
+              </div>
+              
+              {/* Personality Tags */}
+              <div className="flex flex-wrap gap-2">
+                {backendProperty.roommates.map((roommate: any) => 
+                  roommate.personality?.split(',').map((trait: string, idx: number) => (
+                    <Badge key={`${roommate.id}-${idx}`} variant="secondary" className="text-xs px-2 py-1">
+                      {trait.trim()}
+                    </Badge>
+                  ))
+                )}
+                {/* Add some default personality traits if none exist */}
+                {(!backendProperty.roommates.some((r: any) => r.personality)) && (
+                  <>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">Calmado</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">Pet friendly</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">Creativo</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">Fiesteros</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">Nocturno</Badge>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Amenities - Show ALL */}
+        <div className="w-full">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Amenidades</h2>
+          {backendProperty?.amenities && backendProperty.amenities.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {backendProperty.amenities.map((amenity: string, index: number) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {amenity}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">No hay amenidades especificadas</div>
+          )}
+        </div>
+
+        {/* Rules - 4 Card Grid */}
+        <div className="w-full">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Property Rules</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Pets Card */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`p-1.5 rounded-full ${property.rules.pets ? 'bg-green-100' : 'bg-red-100'}`}>
+                  <PawPrint className={`h-3 w-3 ${property.rules.pets ? 'text-green-600' : 'text-red-600'}`} />
+                </div>
+                <div className="font-semibold text-sm">Pets</div>
+              </div>
+              <p className="text-xs text-gray-600 mb-2">
+                {property.rules.pets ? "One small pet allowed" : "Not allowed"}
+              </p>
+              <div className="flex items-center gap-1">
+                {property.rules.pets ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    <span className="text-xs font-medium">1</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3 w-3 text-red-600" />
+                    <span className="text-xs font-medium text-red-600">Not allowed</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Parking Card */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`p-1.5 rounded-full ${backendProperty?.parking > 0 ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                  <Car className={`h-3 w-3 ${backendProperty?.parking > 0 ? 'text-blue-600' : 'text-gray-600'}`} />
+                </div>
+                <div className="font-semibold text-sm">Parking</div>
+              </div>
+              <p className="text-xs text-gray-600 mb-2">
+                {backendProperty?.parking > 0 ? "Available spaces" : "No spaces"}
+              </p>
+              <div className="flex items-center gap-1">
+                <Car className="h-3 w-3 text-gray-600" />
+                <span className="text-xs font-medium">{backendProperty?.parking || 0}</span>
+              </div>
+            </div>
+
+            {/* Events Card */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`p-1.5 rounded-full ${backendProperty?.rules?.meetings?.allowed || property.rules.parties ? 'bg-blue-100' : 'bg-red-100'}`}>
+                  <Clock className={`h-3 w-3 ${backendProperty?.rules?.meetings?.allowed || property.rules.parties ? 'text-blue-600' : 'text-red-600'}`} />
+                </div>
+                <div className="font-semibold text-sm">Events</div>
+              </div>
+              <p className="text-xs text-gray-600 mb-2">
+                {backendProperty?.rules?.meetings?.allowed ? "Weekend meetings" : "Not allowed"}
+              </p>
+              <div className="flex items-center gap-1">
+                {backendProperty?.rules?.meetings?.allowed ? (
+                  <>
+                    <Clock className="h-3 w-3 text-blue-600" />
+                    <span className="text-xs font-medium">{backendProperty.rules.meetings.schedule || "1 AM"}</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3 w-3 text-red-600" />
+                    <span className="text-xs font-medium text-red-600">Not allowed</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Environment (Smoking) Card */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`p-1.5 rounded-full ${property.rules.smoking ? 'bg-yellow-100' : 'bg-green-100'}`}>
+                  <Cigarette className={`h-3 w-3 ${property.rules.smoking ? 'text-yellow-600' : 'text-green-600'}`} />
+                </div>
+                <div className="font-semibold text-sm">Environment</div>
+              </div>
+              <p className="text-xs text-gray-600 mb-2">
+                {property.rules.smoking ? "Smoking allowed" : "Smoke-free"}
+              </p>
+              <div className="flex items-center gap-1">
+                {property.rules.smoking ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 text-yellow-600" />
+                    <span className="text-xs font-medium">Allowed</span>
+                  </>
+                ) : (
+                  <>
+                    <Cigarette className="h-3 w-3 text-red-600" />
+                    <span className="text-xs font-medium text-red-600">🚫 Not allowed</span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-
-
-        {/* Amenities */}
-        <div className="w-full">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {amenities.slice(0, 6).map((amenity, index) => (
-                <div key={index} className="flex items-center gap-2 bg-[#E3E3E7] justify-center px-2 py-1 rounded-2xl min-w-0">
-                  <div className="flex items-center gap-2 rounded-2xl px-2 py-1">
-                  <div className="text-[13px] flex-shrink-0">{amenity.icon}</div>
-                  <span className="text-[13px] text-gray-700 font-medium break-words leading-tight">
-                    {amenity.name}
-                  </span>
+        {/* Contract & Deposit Info */}
+        {backendProperty?.contracts && (
+          <div className="w-full">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">Información del Contrato</h2>
+            <div className="space-y-3">
+              {backendProperty.contracts.requiresDeposit && backendProperty.contracts.depositAmount && (
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <DollarSign className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Depósito requerido</span>
+                  </div>
+                  <div className="text-2xl font-bold text-primary">
+                    {formatPrice(backendProperty.contracts.depositAmount)}
                   </div>
                 </div>
-              ))}
+              )}
+              {backendProperty.contracts.standardOptions && backendProperty.contracts.standardOptions.length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="font-medium mb-2">Opciones de contrato:</div>
+                  <ul className="space-y-1">
+                    {backendProperty.contracts.standardOptions.map((option: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-600">• {option}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-        </div>
+          </div>
+        )}
 
-        {/* Space Rules */}
+        {/* Availability */}
         <div className="w-full">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Reglas del espacio</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {/* Pets */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <PawPrint className="h-4 w-4 text-gray-600" />
-                </div>
-                <div className="font-medium text-gray-900 text-sm">Mascotas</div>
-              </div>
-              <div className="text-xs text-gray-600 mb-3 break-words">Se acepta una mascota pequeña por usuario</div>
-              <div className="flex items-center gap-1">
-                <Car className="h-4 w-4 text-gray-600" />
-                <div className="text-gray-600 font-bold text-sm">1</div>
-              </div>
-            </div>
-
-            {/* Parking */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Car className="h-4 w-4 text-gray-600" />
-                </div>
-                <div className="font-medium text-gray-900 text-sm">Estacionamiento</div>
-              </div>
-              <div className="text-xs text-gray-600 mb-3 break-words">Existen espacios disponibles para esta unidad</div>
-              <div className="flex items-center gap-1">
-                <Car className="h-4 w-4 text-gray-600" />
-                <div className="text-gray-600 font-bold text-sm">2</div>
-              </div>
-            </div>
-
-            {/* Meetings */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="h-4 w-4 text-gray-600" />
-                </div>
-                <div className="font-medium text-gray-900 text-sm">Reuniones</div>
-              </div>
-              <div className="text-xs text-gray-600 mb-3 break-words">Reuniones los fines de semana hasta:</div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4 text-gray-600" />
-                <div className="text-gray-900 font-bold text-sm">1 am</div>
-              </div>
-            </div>
-
-            {/* Environment */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Cigarette className="h-4 w-4 text-red-600" />
-                </div>
-                <div className="font-medium text-gray-900 text-sm">Ambiente</div>
-              </div>
-              <div className="text-xs text-gray-600 mb-3 break-words">Libre de humo dentro del departamento</div>
-              <div className="flex items-center gap-1">
-                <Cigarette className="h-4 w-4 text-red-600" />
-                <div className="text-red-600 font-bold text-xs">🚫 No se permite</div>
-              </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Disponibilidad</h2>
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
+            <Calendar className="h-4 w-4 text-gray-600" />
+            <div>
+              <div className="text-xs text-gray-600">Disponible desde:</div>
+              <div className="font-semibold">{formatDate(property.availableFrom)}</div>
             </div>
           </div>
         </div>
 
         {/* Location */}
         <div className="w-full">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Every location tells a story,</h2>
-          <p className="text-purple-600 font-medium mb-4">yours starts here.</p>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Ubicación</h2>
+          <p className="text-sm text-gray-600 mb-4">Encuentra tu nuevo hogar</p>
           
           {/* Real Mapbox Map */}
           <div className="mb-4">
@@ -265,30 +484,61 @@ const MobilePropertyDetails = ({
               }}
             />
           </div>
+
+          {/* Address Card */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">Dirección</h3>
+                {backendProperty?.location?.address ? (
+                  <>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {backendProperty.location.address}
+                    </p>
+                    {backendProperty.location.zone && (
+                      <p className="text-sm text-gray-600">
+                        {backendProperty.location.zone}, Ciudad de México, México
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    {property.zone}, Ciudad de México, México
+                  </p>
+                )}
+                {backendProperty?.location?.lat && backendProperty?.location?.lng && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    Coordenadas: {backendProperty.location.lat.toFixed(4)}, {backendProperty.location.lng.toFixed(4)}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Fixed Bottom Section */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-20">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[18px] font-bold text-gray-900">
-              {formatPrice(property.price)} / mes
+            <div className="text-lg font-bold text-gray-900">
+              {formatPrice(property.price)}
             </div>
-            {/* <div className="text-sm text-gray-600">/ mes</div> */}
+            <div className="text-xs text-gray-600">por mes</div>
           </div>
           <RocButton
             onClick={onApply}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium"
+            className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium"
             disabled={!property.isAvailable}
           >
-            {property.isAvailable ? 'Apply for rent' : 'Not Available'}
+            {property.isAvailable ? 'Aplicar para rentar' : 'No disponible'}
           </RocButton>
         </div>
       </div>
 
       {/* Bottom padding to account for fixed bottom section */}
-      <div className="h-20"></div>
+      <div className="h-24"></div>
     </div>
   )
 }

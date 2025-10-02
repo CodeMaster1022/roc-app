@@ -21,11 +21,13 @@ export const ROOM_CHARACTERISTICS: RoomCharacteristics[] = [
 export interface Room {
   id: string;
   name: string;
+  description?: string;
   characteristics: string;
   furniture: FurnitureType;
   price?: number;
-  availableFrom?: Date;
+  requiresDeposit?: boolean;
   depositAmount?: number;
+  availableFrom?: Date;
   photos?: string[];
 }
 

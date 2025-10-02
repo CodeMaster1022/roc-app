@@ -27,11 +27,14 @@ export interface PropertyRules {
 export interface PropertyRoom {
   id: string;
   name: string;
+  description?: string;
   characteristics: string;
   furniture: string;
   price: number;
+  requiresDeposit?: boolean;
+  depositAmount?: number;
   availableFrom: Date;
-  photos?: string[]; // ✅ Added photos field
+  photos?: string[];
 }
 
 export interface BackendProperty {
@@ -42,6 +45,7 @@ export interface BackendProperty {
   description: string;
   type: 'property' | 'rooms';
   propertyType: 'casa' | 'departamento';
+  scheme?: 'mixto' | 'mujeres' | 'hombres';
   location: {
     address: string;
     lat: number;
@@ -75,6 +79,13 @@ export interface BackendProperty {
     depositAmount?: number;
   };
   images: string[];
+  roommates?: {
+    id: string;
+    gender: 'male' | 'female' | 'other';
+    age: number;
+    occupation: string;
+    personality: string;
+  }[];
   status: 'draft' | 'review' | 'approved' | 'rejected' | 'returned';
   rooms?: PropertyRoom[];
   createdAt?: Date;
@@ -86,6 +97,7 @@ export interface CreatePropertyRequest {
   description: string;
   type: 'property' | 'rooms';
   propertyType: 'casa' | 'departamento';
+  scheme?: 'mixto' | 'mujeres' | 'hombres';
   location: {
     address: string;
     lat: number;
@@ -119,13 +131,23 @@ export interface CreatePropertyRequest {
     depositAmount?: number;
   };
   images: string[];
+  roommates?: {
+    id: string;
+    gender: 'male' | 'female' | 'other';
+    age: number;
+    occupation: string;
+    personality: string;
+  }[];
   status: 'draft' | 'review' | 'approved' | 'rejected' | 'returned';
   rooms?: {
     id: string;
     name: string;
+    description?: string;
     characteristics: string;
     furniture: string;
     price: number;
+    requiresDeposit?: boolean;
+    depositAmount?: number;
     availableFrom: Date;
     photos?: string[];
   }[];

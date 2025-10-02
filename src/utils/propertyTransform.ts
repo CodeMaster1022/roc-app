@@ -42,6 +42,7 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
     description: frontendProperty.details?.description || '',
     type: frontendProperty.type || 'property',
     propertyType: frontendProperty.propertyType || 'departamento',
+    scheme: frontendProperty.scheme || 'mixto',
     location: {
       address: frontendProperty.location?.address || '',
       lat: frontendProperty.location?.lat || 0,
@@ -72,15 +73,19 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
       depositAmount: frontendProperty.contracts.depositAmount
     } : undefined,
     images: frontendProperty.details?.photos || [],
+    roommates: frontendProperty.details?.roommates || [],
     status: frontendProperty.status || 'draft',
     rooms: (frontendProperty.rooms || []).map(room => ({
       id: room.id || `room-${Date.now()}`,
       name: room.name || 'Habitación',
+      description: room.description,
       characteristics: room.characteristics || 'closet_bathroom',
       furniture: room.furniture || 'sin-amueblar',
       price: room.price || 0,
+      requiresDeposit: room.requiresDeposit || false,
+      depositAmount: room.depositAmount || 0,
       availableFrom: room.availableFrom || new Date(),
-      photos: room.photos || [] // ✅ Added room photos
+      photos: room.photos || []
     }))
   };
 }
@@ -91,6 +96,7 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
     type: backendProperty.type,
     propertyType: backendProperty.propertyType,
     furniture: backendProperty.furniture,
+    scheme: backendProperty.scheme,
     location: {
       address: backendProperty.location.address,
       lat: backendProperty.location.lat,
@@ -99,10 +105,14 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
     rooms: backendProperty.rooms?.map(room => ({
       id: room.id,
       name: room.name,
+      description: room.description,
       characteristics: room.characteristics,
       furniture: room.furniture as FurnitureType,
       price: room.price,
+      requiresDeposit: room.requiresDeposit,
+      depositAmount: room.depositAmount,
       availableFrom: room.availableFrom,
+      photos: room.photos,
     })) || [],
     additionalInfo: {
       area: backendProperty.area,
@@ -125,6 +135,7 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
       description: backendProperty.description,
       photos: backendProperty.images,
       amenities: backendProperty.amenities,
+      roommates: backendProperty.roommates,
       advancedConfig: {
         enabled: true,
         rules: {

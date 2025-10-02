@@ -158,7 +158,7 @@ const MobilePropertyMap: React.FC<MobilePropertyMapProps> = ({
   }, [mapLoaded, coords.lat, coords.lng, property.zone])
 
   return (
-    <div className="h-48 bg-gray-100 rounded-lg overflow-hidden relative w-full">
+    <div className="h-full min-h-48 bg-gray-100 rounded-lg overflow-hidden relative w-full">
       {MAPBOX_TOKEN ? (
         <div ref={mapContainer} className="w-full h-full" />
       ) : (

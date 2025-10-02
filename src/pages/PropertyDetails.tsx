@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Wifi, Car, Utensils, Waves, Shield, Calendar, CheckCircle, XCircle, Cigarette, PartyPopper, FileText, CreditCard, UserCheck, ChevronLeft, ChevronRight, Expand, X } from "lucide-react"
+import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Wifi, Car, Utensils, Waves, Shield, Calendar, CheckCircle, XCircle, Cigarette, PartyPopper, FileText, CreditCard, UserCheck, ChevronLeft, ChevronRight, Expand, X, Clock, DollarSign } from "lucide-react"
 import { RocButton } from "@/components/ui/roc-button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -17,6 +17,7 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import MobilePropertyDetails from "@/components/properties/MobilePropertyDetails"
 import AuthPromptModal from "@/components/modals/AuthPromptModal"
+import MobilePropertyMap from "@/components/properties/MobilePropertyMap"
 
 const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -34,6 +35,7 @@ const PropertyDetails = () => {
   const [showFavoriteAuthPrompt, setShowFavoriteAuthPrompt] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [backendProperty, setBackendProperty] = useState<any>(null)
 
   // Amenities list with emojis
   const amenitiesList = [
@@ -87,17 +89,21 @@ const PropertyDetails = () => {
         console.log('Loading property with ID:', id)
         const response = await propertyService.getProperty(id)
         console.log('Property API response:', response)
-        const backendProperty = response.data.property
-        console.log('Backend property:', backendProperty)
-        const transformedProperty = transformBackendPropertyToFrontend(backendProperty)
+        const backendProp = response.data.property
+        console.log('Backend property:', backendProp)
+        
+        // Store the full backend property for additional details
+        setBackendProperty(backendProp)
+        
+        const transformedProperty = transformBackendPropertyToFrontend(backendProp)
         console.log('Transformed property:', transformedProperty)
         
         // Create property with multiple images for gallery and preserve contracts field
         const propertyWithImages = {
           ...transformedProperty,
-          contracts: backendProperty.contracts, // Preserve contracts field for RentalApplicationFlow
-          images: backendProperty.images && backendProperty.images.length > 0 
-            ? backendProperty.images 
+          contracts: backendProp.contracts, // Preserve contracts field for RentalApplicationFlow
+          images: backendProp.images && backendProp.images.length > 0 
+            ? backendProp.images 
             : [transformedProperty.image] // Fallback to single image
         }
         
@@ -196,6 +202,15 @@ const PropertyDetails = () => {
       case "semi-furnished": return "Semi-amueblado"
       case "unfurnished": return "Sin amueblar"
       default: return furnishing
+    }
+  }
+  
+  const getGenderText = (gender: string) => {
+    switch(gender) {
+      case "male": return "Hombre"
+      case "female": return "Mujer"
+      case "other": return "Otro"
+      default: return gender
     }
   }
 
@@ -370,6 +385,7 @@ const PropertyDetails = () => {
       <>
         <MobilePropertyDetails
           property={property}
+          backendProperty={backendProperty}
           isFavorite={isFavorite}
           onBack={() => navigate("/")}
           onFavoriteToggle={handleFavoriteToggle}
@@ -427,9 +443,9 @@ const PropertyDetails = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - 2 columns */}
           <div className="lg:col-span-2 space-y-6">
             {/* Property Image Gallery */}
             <div className="relative rounded-lg overflow-hidden group">
@@ -485,229 +501,436 @@ const PropertyDetails = () => {
               </div>
             </div>
 
-            {/* Property Info */}
+            {/* Property Title and Location */}
             <div>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">{property.title}</h1>
-                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <MapPin className="h-4 w-4" />
-                    <span>{property.zone}</span>
-                  </div>
-                  <div className="text-3xl font-bold text-primary">
-                    {formatPrice(property.price)}/mes
-                  </div>
-                </div>
-                
-                {/* Mobile Share Button */}
-                {isMobile && (
-                  <div className="flex items-center gap-2">
-                    <RocButton
-                      variant="outline"
-                      size="sm"
-                      onClick={handleFavoriteToggle}
-                      className={`${isFavorite ? "text-red-500 border-red-500" : ""}`}
-                    >
-                      <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-                    </RocButton>
-                    <RocButton
-                      variant="outline"
-                      size="sm"
-                      onClick={handleShare}
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </RocButton>
-                  </div>
-                )}
+              <h1 className="text-3xl font-bold mb-2">{property.title}</h1>
+              <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                <MapPin className="h-4 w-4" />
+                <span>{backendProperty?.location?.address || property.zone}</span>
               </div>
-
-              {/* Property Details */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Home className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Tipo</div>
-                    <div className="font-semibold capitalize">{property.propertyType}</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Bed className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Habitaciones</div>
-                    <div className="font-semibold">{property.bedrooms}</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Home className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Área</div>
-                    <div className="font-semibold">{property.area} m²</div>
-                  </div>
-                </div>
-
-                {property.bathType && (
-                  <div className="flex items-center gap-2">
-                    <Bath className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <div className="text-sm text-muted-foreground">Baño</div>
-                      <div className="font-semibold capitalize">{property.bathType}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Info for Rooms */}
-              {property.type === "habitacion" && property.scheme && (
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-semibold">Esquema de convivencia:</span>
-                  </div>
-                  <Badge variant="secondary">{getSchemeText(property.scheme)}</Badge>
+              {backendProperty?.location?.zone && (
+                <div className="text-sm text-muted-foreground mb-4">
+                  Zona: {backendProperty.location.zone}
                 </div>
               )}
+            </div>
 
-              {/* Description */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-3">Descripción</h2>
-                <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+            {/* Description */}
+            <div>
+              <h2 className="text-xl font-semibold mb-3">Descripción</h2>
+              <p className="text-muted-foreground leading-relaxed mb-3">{property.description}</p>
+              <Badge variant="outline" className="text-sm">
+                {getFurnishingText(property.furnishing)}
+              </Badge>
+            </div>
+
+            {/* Property Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-background rounded-lg">
+                  <Bed className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{backendProperty?.bedrooms || property.bedrooms}</div>
+                  <div className="text-sm text-muted-foreground">rooms</div>
+                </div>
               </div>
-
-              {/* Amenities */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-3">Amenidades</h2>
-                <div className="flex flex-wrap gap-2">
-                  {randomAmenities.map((amenity, index) => (
-                    <Badge key={index} variant="secondary" className="text-sm py-1 px-3">
-                      {amenity}
-                    </Badge>
-                  ))}
+              
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-background rounded-lg">
+                  <Home className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{property.area}</div>
+                  <div className="text-sm text-muted-foreground">m²</div>
                 </div>
               </div>
 
-              {/* Furnishing */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-3">Amueblado</h2>
-                <Badge variant="outline" className="text-sm">
-                  {getFurnishingText(property.furnishing)}
-                </Badge>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-background rounded-lg">
+                  <PawPrint className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{property.rules.pets ? "Yes" : "No"}</div>
+                  <div className="text-sm text-muted-foreground">Mascotas</div>
+                </div>
               </div>
 
-              {/* Rules */}
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-background rounded-lg">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{backendProperty?.roommates?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground">Roommates</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Security & Verification */}
+            <div className="flex items-center gap-6 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4 text-green-600" />
+                <span>Security deposit required</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <FileText className="h-4 w-4 text-green-600" />
+                <span>Lease agreement required</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <UserCheck className="h-4 w-4 text-green-600" />
+                <span>Identity verification</span>
+              </div>
+            </div>
+
+            {/* Roommates Section with Personality Tags */}
+            {backendProperty?.roommates && backendProperty.roommates.length > 0 && (
               <div>
-                <h2 className="text-xl font-semibold mb-3">Reglas de la propiedad</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <PawPrint className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-medium">Mascotas</span>
+                <h2 className="text-xl font-semibold mb-4">Personality of roommates</h2>
+                <div className="p-6 bg-muted/30 rounded-lg">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex -space-x-2">
+                      {backendProperty.roommates.slice(0, 3).map((roommate: any, index: number) => (
+                        <div 
+                          key={roommate.id || index}
+                          className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold border-2 border-background"
+                        >
+                          {roommate.gender === 'male' ? '👨' : roommate.gender === 'female' ? '👩' : '👤'}
+                        </div>
+                      ))}
                     </div>
-                    {property.rules.pets ? (
-                      <div className="flex items-center gap-1 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Permitidas</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-red-600">
-                        <XCircle className="h-4 w-4" />
-                        <span>No permitidas</span>
-                      </div>
+                    <div className="text-sm font-medium">
+                      {backendProperty.roommates.length} roommate{backendProperty.roommates.length !== 1 ? 's' : ''} out of {backendProperty?.bedrooms || 5}
+                    </div>
+                  </div>
+                  
+                  {/* Personality Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {backendProperty.roommates.map((roommate: any) => 
+                      roommate.personality?.split(',').map((trait: string, idx: number) => (
+                        <Badge key={`${roommate.id}-${idx}`} variant="secondary" className="px-3 py-1">
+                          {trait.trim()}
+                        </Badge>
+                      ))
                     )}
-                  </Card>
+                    {/* Add some default personality traits if none exist */}
+                    {(!backendProperty.roommates.some((r: any) => r.personality)) && (
+                      <>
+                        <Badge variant="secondary" className="px-3 py-1">Calmado</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">Pet friendly</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">Creativo</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">Fiesteros</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">Nocturno</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">Deportistas</Badge>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
-                  <Card className="p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Cigarette className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-medium">Fumar</span>
+            {/* Amenities */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Amenities</h2>
+              {backendProperty?.amenities && backendProperty.amenities.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {backendProperty.amenities.map((amenity: string, index: number) => (
+                    <div key={index} className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
+                      <div className="text-sm font-medium">{amenity}</div>
                     </div>
-                    {property.rules.smoking ? (
-                      <div className="flex items-center gap-1 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Permitido</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-red-600">
-                        <XCircle className="h-4 w-4" />
-                        <span>No permitido</span>
-                      </div>
-                    )}
-                  </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {randomAmenities.map((amenity, index) => (
+                    <div key={index} className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
+                      <div className="text-sm font-medium">{amenity}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-                  <Card className="p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <PartyPopper className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-medium">Fiestas</span>
+            {/* Rules - 4 Card Grid */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Property Rules</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Pets Card */}
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-full ${property.rules.pets ? 'bg-green-100' : 'bg-red-100'}`}>
+                        <PawPrint className={`h-5 w-5 ${property.rules.pets ? 'text-green-600' : 'text-red-600'}`} />
+                      </div>
+                      <h3 className="font-semibold">Pets</h3>
                     </div>
-                    {property.rules.parties ? (
-                      <div className="flex items-center gap-1 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Permitidas</span>
+                    <p className="text-sm text-muted-foreground">
+                      {property.rules.pets 
+                        ? "One small pet per user is allowed" 
+                        : "Pets are not allowed in this property"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      {property.rules.pets ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium">1 pet allowed</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4 text-red-600" />
+                          <span className="text-sm font-medium">Not allowed</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Environment (Smoking) Card */}
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-full ${property.rules.smoking ? 'bg-yellow-100' : 'bg-green-100'}`}>
+                        <Cigarette className={`h-5 w-5 ${property.rules.smoking ? 'text-yellow-600' : 'text-green-600'}`} />
                       </div>
+                      <h3 className="font-semibold">Environment</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {property.rules.smoking 
+                        ? "Smoking is allowed in designated areas" 
+                        : "Smoke-free inside the apartment"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      {property.rules.smoking ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-yellow-600" />
+                          <span className="text-sm font-medium">Allowed</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4 text-red-600" />
+                          <span className="text-sm font-medium">🚫 Not allowed</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Events (Meetings/Parties) Card */}
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-full ${backendProperty?.rules?.meetings?.allowed || property.rules.parties ? 'bg-blue-100' : 'bg-red-100'}`}>
+                        <Clock className={`h-5 w-5 ${backendProperty?.rules?.meetings?.allowed || property.rules.parties ? 'text-blue-600' : 'text-red-600'}`} />
+                      </div>
+                      <h3 className="font-semibold">Events</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {backendProperty?.rules?.meetings?.allowed 
+                        ? "Meetings on weekends until:" 
+                        : property.rules.parties 
+                          ? "Parties allowed with time restrictions"
+                          : "No events allowed"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      {backendProperty?.rules?.meetings?.allowed ? (
+                        <>
+                          <Clock className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium">{backendProperty.rules.meetings.schedule || "1 AM"}</span>
+                        </>
+                      ) : property.rules.parties ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium">Allowed</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4 text-red-600" />
+                          <span className="text-sm font-medium">Not allowed</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Parking Card */}
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-full ${backendProperty?.parking > 0 ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                        <Car className={`h-5 w-5 ${backendProperty?.parking > 0 ? 'text-blue-600' : 'text-gray-600'}`} />
+                      </div>
+                      <h3 className="font-semibold">Parking</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {backendProperty?.parking > 0 
+                        ? "There are available parking spaces for this unit" 
+                        : "No parking spaces available"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Car className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        {backendProperty?.parking > 0 ? `${backendProperty.parking}` : "0"}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* Location Map */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Location</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Find your new home in {backendProperty?.location?.zone || property.zone}
+              </p>
+              <div className="rounded-lg overflow-hidden h-96">
+                <MobilePropertyMap property={property} />
+              </div>
+              <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-1">Address</h3>
+                    {backendProperty?.location?.address ? (
+                      <>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          {backendProperty.location.address}
+                        </p>
+                        {backendProperty.location.zone && (
+                          <p className="text-sm text-muted-foreground">
+                            {backendProperty.location.zone}, Ciudad de México, México
+                          </p>
+                        )}
+                      </>
                     ) : (
-                      <div className="flex items-center gap-1 text-red-600">
-                        <XCircle className="h-4 w-4" />
-                        <span>No permitidas</span>
-                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {property.zone}, Ciudad de México, México
+                      </p>
                     )}
-                  </Card>
+                    {backendProperty?.location?.lat && backendProperty?.location?.lng && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Coordinates: {backendProperty.location.lat.toFixed(4)}, {backendProperty.location.lng.toFixed(4)}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Availability */}
-            <Card>
-              <CardHeaderComponent>
-                <CardTitleComponent>Disponibilidad</CardTitleComponent>
-              </CardHeaderComponent>
-              <CardContent>
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Disponible desde:</span>
+          {/* Right Sidebar - Individual Rooms */}
+          <div className="space-y-4">
+            {/* Rooms Available Badge */}
+            {backendProperty?.rooms && backendProperty.rooms.length > 0 && (
+              <div className="sticky top-24">
+                <div className="flex items-center gap-2 mb-4 p-3 bg-primary/10 rounded-lg">
+                  <Bed className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">
+                    {backendProperty.rooms.length} Rooms Available out of {backendProperty?.bedrooms || backendProperty.rooms.length}
+                  </span>
                 </div>
-                <div className="font-semibold">{formatDate(property.availableFrom)}</div>
-              </CardContent>
-            </Card>
 
-            {/* Security */}
-            <Card>
-              <CardHeaderComponent>
-                <CardTitleComponent>Seguridad</CardTitleComponent>
-              </CardHeaderComponent>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Depósito de seguridad requerido</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Contrato de arrendamiento</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <UserCheck className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">Verificación de identidad</span>
-                  </div>
+                {/* Individual Room Cards */}
+                <div className="space-y-4">
+                  {backendProperty.rooms.map((room: any, index: number) => (
+                    <Card key={room.id || index} className="overflow-hidden">
+                      {room.photos && room.photos.length > 0 && (
+                        <div className="relative h-32">
+                          <img
+                            src={room.photos[0]}
+                            alt={room.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <button 
+                            className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full hover:bg-white"
+                            onClick={handleFavoriteToggle}
+                          >
+                            <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current text-red-500' : 'text-gray-600'}`} />
+                          </button>
+                        </div>
+                      )}
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <h3 className="font-semibold text-lg mb-1">{room.name}</h3>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Bed className="h-4 w-4" />
+                            <span>No beds</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl font-bold text-primary">{formatPrice(room.price)}</span>
+                          <span className="text-sm text-muted-foreground">/monthly</span>
+                        </div>
+
+                        <RocButton 
+                          className="w-full"
+                          onClick={() => setIsApplicationFlowOpen(true)}
+                          disabled={!property?.isAvailable}
+                        >
+                          Apply to rent
+                        </RocButton>
+
+                        <div className="text-xs text-muted-foreground">
+                          Available from: <span className="font-medium">{formatDate(room.availableFrom)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            )}
 
-            {/* Apply Button */}
-            <Card>
-              <CardContent className="p-6">
-                <RocButton 
-                  className="w-full text-lg py-6"
-                  onClick={() => setIsApplicationFlowOpen(true)}
-                  disabled={!property?.isAvailable}
-                >
-                  {property?.isAvailable ? 'Aplicar para rentar' : 'No disponible'}
-                </RocButton>
-              </CardContent>
-            </Card>
+            {/* If no individual rooms, show property-level info */}
+            {(!backendProperty?.rooms || backendProperty.rooms.length === 0) && (
+              <div className="sticky top-24 space-y-4">
+                {/* Availability Card */}
+                <Card>
+                  <CardHeaderComponent>
+                    <CardTitleComponent>Disponibilidad</CardTitleComponent>
+                  </CardHeaderComponent>
+                  <CardContent>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Disponible desde:</span>
+                    </div>
+                    <div className="font-semibold">{formatDate(property.availableFrom)}</div>
+                  </CardContent>
+                </Card>
+
+                {/* Price & Apply Card */}
+                <Card>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-1">Precio mensual</div>
+                      <div className="text-3xl font-bold text-primary">
+                        {formatPrice(property.price)}
+                      </div>
+                    </div>
+
+                    {backendProperty?.contracts?.requiresDeposit && backendProperty?.contracts?.depositAmount && (
+                      <div className="p-3 bg-primary/5 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <DollarSign className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium">Depósito requerido</span>
+                        </div>
+                        <div className="text-xl font-bold text-primary">
+                          {formatPrice(backendProperty.contracts.depositAmount)}
+                        </div>
+                      </div>
+                    )}
+
+                    <RocButton 
+                      className="w-full text-lg py-6"
+                      onClick={() => setIsApplicationFlowOpen(true)}
+                      disabled={!property?.isAvailable}
+                    >
+                      {property?.isAvailable ? 'Aplicar para rentar' : 'No disponible'}
+                    </RocButton>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </div>
