@@ -48,6 +48,7 @@ export interface Property {
     area: number;
     parking: number;
     bathrooms: number;
+    bedrooms?: number; // For complete properties
   };
   pricing: {
     totalPrice?: number;

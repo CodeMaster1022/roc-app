@@ -88,11 +88,11 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-6 space-y-3">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold mb-2">Property Location</h2>
         <p className="text-muted-foreground">
-          Search for your property address and confirm the exact location on the map
+          Where is your property located?
         </p>
       </div>
 
@@ -112,9 +112,6 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
-            Select "Auto" to automatically detect the zone from the address
-          </p>
         </div>
 
         {/* Map */}
@@ -126,7 +123,7 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
           className="h-96"
         />
         
-        {address && coordinates.lat !== 0 && coordinates.lng !== 0 && (
+        {/* {address && coordinates.lat !== 0 && coordinates.lng !== 0 && (
           <div className="mt-4 p-4 bg-muted rounded-lg space-y-1">
             <p className="text-sm">
               <strong>Zone:</strong> {ZONES.find(z => z.value === zone)?.label || 'Auto'}
@@ -138,11 +135,11 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
               <strong>Coordinates:</strong> {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
             </p>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6 max-w-4xl mx-auto">
+      <div className="flex justify-between pt-10 max-w-4xl mx-auto">
         <Button variant="outline" onClick={onPrev}>
           Previous
         </Button>

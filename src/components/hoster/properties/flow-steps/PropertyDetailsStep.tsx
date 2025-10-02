@@ -385,7 +385,7 @@ export const PropertyDetailsStep = ({ property, updateProperty, onPrev, onComple
           </CardContent>
         </Card>
 
-        {/* Habitaciones individuales (solo para tipo habitaciones) */}
+        {/* For when you want to rent your property by individual rooms, or if you live in the property and want to rent out a few rooms to roommates. (solo para tipo habitaciones) */}
         {property.type === 'rooms' && (
           <Card>
             <CardHeader>

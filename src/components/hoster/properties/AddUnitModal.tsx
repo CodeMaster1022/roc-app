@@ -23,16 +23,16 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
 
   const unitTypes = [
     {
-      id: 'property' as const,
-      title: 'Propiedad completa',
-      description: 'Casa o departamento completo',
-      icon: Home,
-    },
-    {
       id: 'rooms' as const,
       title: 'Habitaciones',
-      description: 'Habitaciones individuales',
+      description: 'For when you want to rent your property by individual rooms, or if you live in the property and want to rent out a few rooms to roommates.',
       icon: Users,
+    },
+    {
+      id: 'property' as const,
+      title: 'Propiedad completa',
+      description: 'For when you want to rent out the whole property as a single unit.',
+      icon: Home,
     },
   ];
 
@@ -73,12 +73,12 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>¿Qué tipo de unidad quieres agregar?</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Add New <span className="text-primary">Unit</span></DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
           {unitTypes.map((type) => {
             const Icon = type.icon;
             const isSelected = selectedType === type.id;
@@ -86,21 +86,21 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
             return (
               <Card
                 key={type.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  isSelected ? 'ring-2 ring-primary bg-primary/5' : ''
+                className={`cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] ${
+                  isSelected ? 'ring-4 ring-primary bg-primary/5 shadow-xl' : 'hover:border-primary/50'
                 }`}
                 onClick={() => setSelectedType(type.id)}
               >
-                <CardContent className="p-6 text-center space-y-4">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-                    isSelected ? 'bg-primary text-white' : 'bg-muted'
+                <CardContent className="p-4 text-center space-y-6">
+                  <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center transition-all ${
+                    isSelected ? 'bg-primary text-white scale-110' : 'bg-muted'
                   }`}>
-                    <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-muted-foreground'}`} />
+                    <Icon className={`w h-10 ${isSelected ? 'text-white' : 'text-muted-foreground'}`} />
                   </div>
                   
                   <div>
-                    <h3 className="text-xl font-semibold">{type.title}</h3>
-                    <p className="text-muted-foreground text-sm mt-1">
+                    <h3 className="text-lg font-bold mb-2">{type.title}</h3>
+                    <p className="text-muted-foreground text-sm">
                       {type.description}
                     </p>
                   </div>
@@ -110,10 +110,10 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
           })}
         </div>
 
-        <div className="flex justify-end pt-4">
+        <div className="flex justify-center">
           <Button 
             variant={selectedType ? "default" : "outline"}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 px-6 py-3 text-base"
             onClick={handleContinue}
             disabled={!selectedType}
           >

@@ -73,7 +73,7 @@ const translations = {
     'results.rooms_available': 'habitaciones disponibles',
     'results.showing_all': 'Mostrando todas las opciones',
     'results.complete_properties': 'properties completas',
-    'results.individual_rooms': 'Habitaciones individuales',
+    'results.individual_rooms': 'For when you want to rent your property by individual rooms, or if you live in the property and want to rent out a few rooms to roommates.',
     'results.no_properties': 'No se encontraron properties',
     'results.no_properties_subtitle': 'Intenta ajustar tus filtros para ver más opciones',
     
@@ -255,7 +255,7 @@ const translations = {
     'propertyFlow.full_property': 'Propiedad Completa',
     'propertyFlow.full_property_desc': 'Renta toda la propiedad como una unidad',
     'propertyFlow.by_rooms': 'Por Habitaciones',
-    'propertyFlow.by_rooms_desc': 'Renta habitaciones individuales',
+    'propertyFlow.by_rooms_desc': 'Renta For when you want to rent your property by individual rooms, or if you live in the property and want to rent out a few rooms to roommates.',
     'propertyFlow.property_type': 'Tipo de Propiedad',
     'propertyFlow.property_type_desc': '¿Qué tipo de propiedad es?',
     'propertyFlow.house': 'Casa',

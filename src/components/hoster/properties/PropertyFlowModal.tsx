@@ -221,15 +221,15 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
     }
   };
 
-  const stepTitle = property.type === 'rooms' ? 'Create Room Rental' : 'Create Property Rental';
+  // const stepTitle = property.type === 'rooms' ? 'Create Room Rental' : 'Create Property Rental';
 
   return (
     <>
       <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          {/* <DialogHeader>
             <DialogTitle>{stepTitle}</DialogTitle>
-          </DialogHeader>
+          </DialogHeader> */}
           
           <div className="space-y-6 relative">
             {/* Progress Overlay - Fixed to viewport center */}
