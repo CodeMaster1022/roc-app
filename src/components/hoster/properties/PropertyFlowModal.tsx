@@ -3,16 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Property } from '@/types/property'
 import { ProgressBar } from './ProgressBar'
 import { PropertyTypeStep } from './flow-steps/PropertyTypeStep'
-import { FurnitureStep } from './flow-steps/FurnitureStep'
 import { LocationStep } from './flow-steps/LocationStep'
-import { PropertyPhotosStep } from './flow-steps/PropertyPhotosStep'
-import { RoomsQuantityStep } from './flow-steps/RoomsQuantityStep'
-import { RoomCharacteristicsStep } from './flow-steps/RoomCharacteristicsStep'
-import { RoommatesStep } from './flow-steps/RoommatesStep'
-import { AdditionalInfoStep } from './flow-steps/AdditionalInfoStep'
-import { PricingStep } from './flow-steps/PricingStep'
-import { ContractsStep } from './flow-steps/ContractsStep'
-import { PropertyDetailsStep } from './flow-steps/PropertyDetailsStep'
 import { propertyService } from '@/services/propertyService'
 import { transformFrontendToBackend } from '@/utils/propertyTransform'
 import { useToast } from '@/hooks/use-toast'
@@ -27,48 +18,21 @@ interface PropertyFlowModalProps {
 
 export type FlowStep = 
   | 'property-type'
-  | 'location'
-  | 'property-photos'
-  | 'furniture'
-  | 'rooms-quantity'
-  | 'room-characteristics'
-  | 'roommates'
-  | 'additional-info'
-  | 'pricing'
-  | 'contracts'
-  | 'property-details';
+  | 'location';
 
-// Define flow paths based on property type
-const ROOMS_FLOW_STEPS: FlowStep[] = [
+// Simplified flow - only 2 steps for now
+const FLOW_STEPS: FlowStep[] = [
   'property-type',
-  'location',
-  'property-photos',
-  'rooms-quantity',
-  'room-characteristics',
-  'roommates',
-  'additional-info',
-  'pricing',
-  'contracts',
-  'property-details'
-];
-
-const PROPERTY_FLOW_STEPS: FlowStep[] = [
-  'property-type',
-  'location',
-  'property-photos',
-  'furniture',
-  'additional-info',
-  'pricing',
-  'contracts',
-  'property-details'
+  'location'
 ];
 
 export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCreated }: PropertyFlowModalProps) => {
   const [currentStep, setCurrentStep] = useState<FlowStep>('property-type');
   const [property, setProperty] = useState<Partial<Property>>({
     type: unitType || 'rooms',
+    propertyType: 'departamento', // Casa or Departamento
     rooms: [],
-    location: { address: '', lat: 0, lng: 0 },
+    location: { address: '', lat: 0, lng: 0, zone: '' },
     additionalInfo: { area: 0, parking: 0, bathrooms: 0 },
     pricing: { totalPrice: 0, rentalType: 'ambos' },
     contracts: { standardOptions: [], requiresDeposit: false },
@@ -90,44 +54,28 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const { toast } = useToast();
 
-  // Get current flow steps based on property type
-  const getFlowSteps = (): FlowStep[] => {
-    return property.type === 'rooms' ? ROOMS_FLOW_STEPS : PROPERTY_FLOW_STEPS;
-  };
-
-  const currentStepIndex = getFlowSteps().indexOf(currentStep);
-  const progress = ((currentStepIndex + 1) / getFlowSteps().length) * 100;
+  const currentStepIndex = FLOW_STEPS.indexOf(currentStep);
+  const progress = ((currentStepIndex + 1) / FLOW_STEPS.length) * 100;
 
   const nextStep = () => {
-    const flowSteps = getFlowSteps();
     const nextIndex = currentStepIndex + 1;
-    if (nextIndex < flowSteps.length) {
-      setCurrentStep(flowSteps[nextIndex]);
+    if (nextIndex < FLOW_STEPS.length) {
+      setCurrentStep(FLOW_STEPS[nextIndex]);
+    } else {
+      // All steps completed, show confirmation modal
+      setShowConfirmationModal(true);
     }
   };
 
   const prevStep = () => {
-    const flowSteps = getFlowSteps();
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
-      setCurrentStep(flowSteps[prevIndex]);
+      setCurrentStep(FLOW_STEPS[prevIndex]);
     }
   };
 
   const updateProperty = (updates: Partial<Property>) => {
-    setProperty(prev => {
-      const updated = { ...prev, ...updates };
-      
-      // If property type changed, reset to first step after property-type
-      if (updates.type && updates.type !== prev.type) {
-        const newFlowSteps = updates.type === 'rooms' ? ROOMS_FLOW_STEPS : PROPERTY_FLOW_STEPS;
-        if (currentStep !== 'property-type') {
-          setCurrentStep(newFlowSteps[1]); // Second step in the flow
-        }
-      }
-      
-      return updated;
-    });
+    setProperty(prev => ({ ...prev, ...updates }));
   };
 
   const handleComplete = async () => {
@@ -268,31 +216,11 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
         return <PropertyTypeStep {...stepProps} />;
       case 'location':
         return <LocationStep {...stepProps} />;
-      case 'property-photos':
-        return <PropertyPhotosStep {...stepProps} />;
-      case 'furniture':
-        return <FurnitureStep {...stepProps} />;
-      case 'rooms-quantity':
-        return <RoomsQuantityStep {...stepProps} />;
-      case 'room-characteristics':
-        return <RoomCharacteristicsStep {...stepProps} />;
-      case 'roommates':
-        return <RoommatesStep {...stepProps} />;
-      case 'additional-info':
-        return <AdditionalInfoStep {...stepProps} />;
-      case 'pricing':
-        return <PricingStep {...stepProps} />;
-      case 'contracts':
-        return <ContractsStep {...stepProps} />;
-      case 'property-details':
-        console.log('Rendering PropertyDetailsStep with onComplete:', handleComplete);
-        return <PropertyDetailsStep {...stepProps} />;
       default:
         return null;
     }
   };
 
-  const flowSteps = getFlowSteps();
   const stepTitle = property.type === 'rooms' ? 'Create Room Rental' : 'Create Property Rental';
 
   return (
@@ -354,39 +282,45 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
       {/* Confirmation Modal */}
       <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>¡Propiedad configurada!</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <p className="text-muted-foreground">
-              Tu propiedad ha sido configurada exitosamente. ¿Qué te gustaría hacer ahora?
-            </p>
-            
-            <div className="space-y-3">
-              <Button 
-                onClick={handleFinishNow}
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                Finalizar ahora
-                <span className="text-xs block">Enviar para revisión</span>
-              </Button>
-              
+          <div className="text-center space-y-6 p-6">
+            {/* Success Icon */}
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full border-2 border-black flex items-center justify-center">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Title */}
+            <div>
+              <h2 className="text-3xl font-bold">
+                Property <span className="text-purple-600">Created!</span>
+              </h2>
+              <p className="text-muted-foreground mt-3">
+                You've successfully created your property. You can finish configuring it now or complete the setup later.
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-4 pt-4">
               <Button 
                 variant="outline"
                 onClick={handleSaveForLater}
-                className="w-full"
+                className="flex-1"
                 disabled={isSubmitting}
               >
-                Guardar para después
-                <span className="text-xs block">Aparecerá como "Finalizar configuración"</span>
+                Save for Later
+              </Button>
+              
+              <Button 
+                onClick={handleFinishNow}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900"
+                disabled={isSubmitting}
+              >
+                Finish Configuration
               </Button>
             </div>
-            
-            <p className="text-xs text-muted-foreground text-center">
-              Puedes continuar editando tu propiedad desde la lista de propiedades
-            </p>
           </div>
         </DialogContent>
       </Dialog>

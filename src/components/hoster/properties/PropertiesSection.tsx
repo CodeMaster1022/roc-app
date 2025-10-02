@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Plus, MapPin, Bed, Bath, Car, DollarSign, Eye, Edit, Trash2, Home } from 'lucide-react'
+import { Plus, MapPin, Bed, Bath, Car, DollarSign, Eye, Edit, Trash2, Home, Settings } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Property } from '@/types/property'
 import { AddUnitModal } from './AddUnitModal'
@@ -32,6 +33,7 @@ const statusColors = {
 };
 
 export const PropertiesSection = () => {
+  const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -238,6 +240,17 @@ export const PropertiesSection = () => {
                   </div>
                   
                   <div className="flex gap-2">
+                    {(property.status === 'draft' || property.status === 'review') && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => property.id && navigate(`/properties/${property.id}/configure`)}
+                        className="bg-gradient-to-r from-purple-600 to-purple-800"
+                      >
+                        <Settings className="w-4 h-4 mr-1" />
+                        Finish Configuration
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

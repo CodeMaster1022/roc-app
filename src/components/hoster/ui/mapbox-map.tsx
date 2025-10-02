@@ -48,7 +48,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [currentCoords, setCurrentCoords] = useState<[number, number]>(
-    coordinates ? [coordinates.lng, coordinates.lat] : [-99.1332, 19.4326]
+    coordinates ? [coordinates.lng, coordinates.lat] : [0, 0]
   );
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -86,8 +86,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
         center: currentCoords,
-        zoom: 15,
-        language: 'es'
+        zoom: currentCoords[0] === 0 && currentCoords[1] === 0 ? 2 : 15
       });
 
       // Add navigation controls
@@ -136,8 +135,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
     } catch (error) {
       console.error('Error initializing Mapbox:', error);
       toast({
-        title: "Error de Mapa",
-        description: "No se pudo cargar el mapa. Verifica la configuración de Mapbox.",
+        title: "Map Error",
+        description: "Could not load the map. Check your Mapbox configuration.",
         variant: "destructive"
       });
     }
@@ -184,7 +183,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
     try {
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
-        `access_token=${MAPBOX_TOKEN}&country=mx&language=es&limit=5&types=address,poi,place&autocomplete=true`,
+        `access_token=${MAPBOX_TOKEN}&limit=5&types=address,poi,place&autocomplete=true`,
         { signal: abortController.current.signal }
       );
 
@@ -235,7 +234,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
     
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchAddress)}.json?access_token=${MAPBOX_TOKEN}&country=mx&language=es&limit=1`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchAddress)}.json?access_token=${MAPBOX_TOKEN}&limit=1`
       );
       
       const data = await response.json();
@@ -256,21 +255,21 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         }
 
         toast({
-          title: "Ubicación encontrada",
-          description: "La dirección se ha localizado correctamente en el mapa.",
+          title: "Location found",
+          description: "The address has been successfully located on the map.",
         });
       } else {
         toast({
-          title: "Dirección no encontrada",
-          description: "No se pudo encontrar la dirección especificada. Intenta con una dirección más específica.",
+          title: "Address not found",
+          description: "Could not find the specified address. Try a more specific address.",
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error('Geocoding error:', error);
       toast({
-        title: "Error de búsqueda",
-        description: "No se pudo buscar la dirección. Verifica tu conexión a internet.",
+        title: "Search error",
+        description: "Could not search for the address. Check your internet connection.",
         variant: "destructive"
       });
     } finally {
@@ -284,7 +283,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
 
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&country=mx&language=es&limit=1`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&limit=1`
       );
       
       const data = await response.json();
@@ -321,8 +320,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
     }
 
     toast({
-      title: "Ubicación seleccionada",
-      description: "La dirección se ha establecido correctamente.",
+      title: "Location selected",
+      description: "The address has been set successfully.",
     });
   };
 
@@ -384,8 +383,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast({
-        title: "Geolocalización no disponible",
-        description: "Tu navegador no soporta geolocalización.",
+        title: "Geolocation not available",
+        description: "Your browser does not support geolocation.",
         variant: "destructive"
       });
       return;
@@ -404,28 +403,28 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         
         reverseGeocode(longitude, latitude);
         toast({
-          title: "Ubicación obtenida",
-          description: "Se ha obtenido tu ubicación actual correctamente.",
+          title: "Location obtained",
+          description: "Your current location has been obtained successfully.",
         });
       },
       (error) => {
         console.error('Geolocation error:', error);
-        let errorMessage = "No se pudo obtener tu ubicación actual.";
+        let errorMessage = "Could not get your current location.";
         
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Acceso a la ubicación denegado. Permite el acceso a la ubicación en tu navegador.";
+            errorMessage = "Location access denied. Please allow location access in your browser.";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Información de ubicación no disponible.";
+            errorMessage = "Location information is not available.";
             break;
           case error.TIMEOUT:
-            errorMessage = "Tiempo de espera agotado al obtener la ubicación.";
+            errorMessage = "Timeout while getting location.";
             break;
         }
         
         toast({
-          title: "Error de ubicación",
+          title: "Location error",
           description: errorMessage,
           variant: "destructive"
         });

@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import { AppLayout } from "./components/hoster/layout/AppLayout";
 import DashboardPage from "./pages/hoster/DashboardPage";
 import HosterPropertiesPage from "./pages/hoster/PropertiesPage"; // Aliased import
+import PropertyConfigurationPage from "./pages/hoster/PropertyConfigurationPage";
 import TenantsPage from "./pages/hoster/TenantsPage";
 import TenantDetailPage from "./pages/hoster/TenantDetailPage";
 import ProfilePage from "./pages/hoster/ProfilePage";
@@ -47,6 +48,7 @@ const RoleBasedRoutes = () => {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="properties" element={<HosterPropertiesPage />} />
+          <Route path="properties/:id/configure" element={<PropertyConfigurationPage />} />
           <Route path="tenants" element={<TenantsPage />} />
           <Route path="tenants/:id" element={<TenantDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />

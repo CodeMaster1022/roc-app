@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapboxMap } from "@/components/hoster/ui/mapbox-map";
 import { Property } from "@/types/property";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface LocationStepProps {
@@ -14,22 +13,38 @@ interface LocationStepProps {
   onPrev: () => void;
 }
 
-type LocationPhase = 'address' | 'map';
+const ZONES = [
+  { value: "auto", label: "Auto (Detect from address)" },
+  { value: "centro", label: "Centro" },
+  { value: "roma-norte", label: "Roma Norte" },
+  { value: "roma-sur", label: "Roma Sur" },
+  { value: "condesa", label: "Condesa" },
+  { value: "polanco", label: "Polanco" },
+  { value: "narvarte", label: "Narvarte" },
+  { value: "del-valle", label: "Del Valle" },
+  { value: "coyoacan", label: "Coyoacán" },
+  { value: "san-angel", label: "San Ángel" },
+  { value: "tlalpan", label: "Tlalpan" },
+  { value: "xochimilco", label: "Xochimilco" },
+  { value: "santa-fe", label: "Santa Fe" },
+  { value: "interlomas", label: "Interlomas" },
+  { value: "satelite", label: "Satélite" }
+];
 
 export const LocationStep = ({ property, updateProperty, onNext, onPrev }: LocationStepProps) => {
-  const { t } = useLanguage();
   const { toast } = useToast();
-  const [currentPhase, setCurrentPhase] = useState<LocationPhase>('address');
+  const [zone, setZone] = useState(property.location?.zone || 'auto');
   const [address, setAddress] = useState(property.location?.address || '');
   const [coordinates, setCoordinates] = useState({
-    lat: property.location?.lat || 19.4326,
-    lng: property.location?.lng || -99.1332
+    lat: property.location?.lat || 0,
+    lng: property.location?.lng || 0
   });
-  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Update local state when property changes
   useEffect(() => {
+    if (property.location?.zone && property.location.zone !== zone) {
+      setZone(property.location.zone);
+    }
     if (property.location?.address && property.location.address !== address) {
       setAddress(property.location.address);
     }
@@ -41,174 +56,100 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
     }
   }, [property.location]);
 
-  // Mock address autocomplete - in real implementation, use Google Places API or similar
-  const handleAddressChange = async (value: string) => {
-    setAddress(value);
-    
-    if (value.length > 2) {
-      // Mock suggestions - replace with real API call
-      const mockSuggestions = [
-        `${value} 123, Colonia Centro, Ciudad de México`,
-        `${value} 456, Colonia Roma Norte, Ciudad de México`,
-        `${value} 789, Colonia Condesa, Ciudad de México`,
-      ];
-      setAddressSuggestions(mockSuggestions);
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleAddressSelect = (selectedAddress: string) => {
-    setAddress(selectedAddress);
-    setShowSuggestions(false);
-    
-    // Mock geocoding - replace with real API call
-    const mockCoords = {
-      lat: 19.4326 + (Math.random() - 0.5) * 0.1,
-      lng: -99.1332 + (Math.random() - 0.5) * 0.1
-    };
-    setCoordinates(mockCoords);
-  };
-
   const handleLocationChange = (newAddress: string, lat: number, lng: number) => {
     console.log('Location changed:', { newAddress, lat, lng });
     setAddress(newAddress);
     setCoordinates({ lat, lng });
   };
 
-  const handleAddressNext = () => {
-    if (address.trim()) {
-      setCurrentPhase('map');
-    } else {
+  const handleConfirm = () => {
+    // Only check if coordinates are valid (not 0,0)
+    if (coordinates.lat === 0 && coordinates.lng === 0) {
       toast({
-        title: "Dirección requerida",
-        description: "Por favor ingresa una dirección válida",
+        title: "Location required",
+        description: "Please search for an address and confirm the location on the map",
         variant: "destructive",
       });
+      return;
     }
-  };
 
-  const handleMapConfirm = () => {
+    // If we have coordinates but no address, use a placeholder
+    const finalAddress = address.trim() || 'Location selected on map';
+
     updateProperty({
       location: {
-        address: address.trim(),
+        address: finalAddress,
         lat: coordinates.lat,
         lng: coordinates.lng,
-        zone: undefined // Zone is optional now
+        zone: zone || 'auto'
       }
     });
     onNext();
   };
 
-  const handlePhaseBack = () => {
-    if (currentPhase === 'map') {
-      setCurrentPhase('address');
-    } else {
-      onPrev();
-    }
-  };
-
-  const renderPhase = () => {
-    switch (currentPhase) {
-      case 'address':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-highlight">Ingresa la dirección</span>
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base">
-                Escribe la dirección completa de tu propiedad
-              </p>
-            </div>
-
-            <div className="max-w-md mx-auto relative">
-              <Label htmlFor="address">Dirección completa</Label>
-              <Input
-                id="address"
-                value={address}
-                onChange={(e) => handleAddressChange(e.target.value)}
-                placeholder="Ej: Av. Insurgentes Sur 123, Colonia Roma Norte"
-                className="w-full"
-              />
-              
-              {showSuggestions && addressSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-10 mt-1">
-                  {addressSuggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                      onClick={() => handleAddressSelect(suggestion)}
-                    >
-                      {suggestion}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={onPrev}>
-                Anterior
-              </Button>
-              <Button onClick={handleAddressNext} disabled={!address.trim()}>
-                Continuar
-              </Button>
-            </div>
-          </div>
-        );
-
-      case 'map':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="text-highlight">Confirma en el mapa</span>
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base">
-                Arrastra el pin para ajustar la ubicación exacta
-              </p>
-            </div>
-
-            <div className="max-w-4xl mx-auto">
-              <MapboxMap
-                address={address}
-                coordinates={coordinates}
-                onLocationChange={handleLocationChange}
-                onConfirm={handleMapConfirm}
-                className="animate-fade-in h-96"
-              />
-              
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <p className="text-sm">
-                  <strong>Dirección:</strong> {address}
-                </p>
-                <p className="text-sm">
-                  <strong>Coordenadas:</strong> {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={handlePhaseBack}>
-                Anterior
-              </Button>
-              <Button onClick={handleMapConfirm}>
-                Confirmar ubicación
-              </Button>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="p-4 space-y-6">
-      {renderPhase()}
+    <div className="p-6 space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold mb-2">Property Location</h2>
+        <p className="text-muted-foreground">
+          Search for your property address and confirm the exact location on the map
+        </p>
+      </div>
+
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Zone Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="zone">Zone (Optional)</Label>
+          <Select value={zone} onValueChange={setZone}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a zone" />
+            </SelectTrigger>
+            <SelectContent>
+              {ZONES.map((z) => (
+                <SelectItem key={z.value} value={z.value}>
+                  {z.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Select "Auto" to automatically detect the zone from the address
+          </p>
+        </div>
+
+        {/* Map */}
+        <MapboxMap
+          address={address}
+          coordinates={coordinates}
+          onLocationChange={handleLocationChange}
+          onConfirm={handleConfirm}
+          className="h-96"
+        />
+        
+        {address && coordinates.lat !== 0 && coordinates.lng !== 0 && (
+          <div className="mt-4 p-4 bg-muted rounded-lg space-y-1">
+            <p className="text-sm">
+              <strong>Zone:</strong> {ZONES.find(z => z.value === zone)?.label || 'Auto'}
+            </p>
+            <p className="text-sm">
+              <strong>Address:</strong> {address}
+            </p>
+            <p className="text-sm">
+              <strong>Coordinates:</strong> {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between pt-6 max-w-4xl mx-auto">
+        <Button variant="outline" onClick={onPrev}>
+          Previous
+        </Button>
+        <Button onClick={handleConfirm}>
+          Continue
+        </Button>
+      </div>
     </div>
   );
 };

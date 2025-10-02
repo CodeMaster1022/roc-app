@@ -46,7 +46,7 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
       address: frontendProperty.location?.address || '',
       lat: frontendProperty.location?.lat || 0,
       lng: frontendProperty.location?.lng || 0,
-      zone: frontendProperty.location?.zone || 'Centro' // Use actual zone from frontend, fallback to Centro
+      zone: frontendProperty.location?.zone || 'auto' // Use actual zone from frontend, fallback to auto
     },
     area: frontendProperty.additionalInfo?.area || 0,
     bedrooms: frontendProperty.rooms?.length || 0,

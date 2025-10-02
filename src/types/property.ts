@@ -34,6 +34,7 @@ export interface Property {
   type: 'rooms' | 'property';
   propertyType: PropertyType;
   furniture: FurnitureType;
+  scheme?: 'mixto' | 'mujeres' | 'hombres';
   location: {
     address: string;
     lat?: number;
