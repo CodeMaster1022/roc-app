@@ -1364,8 +1364,20 @@ const translations = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
+const LANGUAGE_STORAGE_KEY = 'roc-platform-language'
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('es')
+  // Initialize language from localStorage, default to English ('en')
+  const [language, setLanguageState] = useState<Language>(() => {
+    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+    return (storedLanguage === 'es' || storedLanguage === 'en') ? storedLanguage : 'en'
+  })
+  
+  // Wrapper to persist language changes to localStorage
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang)
+  }
   
   const t = (key: string): string => {
     const dict = translations[language] as Record<string, string>
