@@ -498,9 +498,19 @@ const Index = () => {
 
               {/* Loading state */}
               {loading && (
-                <div className="flex justify-center items-center py-12 h-screen bg-gray-100">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <span className="ml-2 text-muted-foreground">Loading properties...</span>
+                <div className="flex flex-col justify-center items-center py-20 min-h-[60vh]">
+                  <div className="relative">
+                    {/* Outer spinning ring */}
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-primary"></div>
+                    {/* Inner pulsing circle */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="h-8 w-8 bg-primary/20 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="mt-6 text-center space-y-2">
+                    <p className="text-lg font-medium text-foreground">Loading properties...</p>
+                    <p className="text-sm text-muted-foreground">Finding the best options for you</p>
+                  </div>
                 </div>
               )}
 
