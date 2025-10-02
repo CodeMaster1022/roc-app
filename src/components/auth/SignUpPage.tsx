@@ -82,6 +82,11 @@ const SignUpPage = () => {
     setStep((prev) => prev - 1);
   };
 
+  // Check if current step fields are filled
+  const isStep1Valid = formData.name.trim() !== "" && formData.email.trim() !== "" && formData.phone.trim() !== "";
+  const isStep2Valid = formData.birthday !== "" && formData.gender !== "";
+  const isStep3Valid = formData.password !== "" && formData.confirmPassword !== "";
+
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[35%_65%] xl:grid-cols-[40%_60%] 2xl:grid-cols-[45%_55%]">
       <div className="hidden bg-[#57007B] lg:flex lg:flex-col py-8 px-6 lg:py-12 lg:pl-8 xl:pl-12 text-white justify-between items-center">
@@ -163,7 +168,12 @@ const SignUpPage = () => {
                   />
                 </div>
 
-                <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg">
+                <Button 
+                  type="button" 
+                  onClick={nextStep} 
+                  className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!isStep1Valid}
+                >
                   Continuar
                 </Button>
                 <div className="text-center text-xs sm:text-sm text-gray-600">
@@ -211,7 +221,12 @@ const SignUpPage = () => {
                   <Button type="button" onClick={prevStep} variant="outline" className="w-full py-4 sm:py-6 text-sm sm:text-base hidden lg:flex">
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg">
+                  <Button 
+                    type="button" 
+                    onClick={nextStep} 
+                    className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!isStep2Valid}
+                  >
                     Continuar
                   </Button>
                 </div>
@@ -241,18 +256,6 @@ const SignUpPage = () => {
                     onChange={handleChange} 
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="role" className="text-gray-600">Role</Label>
-                  <Select onValueChange={(value) => handleSelectChange("role", value)} value={formData.role}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tenant">Tenant</SelectItem>
-                      <SelectItem value="hoster">Hoster</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
                 <div className="text-center text-xs sm:text-sm text-gray-600">
                   Already have an account?{' '}
@@ -267,8 +270,8 @@ const SignUpPage = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg"
-                    disabled={isLoading}
+                    className="w-full bg-[#57007B] hover:bg-violet-700 py-4 sm:py-6 text-sm sm:text-base lg:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading || !isStep3Valid || formData.password !== formData.confirmPassword}
                   >
                     {isLoading ? "Creating Account..." : "Continuar"}
                   </Button>
