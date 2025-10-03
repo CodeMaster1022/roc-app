@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Home, Users, ArrowRight } from "lucide-react";
 import { PropertyFlowModal } from "./PropertyFlowModal";
 import { Property } from "@/types/property";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AddUnitModalProps {
   open: boolean;
@@ -20,18 +21,19 @@ interface AddUnitModalProps {
 export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitModalProps) => {
   const [selectedType, setSelectedType] = useState<'rooms' | 'property' | null>(null);
   const [showFlow, setShowFlow] = useState(false);
+  const { t } = useLanguage();
 
   const unitTypes = [
     {
       id: 'rooms' as const,
-      title: 'Habitaciones',
-      description: 'For when you want to rent your property by individual rooms, or if you live in the property and want to rent out a few rooms to roommates.',
+      title: t('propertyFlow.by_rooms'),
+      description: t('propertyFlow.by_rooms_desc'),
       icon: Users,
     },
     {
       id: 'property' as const,
-      title: 'Propiedad completa',
-      description: 'For when you want to rent out the whole property as a single unit.',
+      title: t('propertyFlow.full_property'),
+      description: t('propertyFlow.full_property_desc'),
       icon: Home,
     },
   ];
@@ -75,7 +77,7 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Add New <span className="text-primary">Unit</span></DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">{t('propertyFlow.title')}</DialogTitle>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
@@ -117,7 +119,7 @@ export const AddUnitModal = ({ open, onOpenChange, onPropertyCreated }: AddUnitM
             onClick={handleContinue}
             disabled={!selectedType}
           >
-            Continuar
+            {t('propertyFlow.continue')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

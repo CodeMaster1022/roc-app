@@ -37,40 +37,6 @@ const PropertyDetails = () => {
   const [error, setError] = useState<string | null>(null)
   const [backendProperty, setBackendProperty] = useState<any>(null)
 
-  // Amenities list with emojis
-  const amenitiesList = [
-    "🏋️‍♂️ Gym",
-    "🧸 Ludoteca", 
-    "🌇 Roof Garden",
-    "🍷 Lounge",
-    "🌿 Jardines",
-    "🏊‍♂️ Alberca",
-    "📊 Sala de juntas",
-    "🧘‍♂️ Área de yoga",
-    "🎉 Salón de fiestas",
-    "☕ Cafetería",
-    "💼 Coworking",
-    "🎮 Salón de juegos",
-    "🐾 Pet friendly",
-    "🍸 Sky bar",
-    "🧖 Sauna",
-    "💆‍♂️ Spa",
-    "🧺 Lavandería",
-    "🎾 Cancha de pádel",
-    "💇‍♀️ Salón de belleza",
-    "🏀 Cancha de básquet",
-    "⚽ Cancha de fútbol",
-    "🎥 Cine privado",
-    "⛳ Acceso directo al campo de golf",
-    "🏃 Zona de jogging"
-  ]
-
-  // Get random selection of amenities (memoized to prevent regeneration on re-renders)
-  const randomAmenities = useMemo(() => {
-    if (!property?.amenities) return []
-    const shuffled = [...amenitiesList].sort(() => 0.5 - Math.random())
-    return shuffled.slice(0, Math.min(6, property.amenities.length))
-  }, [property?.amenities?.length])
 
   // Load property data and favorite status
   useEffect(() => {
@@ -564,12 +530,12 @@ const PropertyDetails = () => {
                     {/* Add some default personality traits if none exist */}
                     {(!backendProperty.roommates.some((r: any) => r.personality)) && (
                       <>
-                        <Badge variant="secondary" className="px-3 py-1">Calmado</Badge>
-                        <Badge variant="secondary" className="px-3 py-1">Pet friendly</Badge>
-                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">Creativo</Badge>
-                        <Badge variant="secondary" className="px-3 py-1">Fiesteros</Badge>
-                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">Nocturno</Badge>
-                        <Badge variant="secondary" className="px-3 py-1">Deportistas</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">{t('details.calmado')}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">{t('details.pet_friendly')}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">{t('details.creativo')}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">{t('details.fiesteros')}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 bg-primary text-primary-foreground">{t('details.nocturno')}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1">{t('details.deportistas')}</Badge>
                       </>
                     )}
                   </div>
@@ -592,14 +558,7 @@ const PropertyDetails = () => {
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {randomAmenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                      <div className="text-sm font-medium">{amenity}</div>
-                    </div>
-                  ))}
-                </div>
+                <div className="text-sm text-muted-foreground">{t('details.no_amenities')}</div>
               )}
             </div>
 
@@ -830,7 +789,7 @@ const PropertyDetails = () => {
                           <h3 className="font-semibold text-lg mb-1">{room.name}</h3>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Bed className="h-4 w-4" />
-                            <span>{t('details.no_beds')}</span>
+                            <span>{room.beds || 1} {t('details.bed')}</span>
                           </div>
                         </div>
                         
@@ -943,6 +902,16 @@ const PropertyDetails = () => {
                         <div className="text-sm font-medium">
                           {formatPrice(backendProperty.contracts.depositAmount)}
                         </div>
+                      </div>
+                    )}
+                    {backendProperty?.contracts?.standardOptions && backendProperty.contracts.standardOptions.length > 0 && (
+                      <div className="px-6 py-2">
+                        <div className="text-sm font-medium mb-2">{t('details.contract_options')}</div>
+                        <ul className="flex space-x-3">
+                          {backendProperty.contracts.standardOptions.map((option: string, index: number) => (
+                            <li key={index} className="text-xs text-muted-foreground bg-gray-100 round-lg px-2">{option}</li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                     <div className="pt-4">

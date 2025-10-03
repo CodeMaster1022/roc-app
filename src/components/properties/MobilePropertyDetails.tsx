@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Car, Calendar, Cigarette, PartyPopper, Clock, Expand, DollarSign, CheckCircle, XCircle, Shield, UserCheck } from "lucide-react"
+import { ArrowLeft, Heart, Share2, MapPin, Home, Users, PawPrint, Bed, Bath, Car, Calendar, Cigarette, PartyPopper, Clock, Expand, DollarSign, CheckCircle, XCircle, Shield, UserCheck, FileText } from "lucide-react"
 import { RocButton } from "@/components/ui/roc-button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -155,50 +155,59 @@ const MobilePropertyDetails = ({
             </div>
           )}
           
-          {/* Key Details Grid - 4 columns to match desktop */}
-          <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <Bed className="h-5 w-5 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{backendProperty?.bedrooms || property.bedrooms}</div>
-              <div className="text-[10px] text-gray-500">{t('mobile.rooms')}</div>
+          {/* Key Details Grid - Dynamic columns based on non-zero values */}
+          <div className="gap-2 mb-4 p-1 flex flex-row flex-wrap">
+            <div className="flex">
+              <span className="text-md font-bold text-primary">
+                {formatPrice(property.price)}
+              </span>
+              <span className="text-gray-600">{t('mobile.per_month')}</span>
             </div>
-            <div className="text-center">
-              <Home className="h-5 w-5 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{property.area}</div>
-              <div className="text-[10px] text-gray-500">m²</div>
+            
+            {(backendProperty?.bedrooms || property.bedrooms) > 0 && (
+              <div className="text-center flex items-center gap-1">
+                <Bed className="h-4 w-4 mb-1 text-primary" />
+                <div className="text-sm">{backendProperty?.bedrooms || property.bedrooms}</div>
+                <div className="text-[10px] text-gray-500">{t('mobile.rooms')}</div>
+              </div>
+            )}
+            {property.area > 0 && (
+              <div className="text-center flex items-center gap-1">
+                <Home className="h-4 w-4 mb-1 text-primary" />
+                <div className="text-sm">{property.area}</div>
+                <div className="text-[10px] text-gray-500">m²</div>
+              </div>
+            )}
+            <div className="text-center flex items-center gap-1">
+              <PawPrint className="h-4 w-4 mb-1 text-primary" />
+              <div className="text-sm">{property.rules.pets ? t('details.allowed') : t('details.not_allowed')}</div>
+              {/* <div className="text-[10px] text-gray-500">{t('mobile.pets')}</div> */}
             </div>
-            <div className="text-center">
-              <PawPrint className="h-5 w-5 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{property.rules.pets ? t('details.allowed') : t('details.not_allowed')}</div>
-              <div className="text-[10px] text-gray-500">{t('mobile.pets')}</div>
-            </div>
-            <div className="text-center">
-              <Users className="h-5 w-5 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{backendProperty?.roommates?.length || 0}</div>
-              <div className="text-[10px] text-gray-500">{t('mobile.roomies')}</div>
-            </div>
+            {(backendProperty?.roommates?.length || 0) > 0 && (
+              <div className="text-center flex items-center gap-1">
+                <Users className="h-5 w-5 mb-1 text-primary" />
+                <div className="text-sm font-bold">{backendProperty?.roommates?.length || 0}</div>
+                <div className="text-[10px] text-gray-500">{t('mobile.roomies')}</div>
+              </div>
+            )}
           </div>
 
           {/* Security badges */}
           <div className="flex flex-wrap gap-2 mb-4 text-xs">
             <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
               <Shield className="h-3 w-3" />
-              <span>{t('mobile.deposit_required')}</span>
+              <span>{t('details.security_deposit_required')}</span>
             </div>
             <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
               <UserCheck className="h-3 w-3" />
-              <span>{t('mobile.id_verified')}</span>
+              <span>{t('details.identity_verification_required')}</span>
+            </div>
+            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded">
+              <FileText className="h-3 w-3" />
+              <span>{t('details.lease_agreement_required')}</span>
             </div>
           </div>
 
-          {/* Price */}
-          <div className="mb-6 p-4 bg-primary/5 rounded-lg">
-            <div className="text-sm text-gray-600 mb-1">{t('mobile.monthly_price')}</div>
-            <span className="text-2xl font-bold text-primary">
-              {formatPrice(property.price)}
-            </span>
-            <span className="text-gray-600 ml-2">{t('mobile.per_month')}</span>
-          </div>
         </div>
 
         {/* Description */}
@@ -248,14 +257,24 @@ const MobilePropertyDetails = ({
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">{t('mobile.furnished_label')}</span>
-                          <span className="text-xs">{getFurnishingText(room.furniture)}</span>
+                          <span className="text-xs">{getFurnishingText(room.furniture || room.furnishing)}</span>
                         </div>
-                        {room.requiresDeposit && (
+                        {(room.beds || 1) > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">{t('mobile.beds')}</span>
+                            <span className="text-xs">{room.beds || 1} {t('details.bed')}</span>
+                          </div>
+                        )}
+                        {room.requiresDeposit && (room.depositAmount || 0) > 0 && (
                           <div className="flex justify-between">
                             <span className="text-gray-600">{t('mobile.deposit')}</span>
                             <span className="text-xs">{formatPrice(room.depositAmount || 0)}</span>
                           </div>
                         )}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">{t('mobile.available_from')}</span>
+                          <span className="text-xs">{formatDate(room.availableFrom)}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </div>
@@ -265,7 +284,7 @@ const MobilePropertyDetails = ({
           </div>
         )}
 
-        {/* Roommates with Personality Tags */}
+        {/* Roommates with Personality Tags - Only show if there are roommates */}
         {backendProperty?.roommates && backendProperty.roommates.length > 0 && (
           <div className="w-full">
             <h2 className="text-lg font-bold text-gray-900 mb-3">{t('mobile.personality_title')}</h2>
@@ -298,11 +317,12 @@ const MobilePropertyDetails = ({
                 {/* Add some default personality traits if none exist */}
                 {(!backendProperty.roommates.some((r: any) => r.personality)) && (
                   <>
-                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('mobile.calmado')}</Badge>
-                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('mobile.pet_friendly')}</Badge>
-                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">{t('mobile.creativo')}</Badge>
-                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('mobile.fiesteros')}</Badge>
-                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">{t('mobile.nocturno')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('details.calmado')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('details.pet_friendly')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">{t('details.creativo')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('details.fiesteros')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary text-primary-foreground">{t('details.nocturno')}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">{t('details.deportistas')}</Badge>
                   </>
                 )}
               </div>
@@ -326,11 +346,11 @@ const MobilePropertyDetails = ({
           )}
         </div>
 
-        {/* Rules - 4 Card Grid */}
+        {/* Rules - Dynamic Card Grid */}
         <div className="w-full">
           <h2 className="text-lg font-bold text-gray-900 mb-3">{t('mobile.house_rules')}</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {/* Pets Card */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Pets Card */}
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className={`p-1.5 rounded-full ${backendProperty?.rules?.pets ? 'bg-green-100' : 'bg-red-100'}`}>
@@ -360,24 +380,26 @@ const MobilePropertyDetails = ({
               </div>
             </div>
 
-            {/* Parking Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`p-1.5 rounded-full ${backendProperty?.parking > 0 ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                  <Car className={`h-3 w-3 ${backendProperty?.parking > 0 ? 'text-blue-600' : 'text-gray-600'}`} />
+            {/* Parking Card - Only show if parking > 0 */}
+            {backendProperty?.parking > 0 && (
+              <div className="bg-white border border-gray-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`p-1.5 rounded-full ${backendProperty?.parking > 0 ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                    <Car className={`h-3 w-3 ${backendProperty?.parking > 0 ? 'text-blue-600' : 'text-gray-600'}`} />
+                  </div>
+                  <div className="font-semibold text-sm">{t('details.parking')}</div>
                 </div>
-                <div className="font-semibold text-sm">{t('details.parking')}</div>
+                <p className="text-xs text-gray-600 mb-2">
+                  {backendProperty?.parking > 0 
+                    ? (backendProperty.parkingDescription || t('mobile.available_spaces')) 
+                    : t('mobile.no_spaces')}
+                </p>
+                <div className="flex items-center gap-1">
+                  <Car className="h-3 w-3 text-gray-600" />
+                  <span className="text-xs font-medium">{backendProperty?.parking || 0} {t('mobile.spaces')}</span>
+                </div>
               </div>
-              <p className="text-xs text-gray-600 mb-2">
-                {backendProperty?.parking > 0 
-                  ? (backendProperty.parkingDescription || t('mobile.available_spaces')) 
-                  : t('mobile.no_spaces')}
-              </p>
-              <div className="flex items-center gap-1">
-                <Car className="h-3 w-3 text-gray-600" />
-                <span className="text-xs font-medium">{backendProperty?.parking || 0} {t('mobile.spaces')}</span>
-              </div>
-            </div>
+            )}
 
             {/* Events Card */}
             <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -455,25 +477,25 @@ const MobilePropertyDetails = ({
         {/* Contract & Deposit Info */}
         {backendProperty?.contracts && (
           <div className="w-full">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">{t('mobile.contract_info')}</h2>
+            <h2 className="text-lg font-bold text-gray-900">{t('mobile.contract_info')}</h2>
             <div className="space-y-3">
-              {backendProperty.contracts.requiresDeposit && backendProperty.contracts.depositAmount && (
-                <div className="bg-primary/5 rounded-lg p-4">
+              {backendProperty.contracts.requiresDeposit && backendProperty.contracts.depositAmount && backendProperty.contracts.depositAmount > 0 && (
+                <div className="px-4 py-2">
                   <div className="flex items-center gap-2 mb-1">
                     <DollarSign className="h-5 w-5 text-primary" />
                     <span className="font-medium">{t('mobile.deposit_required_title')}</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-md font-bold text-primary">
                     {formatPrice(backendProperty.contracts.depositAmount)}
                   </div>
                 </div>
               )}
               {backendProperty.contracts.standardOptions && backendProperty.contracts.standardOptions.length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="rounded-lg px-4">
                   <div className="font-medium mb-2">{t('mobile.contract_options')}</div>
-                  <ul className="space-y-1">
+                  <ul className="flex flex-row flex-wrap space-x-3">
                     {backendProperty.contracts.standardOptions.map((option: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-600">• {option}</li>
+                      <li key={index} className="text-sm text-gray-600 bg-gray-100 rounded-md px-2 py-1">{option}</li>
                     ))}
                   </ul>
                 </div>
@@ -485,7 +507,7 @@ const MobilePropertyDetails = ({
         {/* Availability */}
         <div className="w-full">
           <h2 className="text-lg font-bold text-gray-900 mb-3">{t('mobile.availability')}</h2>
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
+          <div className="flex items-center gap-2 rounded-lg p-3">
             <Calendar className="h-4 w-4 text-gray-600" />
             <div>
               <div className="text-xs text-gray-600">{t('details.available_from_date')}</div>
