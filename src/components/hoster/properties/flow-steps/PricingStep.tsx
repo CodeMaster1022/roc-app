@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, DollarSign, Calculator } from "lucide-react";
 import { format } from "date-fns";
 import { Property, ROOM_CHARACTERISTICS, RentalType } from "@/types/property";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PricingStepProps {  
   property: Partial<Property>;
@@ -20,6 +21,7 @@ interface PricingStepProps {
 }
 
 export const PricingStep = ({ property, updateProperty, onNext, onPrev }: PricingStepProps) => {
+  const { t } = useLanguage();
   const [totalPrice, setTotalPrice] = useState(property.pricing?.totalPrice || 0);
   const [rentalType, setRentalType] = useState<RentalType>(property.pricing?.rentalType || 'ambos');
 
@@ -100,10 +102,16 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
     <div className="p-8 space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold mb-2">
-          Precio y <span className="text-highlight">Disponibilidad</span>
+          {t('pricing.title').split(' ').map((word, index, array) => 
+            index >= array.length - 1 ? (
+              <span key={index} className="text-highlight">{word} </span>
+            ) : (
+              <span key={index}>{word} </span>
+            )
+          )}
         </h2>
         <p className="text-muted-foreground">
-          {isPropertyFlow ? 'Configura el precio y tipo de renta' : 'Establece el precio y disponibilidad de cada habitación'}
+          {isPropertyFlow ? t('pricing.property_config') : t('pricing.room_config')}
         </p>
       </div>
 
@@ -113,14 +121,14 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-primary" />
-              {isPropertyFlow ? 'Configuración de la propiedad' : 'Configuración general de precios'}
+              {isPropertyFlow ? t('pricing.property_setup') : t('pricing.general_setup')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>
-                  {isPropertyFlow ? 'Precio mensual esperado' : 'Precio total mensual esperado'}
+                  {isPropertyFlow ? t('pricing.expected_monthly_price') : t('pricing.total_expected_monthly_price')}
                 </Label>
                 <Input
                   type="number"
@@ -130,27 +138,27 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                 />
                 <p className="text-xs text-muted-foreground">
                   {isPropertyFlow 
-                    ? 'Este será el precio base para calcular los precios individuales de las habitaciones'
-                    : 'Suma total de todas las habitaciones - ayuda a calcular precios individuales'
+                    ? t('pricing.price_base_description')
+                    : t('pricing.total_sum_description')
                   }
                 </p>
               </div>
 
               {isPropertyFlow && (
                 <div className="space-y-2">
-                  <Label>Tipo de renta</Label>
+                  <Label>{t('pricing.rental_type')}</Label>
                   <Select value={rentalType} onValueChange={updateRentalType}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ambos">Ambos esquemas</SelectItem>
-                      <SelectItem value="completa">Propiedad completa</SelectItem>
-                      <SelectItem value="habitaciones">Rentarla por habitaciones</SelectItem>
+                      <SelectItem value="ambos">{t('pricing.both_schemes')}</SelectItem>
+                      <SelectItem value="completa">{t('pricing.full_property')}</SelectItem>
+                      <SelectItem value="habitaciones">{t('pricing.by_rooms')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">
-                    Es el tipo de aplicaciones de inquilinos que recibirás, al final puedes recibir propuestas pero aceptarás la que mejor te funcione
+                    {t('pricing.rental_type_description')}
                   </p>
                 </div>
               )}
@@ -162,7 +170,7 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                 <div className="flex items-center gap-2 mb-4">
                   <Calculator className="w-5 h-5 text-primary" />
                   <h4 className="font-medium">
-                    {isPropertyFlow ? 'Precio recomendado por habitaciones' : 'Distribución de precios sugerida'}
+                    {isPropertyFlow ? t('pricing.recommended_room_prices') : t('pricing.suggested_distribution')}
                   </h4>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -174,7 +182,7 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                       <div key={room.id} className="flex items-center justify-between p-3 bg-background rounded">
                         <div>
                           <p className="font-medium">{room.name}</p>
-                          <p className="text-sm text-muted-foreground">{characteristics?.points} puntos</p>
+                          <p className="text-sm text-muted-foreground">{characteristics?.points} {t('pricing.points')}</p>
                         </div>
                         <Badge variant="secondary">
                           ${recommendedPrice.toLocaleString()}
@@ -185,8 +193,8 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
                   {isPropertyFlow 
-                    ? 'Puedes usar estos precios como referencia o establecer tus propios precios abajo'
-                    : 'Estos son precios sugeridos basados en las características de cada habitación'
+                    ? t('pricing.use_reference_prices')
+                    : t('pricing.suggested_based_characteristics')
                   }
                 </p>
               </div>
@@ -196,7 +204,7 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
 
         {(!isPropertyFlow || rentalType !== 'completa') && (
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Configuración por habitación</h3>
+            <h3 className="text-xl font-semibold">{t('pricing.room_configuration')}</h3>
             {property.rooms?.map((room, index) => {
               const recommendedPrice = roomPrices[room.id];
               
@@ -208,7 +216,7 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                   <CardContent className="space-y-4">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        <div className="space-y-2">
-                         <Label>Precio mensual</Label>
+                         <Label>{t('pricing.monthly_price')}</Label>
                          <Input
                            type="number"
                            placeholder={recommendedPrice ? `$${recommendedPrice}` : "$0"}
@@ -217,18 +225,18 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                          />
                          {recommendedPrice && (
                            <p className="text-sm text-muted-foreground">
-                             Precio recomendado: ${recommendedPrice.toLocaleString()}
+                             {t('pricing.recommended_price')}: ${recommendedPrice.toLocaleString()}
                            </p>
                          )}
                        </div>
 
                        <div className="space-y-2">
-                         <Label>Disponible desde</Label>
+                         <Label>{t('pricing.available_from')}</Label>
                          <Popover>
                            <PopoverTrigger asChild>
                              <Button variant="outline" className="w-full justify-start text-left font-normal">
                                <CalendarIcon className="mr-2 h-4 w-4" />
-                               {room.availableFrom ? format(room.availableFrom, "PPP") : "Seleccionar fecha"}
+                               {room.availableFrom ? format(room.availableFrom, "PPP") : t('pricing.select_date')}
                              </Button>
                            </PopoverTrigger>
                            <PopoverContent className="w-auto p-0">
@@ -247,14 +255,14 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                      {property.contracts?.requiresDeposit && (
                        <div className="space-y-3 pt-4 border-t animate-fade-in">
                          <div className="flex items-center justify-between">
-                           <Label className="font-medium">Monto del depósito de garantía</Label>
+                           <Label className="font-medium">{t('pricing.deposit_amount')}</Label>
                            <Button 
                              variant="outline" 
                              size="sm"
                              onClick={() => updateRoomDeposit(room.id, room.price || 0)}
                              disabled={!room.price}
                            >
-                             Igual a 1 mes de renta
+                             {t('pricing.equal_to_one_month')}
                            </Button>
                          </div>
                          <Input
@@ -264,7 +272,7 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
                            onChange={(e) => updateRoomDeposit(room.id, parseInt(e.target.value) || 0)}
                          />
                          <p className="text-xs text-muted-foreground">
-                           Este será el monto de depósito requerido para esta habitación
+                           {t('pricing.deposit_description')}
                          </p>
                        </div>
                      )}
@@ -278,14 +286,14 @@ export const PricingStep = ({ property, updateProperty, onNext, onPrev }: Pricin
 
       <div className="flex justify-between pt-4 max-w-4xl mx-auto">
         <Button variant="outline" onClick={onPrev}>
-          Anterior
+          {t('pricing.previous')}
         </Button>
         <RocButton 
           variant="default" 
           onClick={onNext}
           disabled={!isValid}
         >
-          Continuar
+          {t('pricing.continue')}
         </RocButton>
       </div>
     </div>

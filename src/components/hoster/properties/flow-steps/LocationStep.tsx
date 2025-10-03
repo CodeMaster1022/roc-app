@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapboxMap } from "@/components/hoster/ui/mapbox-map";
 import { Property } from "@/types/property";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LocationStepProps {
   property: Partial<Property>;
@@ -33,6 +34,7 @@ const ZONES = [
 
 export const LocationStep = ({ property, updateProperty, onNext, onPrev }: LocationStepProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [zone, setZone] = useState(property.location?.zone || 'auto');
   const [address, setAddress] = useState(property.location?.address || '');
   const [coordinates, setCoordinates] = useState({
@@ -66,8 +68,8 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
     // Only check if coordinates are valid (not 0,0)
     if (coordinates.lat === 0 && coordinates.lng === 0) {
       toast({
-        title: "Location required",
-        description: "Please search for an address and confirm the location on the map",
+        title: t('create.location_required_title'),
+        description: t('create.location_required_description'),
         variant: "destructive",
       });
       return;
@@ -90,19 +92,19 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
   return (
     <div className="px-6 space-y-3">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">Property Location</h2>
+        <h2 className="text-2xl font-bold mb-2">{t('create.location_title')}</h2>
         <p className="text-muted-foreground">
-          Where is your property located?
+          {t('create.location_description')}
         </p>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Zone Selection */}
         <div className="space-y-2">
-          <Label htmlFor="zone">Zone (Optional)</Label>
+          <Label htmlFor="zone">{t('create.zone_optional')}</Label>
           <Select value={zone} onValueChange={setZone}>
             <SelectTrigger>
-              <SelectValue placeholder="Select a zone" />
+              <SelectValue placeholder={t('create.select_zone')} />
             </SelectTrigger>
             <SelectContent>
               {ZONES.map((z) => (
@@ -141,10 +143,10 @@ export const LocationStep = ({ property, updateProperty, onNext, onPrev }: Locat
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-10 max-w-4xl mx-auto">
         <Button variant="outline" onClick={onPrev}>
-          Previous
+          {t('create.previous')}
         </Button>
         <Button onClick={handleConfirm}>
-          Continue
+          {t('create.continue')}
         </Button>
       </div>
     </div>

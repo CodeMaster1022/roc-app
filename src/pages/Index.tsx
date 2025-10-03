@@ -336,7 +336,7 @@ const Index = () => {
               {/* Mobile view - Show both properties and rooms sections */}
               {isMobile && currentSection === "inicio" && (
                 <div className="space-y-8 pb-6">
-                  {/* Properties Section */}
+                  {/* Properties Section - Horizontal Scroll */}
                   {propertiesOnly.length > 0 && (
                     <div>
                       <div className="flex items-center justify-between mb-6 px-4 pt-4">
@@ -360,37 +360,39 @@ const Index = () => {
                         </button>  
                       </div>
                       
-                      {/* Properties Grid */}
-                      <div className="space-y-4 px-4">
-                        {propertiesOnly.map((property, index) => (
-                          <div 
-                            key={property.id} 
-                            className="animate-fade-in"
-                            style={{ animationDelay: `${index * 0.1}s` }}
-                          >
-                            <MobilePropertyCard
-                              id={property.id}
-                              title={property.title}
-                              image={property.image}
-                              price={property.price}
-                              type={property.type}
-                              propertyType={property.propertyType}
-                              area={property.area}
-                              bedrooms={property.bedrooms}
-                              allowsPets={property.allowsPets}
-                              location={property.zone}
-                              isFavorite={favorites.includes(property.id)}
-                              isAvailable={property.isAvailable}
-                              onFavoriteToggle={handleFavoriteToggle}
-                              onViewDetails={handleViewDetails}
-                            />
-                          </div>
-                        ))}
+                      {/* Properties Horizontal Scroll */}
+                      <div className="overflow-x-auto scrollbar-hide">
+                        <div className="flex gap-4 px-4 pb-2">
+                          {propertiesOnly.map((property, index) => (
+                            <div 
+                              key={property.id} 
+                              className="flex-shrink-0 w-[85vw] animate-fade-in"
+                              style={{ animationDelay: `${index * 0.1}s` }}
+                            >
+                              <MobilePropertyCard
+                                id={property.id}
+                                title={property.title}
+                                image={property.image}
+                                price={property.price}
+                                type={property.type}
+                                propertyType={property.propertyType}
+                                area={property.area}
+                                bedrooms={property.bedrooms}
+                                allowsPets={property.allowsPets}
+                                location={property.zone}
+                                isFavorite={favorites.includes(property.id)}
+                                isAvailable={property.isAvailable}
+                                onFavoriteToggle={handleFavoriteToggle}
+                                onViewDetails={handleViewDetails}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
                   
-                  {/* Rooms Section */}
+                  {/* Rooms Section - Vertical Scroll */}
                   {roomsOnly.length > 0 && (
                     <div>
                       <div className="flex items-center justify-between mb-6 px-4 pt-4">
@@ -414,7 +416,7 @@ const Index = () => {
                         </button>  
                       </div>
                       
-                      {/* Rooms Grid */}
+                      {/* Rooms Vertical List */}
                       <div className="space-y-3 px-4">
                         {roomsOnly.map((room, index) => (
                           <div 

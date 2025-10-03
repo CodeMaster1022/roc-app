@@ -8,6 +8,7 @@ import { propertyService } from '@/services/propertyService'
 import { transformFrontendToBackend } from '@/utils/propertyTransform'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface PropertyFlowModalProps {
   open: boolean
@@ -27,6 +28,7 @@ const FLOW_STEPS: FlowStep[] = [
 ];
 
 export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCreated }: PropertyFlowModalProps) => {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState<FlowStep>('property-type');
   const [property, setProperty] = useState<Partial<Property>>({
     type: unitType || 'rooms',
@@ -89,8 +91,8 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
         description: property?.details?.description
       });
       toast({
-        title: "Error",
-        description: "Please complete all required fields before submitting.",
+        title: t('create.error_title'),
+        description: t('create.error_description'),
         variant: "destructive",
       });
       return;
@@ -115,32 +117,32 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
     
     try {
       // Step 1: Transform data
-      setSubmissionStep('Procesando información...');
+      setSubmissionStep(t('create.processing_info'));
       await new Promise(resolve => setTimeout(resolve, 500));
       const propertyWithStatus = { ...property, status } as Property;
       const backendPropertyData = transformFrontendToBackend(propertyWithStatus);
       console.log('🔄 Transformed data:', backendPropertyData);
       
       // Step 2: Upload images and create property
-      setSubmissionStep('Subiendo imágenes...');
+      setSubmissionStep(t('create.uploading_images'));
       await new Promise(resolve => setTimeout(resolve, 500));
       console.log('📡 Calling API...');
       
       // Step 3: Save to database
-      setSubmissionStep('Guardando en base de datos...');
+      setSubmissionStep(t('create.saving_database'));
       const response = await propertyService.createProperty(backendPropertyData);
       console.log('📡 API Response:', response);
       
       // Step 4: Finalizing
-      setSubmissionStep('Finalizando...');
+      setSubmissionStep(t('create.finalizing'));
       await new Promise(resolve => setTimeout(resolve, 300));
       
       const message = status === 'review' 
-        ? "Property created successfully and submitted for review!"
-        : "Property saved! You can finish the configuration later.";
+        ? t('create.success_review_message')
+        : t('create.success_draft_message');
       
       toast({
-        title: "Success",
+        title: t('create.success_title'),
         description: message,
       });
 
@@ -156,8 +158,8 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
     } catch (error: any) {
       console.error('❌ Error creating property:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to create property. Please try again.",
+        title: t('create.error_title'),
+        description: error.message || t('create.error_failed_message'),
         variant: "destructive",
       });
     } finally {
@@ -238,30 +240,30 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
                 <div className="bg-card p-6 rounded-lg shadow-lg border flex flex-col items-center gap-4 min-w-[300px] mx-4">
                   <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   <div className="text-center">
-                    <h3 className="font-semibold text-lg mb-2">Creando Propiedad</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t('create.property_created_title')}</h3>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center justify-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Procesando') ? 'bg-primary animate-pulse' : submissionStep === 'Procesando información...' ? 'bg-muted' : 'bg-green-500'}`} />
+                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Procesando') ? 'bg-primary animate-pulse' : submissionStep === t('create.processing_info') ? 'bg-muted' : 'bg-green-500'}`} />
                         <span className={submissionStep.includes('Procesando') ? 'text-primary font-medium' : ''}>
-                          Procesando información
+                          {t('create.processing_info_step')}
                         </span>
                       </div>
                       <div className="flex items-center justify-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Subiendo') ? 'bg-primary animate-pulse' : submissionStep === 'Subiendo imágenes...' ? 'bg-muted' : submissionStep.includes('Guardando') || submissionStep.includes('Finalizando') ? 'bg-green-500' : 'bg-muted'}`} />
+                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Subiendo') ? 'bg-primary animate-pulse' : submissionStep === t('create.uploading_images') ? 'bg-muted' : submissionStep.includes('Guardando') || submissionStep.includes('Finalizando') ? 'bg-green-500' : 'bg-muted'}`} />
                         <span className={submissionStep.includes('Subiendo') ? 'text-primary font-medium' : ''}>
-                          Subiendo imágenes
+                          {t('create.uploading_images_step')}
                         </span>
                       </div>
                       <div className="flex items-center justify-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Guardando') ? 'bg-primary animate-pulse' : submissionStep === 'Guardando en base de datos...' ? 'bg-muted' : submissionStep.includes('Finalizando') ? 'bg-green-500' : 'bg-muted'}`} />
+                        <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Guardando') ? 'bg-primary animate-pulse' : submissionStep === t('create.saving_database') ? 'bg-muted' : submissionStep.includes('Finalizando') ? 'bg-green-500' : 'bg-muted'}`} />
                         <span className={submissionStep.includes('Guardando') ? 'text-primary font-medium' : ''}>
-                          Guardando en base de datos
+                          {t('create.saving_database_step')}
                         </span>
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${submissionStep.includes('Finalizando') ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
                         <span className={submissionStep.includes('Finalizando') ? 'text-primary font-medium' : ''}>
-                          Finalizando
+                          {t('create.finalizing_step')}
                         </span>
                       </div>
                     </div>
@@ -295,10 +297,10 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
             {/* Title */}
             <div>
               <h2 className="text-3xl font-bold">
-                Property <span className="text-purple-600">Created!</span>
+                Property <span className="text-purple-600">{t('create.property_created_title')}</span>
               </h2>
               <p className="text-muted-foreground mt-3">
-                You've successfully created your property. You can finish configuring it now or complete the setup later.
+                {t('create.property_created_description')}
               </p>
             </div>
 
@@ -310,7 +312,7 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
                 className="flex-1"
                 disabled={isSubmitting}
               >
-                Save for Later
+                {t('create.save_for_later')}
               </Button>
               
               <Button 
@@ -318,7 +320,7 @@ export const PropertyFlowModal = ({ open, onOpenChange, unitType, onPropertyCrea
                 className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900"
                 disabled={isSubmitting}
               >
-                Finish Configuration
+                {t('create.finish_configuration')}
               </Button>
             </div>
           </div>

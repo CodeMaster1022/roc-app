@@ -26,13 +26,13 @@ export const PropertyTypeStep = ({ property, updateProperty, onNext }: PropertyT
   const propertyTypes = [
     {
       id: 'casa' as PropertyType,
-      title: 'Casa',
+      title: t('create.casa'),
       description: '',
       icon: Home
     },
     {
       id: 'departamento' as PropertyType,
-      title: 'Departamento',
+      title: t('create.departamento'),
       description: '',
       icon: Building2
     }
@@ -42,10 +42,10 @@ export const PropertyTypeStep = ({ property, updateProperty, onNext }: PropertyT
     <div className="p-6 space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">
-          Tipo de Propiedad
+          {t('create.property_type_title')}
         </h2>
         <p className="text-muted-foreground">
-          Selecciona el tipo de propiedad que vas a registrar
+          {t('create.property_type_description')}
         </p>
       </div>
 

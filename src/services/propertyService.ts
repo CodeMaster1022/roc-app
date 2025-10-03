@@ -16,11 +16,19 @@ export interface PropertyPricing {
 
 export interface PropertyRules {
   pets: boolean;
+  petPolicy?: string;
+  maxPetsPerUser?: number;
   smoking: boolean;
+  smokingPolicy?: string;
+  smokingDetails?: string;
   parties: boolean;
   meetings?: {
     allowed: boolean;
     schedule?: string;
+    description?: string;
+    allowedDays?: string[];
+    endTimeLimit?: string;
+    maxGuests?: number;
   };
 }
 
@@ -64,13 +72,22 @@ export interface BackendProperty {
   };
   rules: {
     pets: boolean;
+    petPolicy?: string;
+    maxPetsPerUser?: number;
     smoking: boolean;
+    smokingPolicy?: string;
+    smokingDetails?: string;
     parties: boolean;
     meetings?: {
       allowed: boolean;
       schedule?: string;
+      description?: string;
+      allowedDays?: string[];
+      endTimeLimit?: string;
+      maxGuests?: number;
     };
   };
+  parkingDescription?: string;
   contracts?: {
     contractType?: 'template' | 'custom';
     customContract?: string;
@@ -116,13 +133,22 @@ export interface CreatePropertyRequest {
   };
   rules: {
     pets: boolean;
+    petPolicy?: string;
+    maxPetsPerUser?: number;
     smoking: boolean;
+    smokingPolicy?: string;
+    smokingDetails?: string;
     parties: boolean;
     meetings?: {
       allowed: boolean;
       schedule?: string;
+      description?: string;
+      allowedDays?: string[];
+      endTimeLimit?: string;
+      maxGuests?: number;
     };
   };
+  parkingDescription?: string;
   contracts?: {
     contractType?: 'template' | 'custom';
     customContract?: string;

@@ -633,117 +633,380 @@ const PropertyConfigurationPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Pets */}
-                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                    <div className="text-primary">🐾</div>
-                    <div className="flex-1">
-                      <Label className="font-semibold">Pets *</Label>
-                      <p className="text-sm text-muted-foreground mb-2">Configure pet policy (required)</p>
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="radio" 
-                            id="pets-allowed" 
-                            checked={property.details?.advancedConfig?.rules?.pets === true}
-                            onChange={() => updateProperty({
-                              details: {
-                                ...property.details,
-                                advancedConfig: {
-                                  ...property.details?.advancedConfig,
-                                  rules: { ...property.details?.advancedConfig?.rules, pets: true }
-                                }
-                              } as any
-                            })}
-                          />
-                          <Label htmlFor="pets-allowed" className="font-normal cursor-pointer">Pets allowed</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="radio" 
-                            id="pets-not-allowed" 
-                            checked={property.details?.advancedConfig?.rules?.pets === false}
-                            onChange={() => updateProperty({
-                              details: {
-                                ...property.details,
-                                advancedConfig: {
-                                  ...property.details?.advancedConfig,
-                                  rules: { ...property.details?.advancedConfig?.rules, pets: false }
-                                }
-                              } as any
-                            })}
-                          />
-                          <Label htmlFor="pets-not-allowed" className="font-normal cursor-pointer">Pets not allowed</Label>
-                        </div>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="text-primary">🐾</div>
+                      <div className="flex-1">
+                        <Label className="font-semibold">Pets *</Label>
+                        <p className="text-sm text-muted-foreground">Configure pet policy (required)</p>
                       </div>
                     </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          id="pets-allowed" 
+                          checked={property.details?.advancedConfig?.rules?.pets === true}
+                          onChange={() => updateProperty({
+                            details: {
+                              ...property.details,
+                              advancedConfig: {
+                                ...property.details?.advancedConfig,
+                                rules: { ...property.details?.advancedConfig?.rules, pets: true }
+                              }
+                            } as any
+                          })}
+                        />
+                        <Label htmlFor="pets-allowed" className="font-normal cursor-pointer">Pets allowed</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          id="pets-not-allowed" 
+                          checked={property.details?.advancedConfig?.rules?.pets === false}
+                          onChange={() => updateProperty({
+                            details: {
+                              ...property.details,
+                              advancedConfig: {
+                                ...property.details?.advancedConfig,
+                                rules: { ...property.details?.advancedConfig?.rules, pets: false }
+                              }
+                            } as any
+                          })}
+                        />
+                        <Label htmlFor="pets-not-allowed" className="font-normal cursor-pointer">Pets not allowed</Label>
+                      </div>
+                    </div>
+                    {property.details?.advancedConfig?.rules?.pets && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="pet-policy-desc">Pet Policy Description</Label>
+                          <Input
+                            id="pet-policy-desc"
+                            value={(property.details?.advancedConfig?.rules as any)?.petPolicy || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    petPolicy: e.target.value 
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="e.g., One small pet per user is allowed"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="max-pets">Maximum Pets per User</Label>
+                          <Input
+                            id="max-pets"
+                            type="number"
+                            min="0"
+                            value={(property.details?.advancedConfig?.rules as any)?.maxPetsPerUser || 1}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    maxPetsPerUser: Number(e.target.value) 
+                                  }
+                                }
+                              } as any
+                            })}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Smoking */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🚬</div>
-                      <div>
-                        <Label className="font-semibold">Smoking</Label>
-                        <p className="text-sm text-muted-foreground">Configure smoking policy</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🚬</div>
+                        <div>
+                          <Label className="font-semibold">Smoking</Label>
+                          <p className="text-sm text-muted-foreground">Configure smoking policy</p>
+                        </div>
                       </div>
+                      <Switch
+                        checked={property.details?.advancedConfig?.rules?.smoking || false}
+                        onCheckedChange={(checked) => updateProperty({
+                          details: {
+                            ...property.details,
+                            advancedConfig: {
+                              ...property.details?.advancedConfig,
+                              rules: { ...property.details?.advancedConfig?.rules, smoking: checked }
+                            }
+                          } as any
+                        })}
+                      />
                     </div>
-                    <Switch
-                      checked={property.details?.advancedConfig?.rules?.smoking || false}
-                      onCheckedChange={(checked) => updateProperty({
-                        details: {
-                          ...property.details,
-                          advancedConfig: {
-                            ...property.details?.advancedConfig,
-                            rules: { ...property.details?.advancedConfig?.rules, smoking: checked }
-                          }
-                        } as any
-                      })}
-                    />
+                    {property.details?.advancedConfig?.rules?.smoking && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="smoking-policy">Smoking Policy</Label>
+                          <Select
+                            value={(property.details?.advancedConfig?.rules as any)?.smokingPolicy || 'not-allowed-inside'}
+                            onValueChange={(value) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    smokingPolicy: value 
+                                  }
+                                }
+                              } as any
+                            })}
+                          >
+                            <SelectTrigger id="smoking-policy">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="not-allowed-inside">Not allowed inside</SelectItem>
+                              <SelectItem value="designated-areas">Designated areas only</SelectItem>
+                              <SelectItem value="allowed-everywhere">Allowed everywhere</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="smoking-details">Additional Details</Label>
+                          <Textarea
+                            id="smoking-details"
+                            value={(property.details?.advancedConfig?.rules as any)?.smokingDetails || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    smokingDetails: e.target.value 
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="Additional smoking policy details"
+                            rows={2}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Events & Meetings */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🎵</div>
-                      <div>
-                        <Label className="font-semibold">Events & Meetings</Label>
-                        <p className="text-sm text-muted-foreground">Configure event and meeting policies</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🎵</div>
+                        <div>
+                          <Label className="font-semibold">Events & Meetings</Label>
+                          <p className="text-sm text-muted-foreground">Configure event and meeting policies</p>
+                        </div>
                       </div>
-                    </div>
-                    <Switch
-                      checked={property.details?.advancedConfig?.rules?.meetings?.allowed || false}
-                      onCheckedChange={(checked) => updateProperty({
-                        details: {
-                          ...property.details,
-                          advancedConfig: {
-                            ...property.details?.advancedConfig,
-                            rules: { 
-                              ...property.details?.advancedConfig?.rules, 
-                              meetings: { allowed: checked }
+                      <Switch
+                        checked={property.details?.advancedConfig?.rules?.meetings?.allowed || false}
+                        onCheckedChange={(checked) => updateProperty({
+                          details: {
+                            ...property.details,
+                            advancedConfig: {
+                              ...property.details?.advancedConfig,
+                              rules: { 
+                                ...property.details?.advancedConfig?.rules, 
+                                meetings: { 
+                                  ...property.details?.advancedConfig?.rules?.meetings,
+                                  allowed: checked 
+                                }
+                              }
                             }
-                          }
-                        } as any
-                      })}
-                    />
+                          } as any
+                        })}
+                      />
+                    </div>
+                    {property.details?.advancedConfig?.rules?.meetings?.allowed && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="event-policy-desc">Event Policy Description</Label>
+                          <Input
+                            id="event-policy-desc"
+                            value={(property.details?.advancedConfig?.rules?.meetings as any)?.description || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules,
+                                    meetings: {
+                                      ...property.details?.advancedConfig?.rules?.meetings,
+                                      description: e.target.value
+                                    }
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="e.g., Weekend meetings are allowed"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Allowed Days</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                              const allowedDays = (property.details?.advancedConfig?.rules?.meetings as any)?.allowedDays || [];
+                              return (
+                                <div key={day} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`day-${day}`}
+                                    checked={allowedDays.includes(day)}
+                                    onCheckedChange={(checked) => {
+                                      const newDays = checked
+                                        ? [...allowedDays, day]
+                                        : allowedDays.filter((d: string) => d !== day);
+                                      updateProperty({
+                                        details: {
+                                          ...property.details,
+                                          advancedConfig: {
+                                            ...property.details?.advancedConfig,
+                                            rules: { 
+                                              ...property.details?.advancedConfig?.rules,
+                                              meetings: {
+                                                ...property.details?.advancedConfig?.rules?.meetings,
+                                                allowedDays: newDays
+                                              }
+                                            }
+                                          }
+                                        } as any
+                                      });
+                                    }}
+                                  />
+                                  <Label htmlFor={`day-${day}`} className="cursor-pointer font-normal">{day}</Label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="end-time-limit">End Time Limit</Label>
+                            <Select
+                              value={(property.details?.advancedConfig?.rules?.meetings as any)?.endTimeLimit || '10:00 PM'}
+                              onValueChange={(value) => updateProperty({
+                                details: {
+                                  ...property.details,
+                                  advancedConfig: {
+                                    ...property.details?.advancedConfig,
+                                    rules: { 
+                                      ...property.details?.advancedConfig?.rules,
+                                      meetings: {
+                                        ...property.details?.advancedConfig?.rules?.meetings,
+                                        endTimeLimit: value
+                                      }
+                                    }
+                                  }
+                                } as any
+                              })}
+                            >
+                              <SelectTrigger id="end-time-limit">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="8:00 PM">8:00 PM</SelectItem>
+                                <SelectItem value="9:00 PM">9:00 PM</SelectItem>
+                                <SelectItem value="10:00 PM">10:00 PM</SelectItem>
+                                <SelectItem value="11:00 PM">11:00 PM</SelectItem>
+                                <SelectItem value="12:00 AM">12:00 AM</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="max-guests">Maximum Guests</Label>
+                            <Input
+                              id="max-guests"
+                              type="number"
+                              min="0"
+                              value={(property.details?.advancedConfig?.rules?.meetings as any)?.maxGuests || 5}
+                              onChange={(e) => updateProperty({
+                                details: {
+                                  ...property.details,
+                                  advancedConfig: {
+                                    ...property.details?.advancedConfig,
+                                    rules: { 
+                                      ...property.details?.advancedConfig?.rules,
+                                      meetings: {
+                                        ...property.details?.advancedConfig?.rules?.meetings,
+                                        maxGuests: Number(e.target.value)
+                                      }
+                                    }
+                                  }
+                                } as any
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Parking */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🚗</div>
-                      <div>
-                        <Label className="font-semibold">Parking</Label>
-                        <p className="text-sm text-muted-foreground">Configure parking availability for tenants</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🚗</div>
+                        <div>
+                          <Label className="font-semibold">Parking</Label>
+                          <p className="text-sm text-muted-foreground">Configure parking availability for tenants</p>
+                        </div>
                       </div>
+                      <Switch
+                        checked={(property.additionalInfo?.parking || 0) > 0}
+                        onCheckedChange={(checked) => updateProperty({
+                          additionalInfo: { 
+                            ...property.additionalInfo, 
+                            parking: checked ? 1 : 0 
+                          } as any
+                        })}
+                      />
                     </div>
-                    <Switch
-                      checked={(property.additionalInfo?.parking || 0) > 0}
-                      onCheckedChange={(checked) => updateProperty({
-                        additionalInfo: { 
-                          ...property.additionalInfo, 
-                          parking: checked ? 1 : 0 
-                        } as any
-                      })}
-                    />
+                    {(property.additionalInfo?.parking || 0) > 0 && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="parking-spaces">Number of Parking Spaces</Label>
+                          <Input
+                            id="parking-spaces"
+                            type="number"
+                            min="0"
+                            value={property.additionalInfo?.parking || 0}
+                            onChange={(e) => updateProperty({
+                              additionalInfo: { 
+                                ...property.additionalInfo, 
+                                parking: Number(e.target.value) 
+                              } as any
+                            })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="parking-desc">Parking Description</Label>
+                          <Input
+                            id="parking-desc"
+                            value={(property.additionalInfo as any)?.parkingDescription || ''}
+                            onChange={(e) => updateProperty({
+                              additionalInfo: { 
+                                ...property.additionalInfo, 
+                                parkingDescription: e.target.value 
+                              } as any
+                            })}
+                            placeholder="e.g., Covered parking spaces available for tenants"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1182,117 +1445,380 @@ const PropertyConfigurationPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Pets */}
-                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                    <div className="text-primary">🐾</div>
-                    <div className="flex-1">
-                      <Label className="font-semibold">Pets *</Label>
-                      <p className="text-sm text-muted-foreground mb-2">Configure pet policy (required)</p>
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="radio" 
-                            id="pets-allowed-rooms" 
-                            checked={property.details?.advancedConfig?.rules?.pets === true}
-                            onChange={() => updateProperty({
-                              details: {
-                                ...property.details,
-                                advancedConfig: {
-                                  ...property.details?.advancedConfig,
-                                  rules: { ...property.details?.advancedConfig?.rules, pets: true }
-                                }
-                              } as any
-                            })}
-                          />
-                          <Label htmlFor="pets-allowed-rooms" className="font-normal cursor-pointer">Pets allowed</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="radio" 
-                            id="pets-not-allowed-rooms" 
-                            checked={property.details?.advancedConfig?.rules?.pets === false}
-                            onChange={() => updateProperty({
-                              details: {
-                                ...property.details,
-                                advancedConfig: {
-                                  ...property.details?.advancedConfig,
-                                  rules: { ...property.details?.advancedConfig?.rules, pets: false }
-                                }
-                              } as any
-                            })}
-                          />
-                          <Label htmlFor="pets-not-allowed-rooms" className="font-normal cursor-pointer">Pets not allowed</Label>
-                        </div>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="text-primary">🐾</div>
+                      <div className="flex-1">
+                        <Label className="font-semibold">Pets *</Label>
+                        <p className="text-sm text-muted-foreground">Configure pet policy (required)</p>
                       </div>
                     </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          id="pets-allowed-rooms" 
+                          checked={property.details?.advancedConfig?.rules?.pets === true}
+                          onChange={() => updateProperty({
+                            details: {
+                              ...property.details,
+                              advancedConfig: {
+                                ...property.details?.advancedConfig,
+                                rules: { ...property.details?.advancedConfig?.rules, pets: true }
+                              }
+                            } as any
+                          })}
+                        />
+                        <Label htmlFor="pets-allowed-rooms" className="font-normal cursor-pointer">Pets allowed</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input 
+                          type="radio" 
+                          id="pets-not-allowed-rooms" 
+                          checked={property.details?.advancedConfig?.rules?.pets === false}
+                          onChange={() => updateProperty({
+                            details: {
+                              ...property.details,
+                              advancedConfig: {
+                                ...property.details?.advancedConfig,
+                                rules: { ...property.details?.advancedConfig?.rules, pets: false }
+                              }
+                            } as any
+                          })}
+                        />
+                        <Label htmlFor="pets-not-allowed-rooms" className="font-normal cursor-pointer">Pets not allowed</Label>
+                      </div>
+                    </div>
+                    {property.details?.advancedConfig?.rules?.pets && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="pet-policy-desc-rooms">Pet Policy Description</Label>
+                          <Input
+                            id="pet-policy-desc-rooms"
+                            value={(property.details?.advancedConfig?.rules as any)?.petPolicy || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    petPolicy: e.target.value 
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="e.g., One small pet per user is allowed"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="max-pets-rooms">Maximum Pets per User</Label>
+                          <Input
+                            id="max-pets-rooms"
+                            type="number"
+                            min="0"
+                            value={(property.details?.advancedConfig?.rules as any)?.maxPetsPerUser || 1}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    maxPetsPerUser: Number(e.target.value) 
+                                  }
+                                }
+                              } as any
+                            })}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Smoking */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🚬</div>
-                      <div>
-                        <Label className="font-semibold">Smoking</Label>
-                        <p className="text-sm text-muted-foreground">Configure smoking policy</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🚬</div>
+                        <div>
+                          <Label className="font-semibold">Smoking</Label>
+                          <p className="text-sm text-muted-foreground">Configure smoking policy</p>
+                        </div>
                       </div>
+                      <Switch
+                        checked={property.details?.advancedConfig?.rules?.smoking || false}
+                        onCheckedChange={(checked) => updateProperty({
+                          details: {
+                            ...property.details,
+                            advancedConfig: {
+                              ...property.details?.advancedConfig,
+                              rules: { ...property.details?.advancedConfig?.rules, smoking: checked }
+                            }
+                          } as any
+                        })}
+                      />
                     </div>
-                    <Switch
-                      checked={property.details?.advancedConfig?.rules?.smoking || false}
-                      onCheckedChange={(checked) => updateProperty({
-                        details: {
-                          ...property.details,
-                          advancedConfig: {
-                            ...property.details?.advancedConfig,
-                            rules: { ...property.details?.advancedConfig?.rules, smoking: checked }
-                          }
-                        } as any
-                      })}
-                    />
+                    {property.details?.advancedConfig?.rules?.smoking && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="smoking-policy-rooms">Smoking Policy</Label>
+                          <Select
+                            value={(property.details?.advancedConfig?.rules as any)?.smokingPolicy || 'not-allowed-inside'}
+                            onValueChange={(value) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    smokingPolicy: value 
+                                  }
+                                }
+                              } as any
+                            })}
+                          >
+                            <SelectTrigger id="smoking-policy-rooms">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="not-allowed-inside">Not allowed inside</SelectItem>
+                              <SelectItem value="designated-areas">Designated areas only</SelectItem>
+                              <SelectItem value="allowed-everywhere">Allowed everywhere</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="smoking-details-rooms">Additional Details</Label>
+                          <Textarea
+                            id="smoking-details-rooms"
+                            value={(property.details?.advancedConfig?.rules as any)?.smokingDetails || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules, 
+                                    smokingDetails: e.target.value 
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="Additional smoking policy details"
+                            rows={2}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Events & Meetings */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🎵</div>
-                      <div>
-                        <Label className="font-semibold">Events & Meetings</Label>
-                        <p className="text-sm text-muted-foreground">Configure event and meeting policies</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🎵</div>
+                        <div>
+                          <Label className="font-semibold">Events & Meetings</Label>
+                          <p className="text-sm text-muted-foreground">Configure event and meeting policies</p>
+                        </div>
                       </div>
-                    </div>
-                    <Switch
-                      checked={property.details?.advancedConfig?.rules?.meetings?.allowed || false}
-                      onCheckedChange={(checked) => updateProperty({
-                        details: {
-                          ...property.details,
-                          advancedConfig: {
-                            ...property.details?.advancedConfig,
-                            rules: { 
-                              ...property.details?.advancedConfig?.rules, 
-                              meetings: { allowed: checked }
+                      <Switch
+                        checked={property.details?.advancedConfig?.rules?.meetings?.allowed || false}
+                        onCheckedChange={(checked) => updateProperty({
+                          details: {
+                            ...property.details,
+                            advancedConfig: {
+                              ...property.details?.advancedConfig,
+                              rules: { 
+                                ...property.details?.advancedConfig?.rules, 
+                                meetings: { 
+                                  ...property.details?.advancedConfig?.rules?.meetings,
+                                  allowed: checked 
+                                }
+                              }
                             }
-                          }
-                        } as any
-                      })}
-                    />
+                          } as any
+                        })}
+                      />
+                    </div>
+                    {property.details?.advancedConfig?.rules?.meetings?.allowed && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="event-policy-desc-rooms">Event Policy Description</Label>
+                          <Input
+                            id="event-policy-desc-rooms"
+                            value={(property.details?.advancedConfig?.rules?.meetings as any)?.description || ''}
+                            onChange={(e) => updateProperty({
+                              details: {
+                                ...property.details,
+                                advancedConfig: {
+                                  ...property.details?.advancedConfig,
+                                  rules: { 
+                                    ...property.details?.advancedConfig?.rules,
+                                    meetings: {
+                                      ...property.details?.advancedConfig?.rules?.meetings,
+                                      description: e.target.value
+                                    }
+                                  }
+                                }
+                              } as any
+                            })}
+                            placeholder="e.g., Weekend meetings are allowed"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Allowed Days</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                              const allowedDays = (property.details?.advancedConfig?.rules?.meetings as any)?.allowedDays || [];
+                              return (
+                                <div key={day} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`day-${day}-rooms`}
+                                    checked={allowedDays.includes(day)}
+                                    onCheckedChange={(checked) => {
+                                      const newDays = checked
+                                        ? [...allowedDays, day]
+                                        : allowedDays.filter((d: string) => d !== day);
+                                      updateProperty({
+                                        details: {
+                                          ...property.details,
+                                          advancedConfig: {
+                                            ...property.details?.advancedConfig,
+                                            rules: { 
+                                              ...property.details?.advancedConfig?.rules,
+                                              meetings: {
+                                                ...property.details?.advancedConfig?.rules?.meetings,
+                                                allowedDays: newDays
+                                              }
+                                            }
+                                          }
+                                        } as any
+                                      });
+                                    }}
+                                  />
+                                  <Label htmlFor={`day-${day}-rooms`} className="cursor-pointer font-normal">{day}</Label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="end-time-limit-rooms">End Time Limit</Label>
+                            <Select
+                              value={(property.details?.advancedConfig?.rules?.meetings as any)?.endTimeLimit || '10:00 PM'}
+                              onValueChange={(value) => updateProperty({
+                                details: {
+                                  ...property.details,
+                                  advancedConfig: {
+                                    ...property.details?.advancedConfig,
+                                    rules: { 
+                                      ...property.details?.advancedConfig?.rules,
+                                      meetings: {
+                                        ...property.details?.advancedConfig?.rules?.meetings,
+                                        endTimeLimit: value
+                                      }
+                                    }
+                                  }
+                                } as any
+                              })}
+                            >
+                              <SelectTrigger id="end-time-limit-rooms">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="8:00 PM">8:00 PM</SelectItem>
+                                <SelectItem value="9:00 PM">9:00 PM</SelectItem>
+                                <SelectItem value="10:00 PM">10:00 PM</SelectItem>
+                                <SelectItem value="11:00 PM">11:00 PM</SelectItem>
+                                <SelectItem value="12:00 AM">12:00 AM</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="max-guests-rooms">Maximum Guests</Label>
+                            <Input
+                              id="max-guests-rooms"
+                              type="number"
+                              min="0"
+                              value={(property.details?.advancedConfig?.rules?.meetings as any)?.maxGuests || 5}
+                              onChange={(e) => updateProperty({
+                                details: {
+                                  ...property.details,
+                                  advancedConfig: {
+                                    ...property.details?.advancedConfig,
+                                    rules: { 
+                                      ...property.details?.advancedConfig?.rules,
+                                      meetings: {
+                                        ...property.details?.advancedConfig?.rules?.meetings,
+                                        maxGuests: Number(e.target.value)
+                                      }
+                                    }
+                                  }
+                                } as any
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Parking */}
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-primary">🚗</div>
-                      <div>
-                        <Label className="font-semibold">Parking</Label>
-                        <p className="text-sm text-muted-foreground">Configure parking availability for tenants</p>
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="text-primary">🚗</div>
+                        <div>
+                          <Label className="font-semibold">Parking</Label>
+                          <p className="text-sm text-muted-foreground">Configure parking availability for tenants</p>
+                        </div>
                       </div>
+                      <Switch
+                        checked={(property.additionalInfo?.parking || 0) > 0}
+                        onCheckedChange={(checked) => updateProperty({
+                          additionalInfo: { 
+                            ...property.additionalInfo, 
+                            parking: checked ? 1 : 0 
+                          } as any
+                        })}
+                      />
                     </div>
-                    <Switch
-                      checked={(property.additionalInfo?.parking || 0) > 0}
-                      onCheckedChange={(checked) => updateProperty({
-                        additionalInfo: { 
-                          ...property.additionalInfo, 
-                          parking: checked ? 1 : 0 
-                        } as any
-                      })}
-                    />
+                    {(property.additionalInfo?.parking || 0) > 0 && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="parking-spaces-rooms">Number of Parking Spaces</Label>
+                          <Input
+                            id="parking-spaces-rooms"
+                            type="number"
+                            min="0"
+                            value={property.additionalInfo?.parking || 0}
+                            onChange={(e) => updateProperty({
+                              additionalInfo: { 
+                                ...property.additionalInfo, 
+                                parking: Number(e.target.value) 
+                              } as any
+                            })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="parking-desc-rooms">Parking Description</Label>
+                          <Input
+                            id="parking-desc-rooms"
+                            value={(property.additionalInfo as any)?.parkingDescription || ''}
+                            onChange={(e) => updateProperty({
+                              additionalInfo: { 
+                                ...property.additionalInfo, 
+                                parkingDescription: e.target.value 
+                              } as any
+                            })}
+                            placeholder="e.g., Covered parking spaces available for tenants"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>

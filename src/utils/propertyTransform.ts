@@ -61,10 +61,22 @@ export function transformFrontendToBackend(frontendProperty: BackendPropertyType
     },
     rules: {
       pets: frontendProperty.details?.advancedConfig?.rules?.pets || false,
+      petPolicy: (frontendProperty.details?.advancedConfig?.rules as any)?.petPolicy,
+      maxPetsPerUser: (frontendProperty.details?.advancedConfig?.rules as any)?.maxPetsPerUser,
       smoking: frontendProperty.details?.advancedConfig?.rules?.smoking || false,
+      smokingPolicy: (frontendProperty.details?.advancedConfig?.rules as any)?.smokingPolicy,
+      smokingDetails: (frontendProperty.details?.advancedConfig?.rules as any)?.smokingDetails,
       parties: false,
-      meetings: frontendProperty.details?.advancedConfig?.rules?.meetings || { allowed: false }
+      meetings: {
+        allowed: frontendProperty.details?.advancedConfig?.rules?.meetings?.allowed || false,
+        schedule: frontendProperty.details?.advancedConfig?.rules?.meetings?.schedule,
+        description: (frontendProperty.details?.advancedConfig?.rules?.meetings as any)?.description,
+        allowedDays: (frontendProperty.details?.advancedConfig?.rules?.meetings as any)?.allowedDays,
+        endTimeLimit: (frontendProperty.details?.advancedConfig?.rules?.meetings as any)?.endTimeLimit,
+        maxGuests: (frontendProperty.details?.advancedConfig?.rules?.meetings as any)?.maxGuests
+      }
     },
+    parkingDescription: (frontendProperty.additionalInfo as any)?.parkingDescription,
     contracts: frontendProperty.contracts ? {
       contractType: frontendProperty.contracts.contractType,
       customContract: frontendProperty.contracts.customContract,
@@ -118,6 +130,7 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
       area: backendProperty.area,
       parking: backendProperty.parking,
       bathrooms: backendProperty.bathrooms,
+      parkingDescription: (backendProperty as any).parkingDescription,
     },
     pricing: {
       totalPrice: backendProperty.pricing.totalPrice,
@@ -140,8 +153,19 @@ export function transformBackendToFrontend(backendProperty: BackendProperty): Ba
         enabled: true,
         rules: {
           pets: backendProperty.rules.pets,
+          petPolicy: (backendProperty.rules as any).petPolicy,
+          maxPetsPerUser: (backendProperty.rules as any).maxPetsPerUser,
           smoking: backendProperty.rules.smoking,
-          meetings: backendProperty.rules.meetings || { allowed: false },
+          smokingPolicy: (backendProperty.rules as any).smokingPolicy,
+          smokingDetails: (backendProperty.rules as any).smokingDetails,
+          meetings: {
+            allowed: backendProperty.rules.meetings?.allowed || false,
+            schedule: backendProperty.rules.meetings?.schedule,
+            description: (backendProperty.rules.meetings as any)?.description,
+            allowedDays: (backendProperty.rules.meetings as any)?.allowedDays,
+            endTimeLimit: (backendProperty.rules.meetings as any)?.endTimeLimit,
+            maxGuests: (backendProperty.rules.meetings as any)?.maxGuests
+          },
         },
         environment: {
           title: '',

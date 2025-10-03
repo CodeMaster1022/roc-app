@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Plus, MapPin, Bed, Bath, Car, DollarSign, Eye, Edit, Trash2, Home, Settings } from 'lucide-react'
+import { Plus, Eye, Edit, Trash2, Home, MapPin, Calendar, Users } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Property } from '@/types/property'
 import { AddUnitModal } from './AddUnitModal'
@@ -42,6 +42,21 @@ export const PropertiesSection = () => {
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
   const { toast } = useToast();
+
+  // Helper function to format property name
+  const formatPropertyName = (property: Property): string => {
+    // Step 2: Property type (casa = House, departamento = Apartment)
+    const propertyTypeText = property.propertyType === 'casa' ? 'House' : 'Apartment';
+    
+    // Step 1: Check if rented by rooms
+    const byRoomsText = property.type === 'rooms' ? ' by rooms' : '';
+    
+    // Step 3: Zone from location
+    const zone = property.location.zone || property.location.address;
+    
+    // Format: [PropertyType] [by rooms if applicable] in [Zone]
+    return `${propertyTypeText}${byRoomsText} in ${zone}`;
+  };
 
   // Load properties on component mount
   useEffect(() => {
@@ -204,72 +219,50 @@ export const PropertiesSection = () => {
               <div className="grid gap-4 md:gap-6">
                 {properties.map((property) => (
             <Card key={property.id} className="animate-slide-up hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3 md:pb-4">
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
-                  {/* Property Image */}
-                  <div className="w-full sm:w-32 h-24 sm:h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                    {property.details?.photos && property.details.photos.length > 0 ? (
-                      <img 
-                        src={property.details.photos[0]} 
-                        alt={property.details.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`w-full h-full bg-muted flex items-center justify-center ${property.details?.photos && property.details.photos.length > 0 ? 'hidden' : ''}`}>
-                      <Home className="w-8 h-8 text-muted-foreground" />
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Home className="w-5 h-5" />
+                      <CardTitle className="text-lg font-semibold">
+                        {formatPropertyName(property)}
+                      </CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      <span>{property.location.address}</span>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2 flex-1">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      {property.details.name}
-                      <Badge className={statusColors[property.status]}>
-                        {statusLabels[property.status]}
-                      </Badge>
-                    </CardTitle>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {property.location.address}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    {(property.status === 'draft' || property.status === 'review') && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => property.id && navigate(`/properties/${property.id}/configure`)}
-                        className="bg-gradient-to-r from-purple-600 to-purple-800"
-                      >
-                        <Settings className="w-4 h-4 mr-1" />
-                        Finish Configuration
-                      </Button>
-                    )}
+                  {/* {(property.status === 'draft' || property.status === 'review') && (
                     <Button
-                      variant="outline"
+                      variant="link"
+                      size="sm"
+                      onClick={() => property.id && navigate(`/properties/${property.id}/configure`)}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Finish Configuration
+                    </Button>
+                  )} */}
+                  <div className="flex gap-2 ml-auto">
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleViewDetails(property)}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(property)}
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => property.id && handleDeleteProperty(property.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -277,39 +270,85 @@ export const PropertiesSection = () => {
                 </div>
               </CardHeader>
               
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Bed className="w-4 h-4 text-muted-foreground" />
-                    <span>{property.additionalInfo.area}m²</span>
+              <CardContent className="pt-0 space-y-4">
+                {/* Two Column Grid */}
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Left Column */}
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Type</p>
+                      <p className="text-sm font-semibold">
+                        {property.type === 'rooms' ? 'Room Rental' : 'Complete Property'}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Price</p>
+                      <p className="text-sm font-semibold text-purple-600">
+                        {property.type === 'rooms' && property.rooms.length > 0 ? (
+                          (() => {
+                            const prices = property.rooms.map(r => r.price || 0).filter(p => p > 0);
+                            if (prices.length === 0) return 'Not set';
+                            const minPrice = Math.min(...prices);
+                            const maxPrice = Math.max(...prices);
+                            return `$${minPrice.toLocaleString()} - $${maxPrice.toLocaleString()}`;
+                          })()
+                        ) : (
+                          property.pricing.totalPrice ? `$${property.pricing.totalPrice.toLocaleString()}` : 'Not set'
+                        )}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Bed className="w-4 h-4 text-muted-foreground" />
-                    <span>{property.rooms.length} rooms</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Bath className="w-4 h-4 text-muted-foreground" />
-                    <span>{property.additionalInfo.bathrooms}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Car className="w-4 h-4 text-muted-foreground" />
-                    <span>{property.additionalInfo.parking}</span>
+
+                  {/* Right Column */}
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Rooms</p>
+                      <p className="text-sm font-semibold">
+                        {property.type === 'rooms' ? property.rooms.length : (property.additionalInfo.bedrooms || 'Not set')}
+                      </p>
+                    </div>
+                    
+                    {property.type === 'rooms' && property.rooms.length > 0 && (
+                      <div className="flex items-center gap-2 text-sm font-semibold">
+                        <Users className="w-4 h-4" />
+                        <span>{property.rooms.filter(r => r.availableFrom).length} available</span>
+                      </div>
+                    )}
+                    
+                    {property.type === 'property' && (
+                      <div>
+                        <Badge className={statusColors[property.status]}>
+                          {statusLabels[property.status]}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-lg font-semibold">
-                    <DollarSign className="w-5 h-5" />
-                    <span>${property.pricing.totalPrice?.toLocaleString()}</span>
-                    <span className="text-sm text-muted-foreground">
-                      /{property.pricing.rentalType}
-                    </span>
-                  </div>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    {property.type === 'rooms' ? 'Rooms' : 'Property'}
-                  </div>
+
+                {/* Available From */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    Available from: {
+                      property.type === 'rooms' && property.rooms.length > 0 
+                        ? (property.rooms[0].availableFrom 
+                            ? new Date(property.rooms[0].availableFrom).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })
+                            : 'Not set')
+                        : 'Not set'
+                    }
+                  </span>
                 </div>
+
+                {/* Finish Configuration Button */}
+                {(property.status === 'draft' || property.status === 'review') && (
+                  <Button
+                    onClick={() => property.id && navigate(`/properties/${property.id}/configure`)}
+                    className="w-[150px] bg-purple-800 hover:from-purple-700 hover:to-purple-900"
+                  >
+                    Finish Configuration
+                  </Button>
+                )}
               </CardContent>
                   </Card>
                 ))

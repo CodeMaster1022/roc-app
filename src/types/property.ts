@@ -49,6 +49,7 @@ export interface Property {
     parking: number;
     bathrooms: number;
     bedrooms?: number; // For complete properties
+    parkingDescription?: string;
   };
   pricing: {
     totalPrice?: number;
@@ -72,11 +73,19 @@ export interface Property {
       enabled: boolean;
       rules: {
         pets: boolean;
+        petPolicy?: string;
+        maxPetsPerUser?: number;
         smoking: boolean;
+        smokingPolicy?: string;
+        smokingDetails?: string;
         parties?: boolean; // Add parties field
         meetings: {
           allowed: boolean; 
           schedule?: string;
+          description?: string;
+          allowedDays?: string[];
+          endTimeLimit?: string;
+          maxGuests?: number;
         };
       };
       environment: {
