@@ -6,7 +6,6 @@ import { RocButton } from "@/components/ui/roc-button"
 import { ContractDurationStep } from "./steps/ContractDurationStep"
 import { OccupancyDateStep } from "./steps/OccupancyDateStep"
 import { OccupationTypeStep } from "./steps/OccupationTypeStep"
-import { ContactInfoStep } from "./steps/ContactInfoStep"
 import { StudentFlow } from "./flows/StudentFlow"
 import { ProfessionalFlow } from "./flows/ProfessionalFlow"
 import { EntrepreneurFlow } from "./flows/EntrepreneurFlow"
@@ -108,9 +107,8 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
   const nextStep = () => setCurrentStep(prev => prev + 1)
   const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1))
   
-  // Check if we need to collect phone number
-  const needsPhoneNumber = !applicationData.phone || applicationData.phone.trim() === ''
-  const totalSteps = needsPhoneNumber ? 5 : 4
+  // Total steps: Contract Duration, Occupancy Date, Occupation Type, Occupation-specific Flow
+  const totalSteps = 4
 
   const handleClose = () => {
     setCurrentStep(1)
@@ -129,11 +127,9 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
       throw new Error('Missing required application data')
     }
 
-    // Validate phone number
-    const phoneValue = data.phone || user?.profile?.phone || ''
-    if (!phoneValue || phoneValue === 'N/A' || phoneValue.trim() === '') {
-      throw new Error('Phone number is required for application submission')
-    }
+    // Get phone number from user profile or application data
+    // Use user's profile phone if available, otherwise use a placeholder
+    const phoneValue = data.phone || user?.profile?.phone || user?.email || 'Not provided'
 
     // Upload files and get URLs
     const uploadedFiles: Record<string, string> = {}
@@ -372,21 +368,7 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
           />
         )
       case 4:
-        // Show phone collection step if needed
-        if (needsPhoneNumber) {
-          return (
-            <ContactInfoStep
-              phone={applicationData.phone || ''}
-              onPhoneChange={(phone) => updateApplicationData({ phone })}
-              onNext={nextStep}
-              onBack={prevStep}
-            />
-          )
-        }
-        // Fall through to occupation-specific flow if phone is already available
-        return renderOccupationFlow()
-      case 5:
-        // Only render occupation flow if we're at step 5 (after phone collection)
+        // Go directly to occupation-specific flow (no phone collection step)
         return renderOccupationFlow()
       default:
         return null

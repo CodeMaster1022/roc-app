@@ -167,13 +167,29 @@ const PropertiesPage = () => {
     navigate(-1)
   }
 
-  const FilterContent = () => (
-    <FilterSection
-      currentFilter={currentFilter}
-      onFilterChange={setCurrentFilter}
-      isMobile={isMobile}
-    />
-  );
+  const FilterContent = () => {
+    // Determine which filter options to hide based on current filter
+    let hideOptions: string[] = []
+    
+    if (isMobile) {
+      // On mobile, hide irrelevant options when viewing specific types
+      if (currentFilter === 'propiedad') {
+        hideOptions = ['ambas', 'habitacion'] // Hide "Both" and "Rooms" when viewing Properties
+      } else if (currentFilter === 'habitacion') {
+        hideOptions = ['ambas', 'propiedad'] // Hide "Both" and "Properties" when viewing Rooms
+      }
+      // When currentFilter is 'ambas', don't hide any options
+    }
+
+    return (
+      <FilterSection
+        currentFilter={currentFilter}
+        onFilterChange={setCurrentFilter}
+        isMobile={isMobile}
+        hideOptions={hideOptions}
+      />
+    )
+  };
 
   return (
     <div className="min-h-screen bg-background">

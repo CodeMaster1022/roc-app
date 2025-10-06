@@ -5,20 +5,25 @@ interface FilterSectionProps {
   currentFilter: "ambas" | "propiedad" | "habitacion"
   onFilterChange: (filter: "ambas" | "propiedad" | "habitacion") => void
   isMobile?: boolean
+  hideOptions?: string[] // Array of filter values to hide
 }
 
 const FilterSection = ({ 
   currentFilter, 
   onFilterChange,
-  isMobile = false
+  isMobile = false,
+  hideOptions = []
 }: FilterSectionProps) => {
   const { t } = useLanguage()
   
-  const filterOptions = [
+  const allFilterOptions = [
     { value: "ambas" as const, label: t('filter.both') },
     { value: "propiedad" as const, label: t('filter.property') },
     { value: "habitacion" as const, label: t('filter.room') }
   ]
+
+  // Filter out hidden options
+  const filterOptions = allFilterOptions.filter(option => !hideOptions.includes(option.value))
 
   return (
     <div className="space-y-4">
