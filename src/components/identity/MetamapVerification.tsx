@@ -245,6 +245,7 @@ export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
     }
 
     if (currentStep === 'guardian') {
+      // Guardian verification complete, now verify student
       setVerificationResults(prev => ({ ...prev, guardian: verificationResult }))
       setCurrentStep('student')
       toast({
@@ -252,20 +253,35 @@ export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
         description: 'Guardian identity verified successfully. Now please verify the student identity.',
       })
     } else {
-      setVerificationResults(prev => ({ ...prev, student: verificationResult }))
-      
-      // If we have both verifications (for student with guardian), complete the process
-      if (applicationType === 'student' && paymentResponsible === 'guardian' && verificationResults.guardian) {
-        onVerificationComplete({
-          ...verificationResult,
-          metadata: {
-            ...verificationResult.metadata,
-            guardianVerification: verificationResults.guardian
-          }
-        })
-      } else {
-        onVerificationComplete(verificationResult)
-      }
+      // Student verification complete
+      setVerificationResults(prev => {
+        const updatedResults = { ...prev, student: verificationResult }
+        
+        // Check if this is a student with guardian flow and we have both verifications
+        if (applicationType === 'student' && paymentResponsible === 'guardian' && updatedResults.guardian) {
+          // Both verifications complete, proceed with combined data
+          toast({
+            title: 'All Verifications Complete!',
+            description: 'Both guardian and student identities verified successfully. Submitting your application...',
+          })
+          onVerificationComplete({
+            ...verificationResult,
+            metadata: {
+              ...verificationResult.metadata,
+              guardianVerification: updatedResults.guardian
+            }
+          })
+        } else {
+          // Single verification complete, proceed
+          toast({
+            title: 'Verification Complete!',
+            description: 'Identity verification successful. Submitting your application...',
+          })
+          onVerificationComplete(verificationResult)
+        }
+        
+        return updatedResults
+      })
     }
   }
 
