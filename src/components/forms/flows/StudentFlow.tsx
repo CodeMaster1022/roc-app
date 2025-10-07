@@ -16,9 +16,11 @@ interface StudentFlowProps {
   onBack: () => void
   onComplete: () => void
   property: Property
+  onHideModal?: () => void
+  onShowModal?: () => void
 }
 
-export const StudentFlow = ({ applicationData, updateData, onBack, onComplete, property }: StudentFlowProps) => {
+export const StudentFlow = ({ applicationData, updateData, onBack, onComplete, property, onHideModal, onShowModal }: StudentFlowProps) => {
   const [currentSubStep, setCurrentSubStep] = useState(1)
 
   const nextSubStep = () => setCurrentSubStep(prev => prev + 1)
@@ -293,6 +295,8 @@ export const StudentFlow = ({ applicationData, updateData, onBack, onComplete, p
               onComplete()
             }}
             onBack={prevSubStep}
+            onHideModal={onHideModal}
+            onShowModal={onShowModal}
           />
         )
 

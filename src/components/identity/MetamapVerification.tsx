@@ -27,6 +27,8 @@ interface MetamapVerificationProps {
   onVerificationComplete: (result: MetamapVerificationResult) => void
   onBack: () => void
   isLoading?: boolean
+  onHideModal?: () => void
+  onShowModal?: () => void
 }
 
 export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
@@ -34,7 +36,9 @@ export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
   paymentResponsible,
   onVerificationComplete,
   onBack,
-  isLoading = false
+  isLoading = false,
+  onHideModal,
+  onShowModal
 }) => {
   const { toast } = useToast()
   const { t } = useLanguage()
@@ -188,20 +192,26 @@ export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
       }
       metamapButton.setAttribute('metadata', JSON.stringify(metadata))
 
-      // Event listeners
-      metamapButton.addEventListener('metamap:userStartedSdk', () => {
-        setVerificationInProgress(true)
-        setLoadingMessage('Verification in progress...')
-      })
+        // Event listeners
+        metamapButton.addEventListener('metamap:userStartedSdk', () => {
+          setVerificationInProgress(true)
+          setLoadingMessage('Verification in progress...')
+          // Hide the rental modal when Metamap opens
+          onHideModal?.()
+        })
 
       metamapButton.addEventListener('metamap:userFinishedSdk', (event: any) => {
         setVerificationInProgress(false)
+        // Show the rental modal again after verification
+        onShowModal?.()
         handleVerificationComplete(event.detail)
       })
 
       metamapButton.addEventListener('metamap:userCancelledSdk', () => {
         setVerificationInProgress(false)
         setLoadingMessage('Verification cancelled')
+        // Show the rental modal again after cancellation
+        onShowModal?.()
         handleVerificationCancelled()
       })
 
@@ -269,6 +279,8 @@ export const MetamapVerification: React.FC<MetamapVerificationProps> = ({
 
   const handleVerificationError = (error: any) => {
     console.error('Metamap verification error:', error)
+    // Show the rental modal again after error
+    onShowModal?.()
     toast({
       title: 'Verification Error',
       description: 'There was an error during identity verification. Please try again.',

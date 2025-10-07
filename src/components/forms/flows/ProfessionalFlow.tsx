@@ -19,9 +19,11 @@ interface ProfessionalFlowProps {
   onBack: () => void
   onComplete: () => void
   property: Property
+  onHideModal?: () => void
+  onShowModal?: () => void
 }
 
-export const ProfessionalFlow = ({ applicationData, updateData, onBack, onComplete, property }: ProfessionalFlowProps) => {
+export const ProfessionalFlow = ({ applicationData, updateData, onBack, onComplete, property, onHideModal, onShowModal }: ProfessionalFlowProps) => {
   const [currentSubStep, setCurrentSubStep] = useState(1)
 
   const nextSubStep = () => setCurrentSubStep(prev => prev + 1)
@@ -145,6 +147,8 @@ export const ProfessionalFlow = ({ applicationData, updateData, onBack, onComple
               onComplete()
             }}
             onBack={prevSubStep}
+            onHideModal={onHideModal}
+            onShowModal={onShowModal}
           />
         )
 

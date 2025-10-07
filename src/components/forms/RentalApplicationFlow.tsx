@@ -87,6 +87,7 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showAuthPrompt, setShowAuthPrompt] = useState(false)
+  const [modalVisible, setModalVisible] = useState(true)
   const [applicationData, setApplicationData] = useState<ApplicationData>({
     contractDuration: null,
     occupancyDate: null,
@@ -407,6 +408,8 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
             onBack={prevStep}
             onComplete={handleSubmitApplication}
             property={property}
+            onHideModal={() => setModalVisible(false)}
+            onShowModal={() => setModalVisible(true)}
           />
         )
       case 'professional':
@@ -417,6 +420,8 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
             onBack={prevStep}
             onComplete={handleSubmitApplication}
             property={property}
+            onHideModal={() => setModalVisible(false)}
+            onShowModal={() => setModalVisible(true)}
           />
         )
       case 'entrepreneur':
@@ -427,6 +432,8 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
             onBack={prevStep}
             onComplete={handleSubmitApplication}
             property={property}
+            onHideModal={() => setModalVisible(false)}
+            onShowModal={() => setModalVisible(true)}
           />
         )
       default:
@@ -436,7 +443,7 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
+      <Dialog open={isOpen && modalVisible} onOpenChange={handleClose}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('apply_to_rent')}</DialogTitle>

@@ -16,9 +16,11 @@ interface EntrepreneurFlowProps {
   onBack: () => void
   onComplete: () => void
   property: Property
+  onHideModal?: () => void
+  onShowModal?: () => void
 }
 
-export const EntrepreneurFlow = ({ applicationData, updateData, onBack, onComplete, property }: EntrepreneurFlowProps) => {
+export const EntrepreneurFlow = ({ applicationData, updateData, onBack, onComplete, property, onHideModal, onShowModal }: EntrepreneurFlowProps) => {
   const [currentSubStep, setCurrentSubStep] = useState(1)
 
   const nextSubStep = () => setCurrentSubStep(prev => prev + 1)
@@ -110,6 +112,8 @@ export const EntrepreneurFlow = ({ applicationData, updateData, onBack, onComple
               onComplete()
             }}
             onBack={prevSubStep}
+            onHideModal={onHideModal}
+            onShowModal={onShowModal}
           />
         )
 
