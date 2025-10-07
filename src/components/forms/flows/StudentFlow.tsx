@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { IncomeStep } from "../steps/IncomeStep"
-import { KYCStep } from "../steps/KYCStep"
+import { MetamapVerification, type MetamapVerificationResult } from "@/components/identity/MetamapVerification"
 import type { ApplicationData } from "../RentalApplicationFlow"
 import type { Property } from "@/types/unified-property"
 
@@ -266,21 +266,33 @@ export const StudentFlow = ({ applicationData, updateData, onBack, onComplete, p
 
       case 5:
         return (
-          <KYCStep
+          <MetamapVerification
             applicationType="student"
             paymentResponsible={applicationData.paymentResponsible!}
-            idDocument={applicationData.idDocument}
-            videoSelfie={applicationData.videoSelfie}
-            guardianIdDocument={applicationData.guardianIdDocument}
-            idDocumentUrl={applicationData.idDocumentUrl}
-            videoSelfieUrl={applicationData.videoSelfieUrl}
-            guardianIdDocumentUrl={applicationData.guardianIdDocumentUrl}
-            onIdDocumentChange={(file, url) => updateData({ idDocument: file, idDocumentUrl: url })}
-            onVideoSelfieChange={(file, url) => updateData({ videoSelfie: file, videoSelfieUrl: url })}
-            onGuardianIdDocumentChange={(file, url) => updateData({ guardianIdDocument: file, guardianIdDocumentUrl: url })}
-            onSubmit={onComplete}
+            onVerificationComplete={(result: MetamapVerificationResult) => {
+              // Update application data with Metamap verification results
+              if (result.metadata?.guardianVerification) {
+                updateData({
+                  metamapVerificationId: result.verificationId,
+                  metamapIdentityId: result.identityId,
+                  metamapVerificationStatus: result.status,
+                  metamapVerificationData: result.metadata,
+                  metamapGuardianVerificationId: result.metadata.guardianVerification.verificationId,
+                  metamapGuardianIdentityId: result.metadata.guardianVerification.identityId,
+                  metamapGuardianVerificationStatus: result.metadata.guardianVerification.status,
+                  metamapGuardianVerificationData: result.metadata.guardianVerification.metadata
+                })
+              } else {
+                updateData({
+                  metamapVerificationId: result.verificationId,
+                  metamapIdentityId: result.identityId,
+                  metamapVerificationStatus: result.status,
+                  metamapVerificationData: result.metadata
+                })
+              }
+              onComplete()
+            }}
             onBack={prevSubStep}
-            property={property}
           />
         )
 

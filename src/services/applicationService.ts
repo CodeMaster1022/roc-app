@@ -38,9 +38,19 @@ export interface ApplicationData {
   businessDescription?: string;
   businessWebsite?: string;
   
-  // KYC documents
+  // KYC documents (legacy)
   idDocument?: string; // URL to uploaded document
   videoSelfie?: string; // URL to uploaded video
+  
+  // Metamap verification
+  metamapVerificationId?: string;
+  metamapIdentityId?: string;
+  metamapVerificationStatus?: 'pending' | 'completed' | 'failed' | 'cancelled';
+  metamapVerificationData?: any;
+  metamapGuardianVerificationId?: string;
+  metamapGuardianIdentityId?: string;
+  metamapGuardianVerificationStatus?: 'pending' | 'completed' | 'failed' | 'cancelled';
+  metamapGuardianVerificationData?: any;
 }
 
 export interface Application {

@@ -1,0 +1,78 @@
+/* Metamap Button Styling */
+.metamap-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+
+/* Ensure Metamap button is responsive */
+metamap-button {
+  width: 100% !important;
+  max-width: 400px !important;
+  min-height: 50px !important;
+  border-radius: 8px !important;
+  font-family: inherit !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .metamap-button-container {
+    padding: 0 16px;
+  }
+  
+  metamap-button {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 48px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  metamap-button {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+  
+  metamap-button:hover {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+}
+
+/* Light mode styling */
+@media (prefers-color-scheme: light) {
+  metamap-button {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    border: 1px solid hsl(var(--primary)) !important;
+  }
+  
+  metamap-button:hover {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+}
+
+/* Loading state */
+metamap-button[disabled] {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Focus states for accessibility */
+metamap-button:focus {
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+}
+
+/* Ensure proper z-index for modal content */
+.metamap-button-container {
+  position: relative;
+  z-index: 10;
+}

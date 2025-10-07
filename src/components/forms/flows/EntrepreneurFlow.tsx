@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { IncomeStep } from "../steps/IncomeStep"
-import { KYCStep } from "../steps/KYCStep"
+import { MetamapVerification, type MetamapVerificationResult } from "@/components/identity/MetamapVerification"
 import type { ApplicationData } from "../RentalApplicationFlow"
 import type { Property } from "@/types/unified-property"
 
@@ -98,17 +98,18 @@ export const EntrepreneurFlow = ({ applicationData, updateData, onBack, onComple
 
       case 3:
         return (
-          <KYCStep
+          <MetamapVerification
             applicationType="entrepreneur"
-            idDocument={applicationData.idDocument}
-            videoSelfie={applicationData.videoSelfie}
-            idDocumentUrl={applicationData.idDocumentUrl}
-            videoSelfieUrl={applicationData.videoSelfieUrl}
-            onIdDocumentChange={(file, url) => updateData({ idDocument: file, idDocumentUrl: url })}
-            onVideoSelfieChange={(file, url) => updateData({ videoSelfie: file, videoSelfieUrl: url })}
-            onSubmit={onComplete}
+            onVerificationComplete={(result: MetamapVerificationResult) => {
+              updateData({
+                metamapVerificationId: result.verificationId,
+                metamapIdentityId: result.identityId,
+                metamapVerificationStatus: result.status,
+                metamapVerificationData: result.metadata
+              })
+              onComplete()
+            }}
             onBack={prevSubStep}
-            property={property}
           />
         )
 

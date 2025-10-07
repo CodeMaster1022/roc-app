@@ -9,6 +9,7 @@ import { OccupationTypeStep } from "./steps/OccupationTypeStep"
 import { StudentFlow } from "./flows/StudentFlow"
 import { ProfessionalFlow } from "./flows/ProfessionalFlow"
 import { EntrepreneurFlow } from "./flows/EntrepreneurFlow"
+import { MetamapVerification, type MetamapVerificationResult } from "@/components/identity/MetamapVerification"
 import type { Property } from "@/types/unified-property"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
@@ -51,7 +52,7 @@ export interface ApplicationData {
   businessDescription?: string
   businessWebsite?: string
   
-  // KYC documents
+  // KYC documents (legacy - for backward compatibility)
   idDocument?: File
   videoSelfie?: File
   guardianIdDocument?: File
@@ -60,6 +61,16 @@ export interface ApplicationData {
   idDocumentUrl?: string
   videoSelfieUrl?: string
   guardianIdDocumentUrl?: string
+  
+  // Metamap verification
+  metamapVerificationId?: string
+  metamapIdentityId?: string
+  metamapVerificationStatus?: 'pending' | 'completed' | 'failed' | 'cancelled'
+  metamapVerificationData?: any
+  metamapGuardianVerificationId?: string
+  metamapGuardianIdentityId?: string
+  metamapGuardianVerificationStatus?: 'pending' | 'completed' | 'failed' | 'cancelled'
+  metamapGuardianVerificationData?: any
 }
 
 interface RentalApplicationFlowProps {
@@ -248,10 +259,20 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
       businessDescription: data.businessDescription,
       businessWebsite: data.businessWebsite,
       
-      // KYC documents (URLs after upload)
+      // KYC documents (URLs after upload - legacy)
       idDocument: data.idDocumentUrl || uploadedFiles.idDocument,
       videoSelfie: data.videoSelfieUrl || uploadedFiles.videoSelfie,
-      guardianIdDocument: data.guardianIdDocumentUrl || uploadedFiles.guardianIdDocument
+      guardianIdDocument: data.guardianIdDocumentUrl || uploadedFiles.guardianIdDocument,
+      
+      // Metamap verification data
+      metamapVerificationId: data.metamapVerificationId,
+      metamapIdentityId: data.metamapIdentityId,
+      metamapVerificationStatus: data.metamapVerificationStatus,
+      metamapVerificationData: data.metamapVerificationData,
+      metamapGuardianVerificationId: data.metamapGuardianVerificationId,
+      metamapGuardianIdentityId: data.metamapGuardianIdentityId,
+      metamapGuardianVerificationStatus: data.metamapGuardianVerificationStatus,
+      metamapGuardianVerificationData: data.metamapGuardianVerificationData
     }
   }
 
