@@ -893,9 +893,9 @@ const translations = {
   },
   en: {
     // Navigation
-    'nav.inicio': 'Properties',
+    'nav.inicio': 'Home',
     'nav.favoritos': 'Favorites',
-    'nav.hogar': 'My Home',
+    'nav.hogar': 'Household',
     'nav.perfil': 'Profile',
     'details.house_rules': 'House Rules & Policies',
     'details.back_button': 'Back',

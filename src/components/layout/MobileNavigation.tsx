@@ -43,7 +43,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
     if (action === 'profile') {
       onSectionChange('perfil')
     } else {
-      navigate('/hoster/signup')
+      window.open('/hoster/signup', '_blank', 'noopener,noreferrer')
     }
     setShowProfileMenu(false)
   }
@@ -149,7 +149,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
                 </button>
                 <button
                   onClick={() => {
-                    navigate('/hoster/signup')
+                    window.open('/hoster/signup', '_blank', 'noopener,noreferrer')
                     setShowProfileMenu(false)
                   }}
                   className="flex items-center gap-3 p-4 text-left hover:bg-muted rounded-lg transition-colors"

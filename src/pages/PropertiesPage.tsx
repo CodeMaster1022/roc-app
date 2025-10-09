@@ -210,9 +210,9 @@ const PropertiesPage = () => {
                 {isAuthenticated ? (
                   // Authenticated user navigation
                   [
-                    { id: "hogar", label: t('nav.hogar') },
                     { id: "inicio", label: t('nav.inicio') },
-                    { id: "favoritos", label: t('nav.favoritos') }
+                    { id: "favoritos", label: t('nav.favoritos') },
+                    { id: "hogar", label: t('nav.hogar') }
                   ].map((item) => (
                     <button
                       key={item.id}

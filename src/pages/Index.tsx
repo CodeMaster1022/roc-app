@@ -716,9 +716,9 @@ const Index = () => {
                 <nav className="flex space-x-6">
                   {/* Navigation - same for all users to maintain product feel */}
                   {[
-                    { id: "hogar", label: t('nav.hogar') },
                     { id: "inicio", label: t('nav.inicio') },
-                    { id: "favoritos", label: t('nav.favoritos') }
+                    { id: "favoritos", label: t('nav.favoritos') },
+                    { id: "hogar", label: t('nav.hogar') }
                   ].map((item) => (
                     <button
                       key={item.id}
@@ -793,7 +793,7 @@ const Index = () => {
                           <LogIn className="mr-2 h-4 w-4" />
                           Sign In / Sign Up
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/hoster/signup')}>
+                        <DropdownMenuItem onClick={() => window.open('/hoster/signup', '_blank', 'noopener,noreferrer')}>
                           <Building className="mr-2 h-4 w-4" />
                           Register Property
                         </DropdownMenuItem>
