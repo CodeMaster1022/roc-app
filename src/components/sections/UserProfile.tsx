@@ -492,7 +492,7 @@ const UserProfile = ({ onUpdateProfile }: UserProfileProps) => {
                 <span className="font-medium">{t('profile.login')}</span>
               </button>
               <button
-                onClick={() => window.open('/hoster/signup', '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open('/hoster/signin', '_blank', 'noopener,noreferrer')}
                 className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted rounded-lg transition-colors"
               >
                 <Building className="h-5 w-5 text-muted-foreground" />

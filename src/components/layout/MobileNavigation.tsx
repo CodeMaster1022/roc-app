@@ -149,7 +149,7 @@ const MobileNavigation = ({ currentSection, onSectionChange }: MobileNavigationP
                 </button>
                 <button
                   onClick={() => {
-                    window.open('/hoster/signup', '_blank', 'noopener,noreferrer')
+                    window.open('/hoster/signin', '_blank', 'noopener,noreferrer')
                     setShowProfileMenu(false)
                   }}
                   className="flex items-center gap-3 p-4 text-left hover:bg-muted rounded-lg transition-colors"

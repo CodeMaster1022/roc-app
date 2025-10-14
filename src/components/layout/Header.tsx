@@ -99,7 +99,7 @@ const Header = ({ onSearch, onFilterClick }: HeaderProps) => {
                   ) : (
                     <>
                       <DropdownMenuItem>{t('profile.login')}</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => window.open('/hoster/signup', '_blank', 'noopener,noreferrer')}>{t('profile.register_property')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.open('/hoster/signin', '_blank', 'noopener,noreferrer')}>{t('profile.register_property')}</DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />

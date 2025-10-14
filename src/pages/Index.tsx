@@ -793,7 +793,7 @@ const Index = () => {
                           <LogIn className="mr-2 h-4 w-4" />
                           Sign In / Sign Up
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open('/hoster/signup', '_blank', 'noopener,noreferrer')}>
+                        <DropdownMenuItem onClick={() => window.open('/hoster/signin', '_blank', 'noopener,noreferrer')}>
                           <Building className="mr-2 h-4 w-4" />
                           Register Property
                         </DropdownMenuItem>

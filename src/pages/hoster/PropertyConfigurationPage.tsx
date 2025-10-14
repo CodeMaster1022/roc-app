@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ const PropertyConfigurationPage = () => {
   const [contractType, setContractType] = useState<'template' | 'custom'>('template');
   const [selectedMonths, setSelectedMonths] = useState<string[]>(['12']);
   const [customContract, setCustomContract] = useState<File | null>(null);
+  const contractFileInputRef = useRef<HTMLInputElement>(null);
   const [roomModalOpen, setRoomModalOpen] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [roommateModalOpen, setRoommateModalOpen] = useState(false);
@@ -1194,6 +1195,10 @@ const PropertyConfigurationPage = () => {
                           updateProperty({
                             contracts: { ...property.contracts, contractType: 'custom' } as any
                           });
+                          // Trigger file input click after a short delay to ensure state updates
+                          setTimeout(() => {
+                            contractFileInputRef.current?.click();
+                          }, 100);
                         }}
                         className={`p-4 border-2 rounded-lg text-center transition-all ${
                           contractType === 'custom' 
@@ -1207,6 +1212,70 @@ const PropertyConfigurationPage = () => {
                       </button>
                     </div>
                   </div>
+
+                  {contractType === 'custom' && (
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors mt-4">
+                      <input
+                        ref={contractFileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+
+                          const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                          if (!allowedTypes.includes(file.type)) {
+                            toast({
+                              title: "Invalid file type",
+                              description: "Only PDF, DOC and DOCX files are allowed",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          const maxSize = 5 * 1024 * 1024;
+                          if (file.size > maxSize) {
+                            toast({
+                              title: "File too large",
+                              description: "File must be less than 5MB",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          setCustomContract(file);
+                          updateProperty({
+                            contracts: {
+                              ...property.contracts,
+                              contractType: 'custom',
+                              customContract: file.name
+                            } as any
+                          });
+                          toast({
+                            title: "Contract uploaded",
+                            description: `${file.name} uploaded successfully`,
+                          });
+                        }}
+                        className="hidden"
+                        id="contract-upload-entire"
+                      />
+                      <label htmlFor="contract-upload-entire" className="cursor-pointer">
+                        <div className="space-y-3">
+                          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto">
+                            <Upload className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {customContract ? customContract.name : 'Upload custom contract'}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              PDF, DOC or DOCX up to 5MB
+                            </p>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
           </div>
@@ -2239,6 +2308,10 @@ const PropertyConfigurationPage = () => {
                       updateProperty({
                         contracts: { ...property.contracts, contractType: 'custom' } as any
                       });
+                      // Trigger file input click after a short delay to ensure state updates
+                      setTimeout(() => {
+                        contractFileInputRef.current?.click();
+                      }, 100);
                     }}
                     className={`p-4 border-2 rounded-lg transition-all ${
                       contractType === 'custom' 
@@ -2255,6 +2328,7 @@ const PropertyConfigurationPage = () => {
                 {contractType === 'custom' && (
                   <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors mt-4">
                     <input
+                      ref={contractFileInputRef}
                       type="file"
                       accept=".pdf,.doc,.docx"
                       onChange={(e) => {
