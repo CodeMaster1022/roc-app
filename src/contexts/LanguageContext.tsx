@@ -439,6 +439,13 @@ const translations = {
     'propertyFlow.apartment': 'Departamento',
     'propertyFlow.apartment_desc': 'Unidad dentro de un edificio o complejo',
     
+    // Auto-generated titles
+    'title.house': 'Casa',
+    'title.apartment': 'Departamento',
+    'title.by_rooms': 'por habitaciones',
+    'title.in': 'en',
+    'title.room': 'Habitación',
+    
     // Property Photos Step
     'propertyFlow.property_photos': 'Fotos de la Propiedad',
     'propertyFlow.property_photos_desc': 'Sube fotos generales de la propiedad (espacios comunes, exterior, etc.)',
@@ -1302,6 +1309,13 @@ const translations = {
     'propertyFlow.house_desc': 'Independent property with garden or patio',
     'propertyFlow.apartment': 'Apartment',
     'propertyFlow.apartment_desc': 'Unit within a building or complex',
+    
+    // Auto-generated titles
+    'title.house': 'House',
+    'title.apartment': 'Apartment',
+    'title.by_rooms': 'by rooms',
+    'title.in': 'in',
+    'title.room': 'Room',
     
     // Property Photos Step
     'propertyFlow.property_photos': 'Property Photos',

@@ -45,17 +45,19 @@ export const PropertiesSection = () => {
 
   // Helper function to format property name
   const formatPropertyName = (property: Property): string => {
-    // Step 2: Property type (casa = House, departamento = Apartment)
-    const propertyTypeText = property.propertyType === 'casa' ? 'House' : 'Apartment';
+    // Use the property's name if it exists (auto-generated title)
+    if (property.details?.name) {
+      return property.details.name;
+    }
     
-    // Step 1: Check if rented by rooms
-    const byRoomsText = property.type === 'rooms' ? ' by rooms' : '';
-    
-    // Step 3: Zone from location
+    // Fallback: generate title from property data with translations
+    const propertyTypeKey = property.propertyType === 'casa' ? 'title.house' : 'title.apartment';
+    const propertyTypeText = t(propertyTypeKey) || (property.propertyType === 'casa' ? 'House' : 'Apartment');
+    const byRoomsText = property.type === 'rooms' ? ` ${t('title.by_rooms') || 'by rooms'}` : '';
     const zone = property.location.zone || property.location.address;
+    const inText = t('title.in') || 'in';
     
-    // Format: [PropertyType] [by rooms if applicable] in [Zone]
-    return `${propertyTypeText}${byRoomsText} in ${zone}`;
+    return `${propertyTypeText}${byRoomsText} ${inText} ${zone}`;
   };
 
   // Load properties on component mount

@@ -16,13 +16,16 @@ import { propertyService } from "@/services/propertyService";
 import { useToast } from "@/hooks/use-toast";
 import { Property } from "@/types/property";
 import { transformFrontendToBackend, transformBackendToFrontend } from "@/utils/propertyTransform";
+import { generatePropertyTitle, generateRoomTitle, ensurePropertyTitle } from "@/utils/titleGenerator";
 import { API_CONFIG } from "@/config/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowLeft, Save, Send, FileText, Upload, AlertCircle, Shield, Users, User, Plus, X, Minus, Home, ImageIcon, Trash2, ChevronDown } from "lucide-react";
 
 const PropertyConfigurationPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [contractType, setContractType] = useState<'template' | 'custom'>('template');
@@ -64,6 +67,21 @@ const PropertyConfigurationPage = () => {
   // Determine if this is a complete property or rooms rental
   const isCompleteProperty = property.type === 'property' || property.pricing?.rentalType === 'completa';
   const isRoomsRental = property.type === 'rooms' || property.pricing?.rentalType === 'habitaciones';
+
+  // Auto-generate property title when key information changes
+  useEffect(() => {
+    if (property.propertyType && property.location?.address) {
+      const autoTitle = generatePropertyTitle(property, t);
+      if (autoTitle !== property.details?.name) {
+        updateProperty({
+          details: {
+            ...property.details,
+            name: autoTitle
+          } as any
+        });
+      }
+    }
+  }, [property.propertyType, property.type, property.location?.zone, property.location?.address, t]);
 
   useEffect(() => {
     loadProperty();
@@ -127,9 +145,12 @@ const PropertyConfigurationPage = () => {
     try {
       setSaving(true);
       
+      // Ensure property has an auto-generated title with translation support
+      const propertyWithTitle = ensurePropertyTitle(property, t);
+      
       // Ensure contract configuration is included
       const updatedProperty = {
-        ...property,
+        ...propertyWithTitle,
         status,
         contracts: {
           ...property.contracts,
@@ -236,9 +257,10 @@ const PropertyConfigurationPage = () => {
   ];
 
   const addRoom = () => {
+    const roomIndex = property.rooms?.length || 0;
     const newRoom = {
       id: `room-${Date.now()}`,
-      name: `Room ${(property.rooms?.length || 0) + 1}`,
+      name: generateRoomTitle(roomIndex, t),
       description: '',
       characteristics: 'closet_bathroom',
       furniture: 'sin-amueblar' as const,
@@ -1387,16 +1409,18 @@ const PropertyConfigurationPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="name-rooms">Property Name</Label>
+                  <Label htmlFor="name-rooms">Property Name (Auto-generated)</Label>
                   <Input
                     id="name-rooms"
                     value={property.details?.name || ''}
-                    onChange={(e) => updateProperty({ 
-                      details: { ...property.details, name: e.target.value } as any
-                    })}
-                    placeholder="House by rooms in Rice Valley"
-                    className="bg-muted"
+                    readOnly
+                    placeholder="Auto-generated based on property details"
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
+                    title="This title is automatically generated based on property type and location"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Title is automatically generated based on property type and location
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="description-rooms">Property Description</Label>
@@ -2520,13 +2544,17 @@ const PropertyConfigurationPage = () => {
 
                   {/* Room Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="modal-room-name">Room Name</Label>
+                    <Label htmlFor="modal-room-name">Room Name (Auto-generated)</Label>
                     <Input
                       id="modal-room-name"
                       value={room.name}
-                      onChange={(e) => updateRoom(room.id, { name: e.target.value })}
-                      placeholder="Room"
+                      readOnly
+                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                      title="Room names are automatically generated (Room 1, Room 2, etc.)"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Room names are automatically generated based on room order
+                    </p>
                   </div>
 
                   {/* Room Description */}
