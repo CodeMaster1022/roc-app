@@ -14,7 +14,8 @@ import type { Property } from "@/types/unified-property"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { applicationService, type ApplicationData as BackendApplicationData } from "@/services/applicationService"
+import { applicationService, type ApplicationData as BackendApplicationData, type ApplicationDraft } from "@/services/applicationService"
+import { useApplicationProgress } from "@/hooks/useApplicationProgress"
 import AuthPromptModal from "@/components/modals/AuthPromptModal"
 import React from "react"
 
@@ -84,7 +85,6 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
   const { user, isAuthenticated } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
-  const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showAuthPrompt, setShowAuthPrompt] = useState(false)
   const [modalVisible, setModalVisible] = useState(true)
@@ -94,6 +94,66 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
     occupationType: null,
     phone: (user?.profile?.phone && user.profile.phone !== 'N/A') ? user.profile.phone : ''
   })
+
+  // Progress saving hook
+  const {
+    isLoading: isLoadingProgress,
+    isSaving,
+    hasProgress,
+    currentStep: savedCurrentStep,
+    completedSteps,
+    lastSavedAt,
+    saveProgress,
+    loadProgress,
+    deleteProgress,
+    submitDraft
+  } = useApplicationProgress({
+    propertyId: property.id,
+    isOpen,
+    onProgressLoaded: (draft: ApplicationDraft) => {
+      // Load saved data into the form
+      setApplicationData(prev => ({
+        ...prev,
+        contractDuration: draft.contractDuration || null,
+        occupancyDate: draft.occupancyDate ? new Date(draft.occupancyDate) : null,
+        occupationType: draft.occupationType || null,
+        phone: draft.phone || prev.phone,
+        university: draft.university,
+        universityEmail: draft.universityEmail,
+        paymentResponsible: draft.paymentResponsible,
+        incomeSource: draft.incomeSource,
+        incomeRange: draft.incomeRange,
+        guardianName: draft.guardianName,
+        guardianPhone: draft.guardianPhone,
+        guardianEmail: draft.guardianEmail,
+        guardianRelationship: draft.guardianRelationship,
+        guardianIncomeRange: draft.guardianIncomeRange,
+        company: draft.company,
+        startDate: draft.workStartDate ? new Date(draft.workStartDate) : undefined,
+        role: draft.role,
+        workEmail: draft.workEmail,
+        businessName: draft.businessName,
+        businessDescription: draft.businessDescription,
+        businessWebsite: draft.businessWebsite,
+        idDocumentUrl: draft.idDocument,
+        videoSelfieUrl: draft.videoSelfie,
+        guardianIdDocumentUrl: draft.guardianIdDocument,
+        metamapVerificationId: draft.metamapVerificationId,
+        metamapIdentityId: draft.metamapIdentityId,
+        metamapVerificationStatus: draft.metamapVerificationStatus,
+        metamapVerificationData: draft.metamapVerificationData,
+        metamapGuardianVerificationId: draft.metamapGuardianVerificationId,
+        metamapGuardianIdentityId: draft.metamapGuardianIdentityId,
+        metamapGuardianVerificationStatus: draft.metamapGuardianVerificationStatus,
+        metamapGuardianVerificationData: draft.metamapGuardianVerificationData
+      }));
+      
+      // Set the current step to the saved step
+      setCurrentStep(savedCurrentStep);
+    }
+  });
+
+  const [currentStep, setCurrentStep] = useState(1)
 
   // Show auth prompt if not authenticated when trying to apply
   useEffect(() => {
@@ -113,10 +173,34 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
   }
 
   const updateApplicationData = (data: Partial<ApplicationData>) => {
-    setApplicationData(prev => ({ ...prev, ...data }))
+    setApplicationData(prev => {
+      const newData = { ...prev, ...data };
+      
+      // Auto-save progress after each update
+      const newCompletedSteps = [...completedSteps];
+      if (currentStep > 1 && !newCompletedSteps.includes(currentStep - 1)) {
+        newCompletedSteps.push(currentStep - 1);
+      }
+      
+      saveProgress(currentStep, newCompletedSteps, newData);
+      
+      return newData;
+    });
   }
 
-  const nextStep = () => setCurrentStep(prev => prev + 1)
+  const nextStep = () => {
+    const newStep = currentStep + 1;
+    setCurrentStep(newStep);
+    
+    // Mark current step as completed and save progress
+    const newCompletedSteps = [...completedSteps];
+    if (!newCompletedSteps.includes(currentStep)) {
+      newCompletedSteps.push(currentStep);
+    }
+    
+    saveProgress(newStep, newCompletedSteps, applicationData);
+  }
+  
   const prevStep = () => setCurrentStep(prev => Math.max(1, prev - 1))
   
   // Total steps: Contract Duration, Occupancy Date, Occupation Type, Occupation-specific Flow
@@ -289,7 +373,14 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
 
     setIsSubmitting(true)
     try {
-      // Show uploading message
+      // If we have saved progress, submit the draft directly
+      if (hasProgress) {
+        await submitDraft()
+        handleClose()
+        return
+      }
+
+      // Otherwise, use the traditional submission flow
       toast({
         title: "Uploading Documents",
         description: "Please wait while we upload your documents...",
@@ -297,7 +388,6 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
       
       const backendData = await convertToBackendFormat(applicationData)
       
-      // Show submitting message
       toast({
         title: "Submitting Application",
         description: "Finalizing your rental application...",
@@ -451,19 +541,39 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
           
           <div className="space-y-6">
             {/* Progress indicator */}
-            <div className="flex items-center space-x-2">
-              {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-                <div
-                  key={step}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step <= currentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {step}
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+                  <div
+                    key={step}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                      step <= currentStep
+                        ? 'bg-primary text-primary-foreground'
+                        : completedSteps.includes(step)
+                        ? 'bg-green-500 text-white'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {step}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Auto-save status */}
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                {isSaving && (
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span>Saving...</span>
+                  </div>
+                )}
+                {hasProgress && lastSavedAt && !isSaving && (
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Saved</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Property info */}
@@ -475,7 +585,16 @@ export const RentalApplicationFlow = ({ isOpen, onClose, property }: RentalAppli
             </div>
 
             {/* Current step content */}
-            {renderStep()}
+            {isLoadingProgress ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading your progress...</p>
+                </div>
+              </div>
+            ) : (
+              renderStep()
+            )}
           </div>
         </DialogContent>
       </Dialog>

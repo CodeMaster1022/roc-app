@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { RentalApplicationFlow } from "@/components/forms/RentalApplicationFlow"
 import { propertyService } from "@/services/propertyService"
 import { favoriteService } from "@/services/favoriteService"
+import { applicationService } from "@/services/applicationService"
 import { transformBackendPropertyToFrontend } from "@/utils/propertyTransform"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/LanguageContext"
@@ -36,6 +37,23 @@ const PropertyDetails = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [backendProperty, setBackendProperty] = useState<any>(null)
+  const [hasSavedProgress, setHasSavedProgress] = useState(false)
+  const [savedProgressStep, setSavedProgressStep] = useState(1)
+
+  // Check for saved application progress
+  const checkSavedProgress = async (propertyId: string) => {
+    if (!isAuthenticated) return
+
+    try {
+      const response = await applicationService.getApplicationProgress(propertyId)
+      setHasSavedProgress(true)
+      setSavedProgressStep(response.data.draft.currentStep)
+    } catch (error) {
+      // No saved progress found - this is normal
+      setHasSavedProgress(false)
+      setSavedProgressStep(1)
+    }
+  }
 
 
   // Load property data and favorite status
@@ -82,6 +100,9 @@ const PropertyDetails = () => {
         } catch (favError) {
           console.warn('Failed to load favorite status:', favError)
         }
+
+        // Check for saved application progress
+        await checkSavedProgress(id)
 
       } catch (err) {
         console.error('Failed to load property:', err)
@@ -803,7 +824,13 @@ const PropertyDetails = () => {
                           onClick={() => setIsApplicationFlowOpen(true)}
                           disabled={!property?.isAvailable}
                         >
-                          {t('details.apply_to_rent_button')}
+                          {property?.isAvailable 
+                            ? (hasSavedProgress 
+                                ? `Continue Application (Step ${savedProgressStep})` 
+                                : t('details.apply_to_rent_button')
+                              ) 
+                            : t('details.not_available')
+                          }
                         </RocButton>
 
                         <div className="text-xs text-muted-foreground">
@@ -920,8 +947,19 @@ const PropertyDetails = () => {
                         onClick={() => setIsApplicationFlowOpen(true)}
                         disabled={!property?.isAvailable}
                       >
-                        {property?.isAvailable ? t('details.apply_to_rent') : t('details.not_available')}
+                        {property?.isAvailable 
+                          ? (hasSavedProgress 
+                              ? `Continue Application (Step ${savedProgressStep})` 
+                              : t('details.apply_to_rent')
+                            ) 
+                          : t('details.not_available')
+                        }
                       </RocButton>
+                      {hasSavedProgress && (
+                        <p className="text-xs text-muted-foreground mt-2 text-center">
+                          You have saved progress for this property
+                        </p>
+                      )}
                     </div>
                 </div>
 
