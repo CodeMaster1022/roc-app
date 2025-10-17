@@ -407,13 +407,14 @@ const Index = () => {
                             <p className="text-sm text-muted-foreground">Individual rooms</p>
                           </div>
                         </div>
-                        <button 
-                          onClick={() => handleViewAllClick('habitacion')}
-                          className="flex items-center gap-2 text-muted-foreground px-2"
-                        >
-                          <Filter className="h-4 w-4" />
-                          <span className="text-sm font-medium">{t('tenants.view_all')}</span>
-                        </button>  
+                        <div className="flex justify-center mt-8">
+                          <RocButton
+                            onClick={() => navigate('/properties')}
+                            className="px-8 py-3 text-lg font-semibold"
+                          >
+                            {t('tenants.view_all')}
+                          </RocButton>
+                        </div>
                       </div>
                       
                       {/* Rooms Vertical List */}
@@ -544,38 +545,52 @@ const Index = () => {
 
               {/* Grid/List de properties - Desktop only */}
               {!loading && !error && viewMode !== "map" && !isMobile && (
-                <div className={`grid gap-4 ${
-                  viewMode === "grid" 
-                    ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
-                    : "grid-cols-1"
-                }`}>
-                  {filteredProperties.map((property, index) => (
-                  <div 
-                    key={property.id} 
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <PropertyCard
-                      height="300px"
-                      id={property.id}
-                      title={property.title}
-                      image={property.image}
-                      price={property.price}
-                      type={property.type}
-                      propertyType={property.propertyType}
-                      area={property.area}
-                      bedrooms={property.bedrooms}
-                      allowsPets={property.allowsPets}
-                      bathType={property.bathType}
-                      scheme={property.scheme}
-                      isFavorite={favorites.includes(property.id)}
-                      isAvailable={property.isAvailable}
-                      onFavoriteToggle={handleFavoriteToggle}
-                      onViewDetails={handleViewDetails}
-                    />
+                <>
+                  <div className={`grid gap-4 ${
+                    viewMode === "grid" 
+                      ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
+                      : "grid-cols-1"
+                  }`}>
+                    {filteredProperties.slice(0, 6).map((property, index) => (
+                    <div 
+                      key={property.id} 
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <PropertyCard
+                        height="300px"
+                        id={property.id}
+                        title={property.title}
+                        image={property.image}
+                        price={property.price}
+                        type={property.type}
+                        propertyType={property.propertyType}
+                        area={property.area}
+                        bedrooms={property.bedrooms}
+                        allowsPets={property.allowsPets}
+                        bathType={property.bathType}
+                        scheme={property.scheme}
+                        isFavorite={favorites.includes(property.id)}
+                        isAvailable={property.isAvailable}
+                        onFavoriteToggle={handleFavoriteToggle}
+                        onViewDetails={handleViewDetails}
+                      />
+                    </div>
+                    ))}
                   </div>
-                  ))}
-                </div>
+                  
+                  {/* View All Button - Only show if there are more than 6 properties */}
+                  {filteredProperties.length > 6 && (
+                    <div className="flex justify-center mt-8">
+                      <RocButton
+                        onClick={() => navigate('/properties')}
+                        className="px-8 py-3 text-lg font-semibold"
+                      >
+                        {t('tenants.view_all')}
+                      </RocButton>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* Empty state */}
@@ -655,12 +670,12 @@ const Index = () => {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row pb-6 justify-center mx-auto ">
-                          <button 
+                          <RocButton 
                             className="px-8 py-1 text-lg font-semibold bg-primary text-white rounded-sm"
                             onClick={() => navigate('/properties')}
                           >
                             View All
-                          </button>
+                          </RocButton>
                         </div>
                       </div>
                     </div>
